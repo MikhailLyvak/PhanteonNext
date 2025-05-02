@@ -1,0 +1,11 @@
+/* Default background for large screens */
+header section {
+  background-image: url('/Header/FullBG.jpg');
+}
+
+/* For small screens (phones), use FullBGPhone.png */
+@media (max-width: 639px) {
+  header section {
+    background-image: url('/Header/FullBGPhone.png');
+  }
+}
