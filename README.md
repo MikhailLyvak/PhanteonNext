@@ -7,3 +7,6 @@ yarn dev // Щоб запустити сервер
 
 ```
 # PhanteonNext
+
+v 1.0
+
