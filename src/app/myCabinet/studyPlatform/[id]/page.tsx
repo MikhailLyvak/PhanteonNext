@@ -45,9 +45,8 @@ const CourseDetail = () => {
 
   return (
     <>
-      <InnerWhiteHeader />
-      <div className="min-h-screen bg-[#171723]">
-        <div className="max-w-7xl mx-auto pt-[83px] lg:pt-[135px] px-4">
+      <div className="min-h-screen bg-[#171723] pt-2">
+        <div className="max-w-7xl mx-auto px-4">
           {/* ✅ First Row: Breadcrumbs */}
           <div className="my-8">
             <nav className="flex items-center" aria-label="Breadcrumb">
@@ -89,11 +88,7 @@ const CourseDetail = () => {
               </div>
 
               <p className="text-white mb-12">
-                Lorem ipsum dolor sit amet consectetur. Enim fusce sit cursus commodo
-                purus mattis faucibus id. Tellus tristique faucibus viverra dignissim
-                commodo egestas. Faucibus orci enim sed vulputate at dui congue at proin.
-                Dui ut aenean tincidunt et libero proin dictumst id elementum. Iaculis
-                vivamus gravida molestie lacus pellentesque. Diam integer dui tellus est.
+                {data?.description}
               </p>
             </div>
 
@@ -117,68 +112,76 @@ const CourseDetail = () => {
 
           <div className="flex items-center gap-6">
             <div className="w-full">
-              {data?.mine ? (
-                <>
-                  <div className="mx-2 md:mx-0">
-                    <div className="flex items-end max-md:justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 mt-6 md:mt-11 justify-between w-full">
-                        <div className="flex items-center gap-2 ">
-                          <div className=" text-gray-200 text-base md:text-lg">Ваш прогрес навчання: </div>
-                          <div className="text-base text-gray-200 md:text-xl font-bold">{data?.course_progress}%</div>
-                        </div>
-                        <div className="text-gray-200 text-base md:text-lg flex items-center gap-2">
-                          <LuCheck size={20} />
-                          <div>Придбано</div>
-                        </div>
-                      </div>
+              <>
+                <div className="mx-2 md:mx-0">
+                  <div className="flex items-end max-md:justify-between gap-2 mb-2">
 
-                    </div>
-                    <div className="relative w-full h-[14px] rounded-full bg-gray-700 overflow-hidden md:mx-0 mt-7">
-                      <div
-                        className="absolute top-0 left-0 h-full bg-[#D2D2FF] rounded-full transition-all"
-                        style={{ width: `${data?.course_progress}%` }}
-                      />
-                    </div>
+
+
+                    {data?.mine ? (
+                      <>
+                        <div className="flex items-center gap-2 mt-6 md:mt-11 justify-between w-full">
+                          <div className="flex items-center gap-2 ">
+                            <div className=" text-gray-200 text-base md:text-lg">Ваш прогрес навчання: </div>
+                            <div className="text-base text-gray-200 md:text-xl font-bold">{data?.course_progress}%</div>
+                          </div>
+                          <div className="text-gray-200 text-base md:text-lg flex items-center gap-2">
+                            <LuCheck size={20} />
+                            <div>Придбано</div>
+                          </div>
+                        </div>
+                        <div className="relative w-full h-[14px] rounded-full bg-gray-700 overflow-hidden md:mx-0 mt-7">
+                          <div
+                            className="absolute top-0 left-0 h-full bg-[#D2D2FF] rounded-full transition-all"
+                            style={{ width: `${data?.course_progress}%` }}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex max-lg:flex-col items-center gap-6">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            {data?.discount ? (
+                              <span className="text-white text-4xl line-through">{data?.price} $</span>
+                            ) : null}
+                            <span className="text-white text-4xl font-semibold">{data?.sell_price} $</span>
+                          </div>
+                          <p className="text-white text-lg font-medium">Вартість мандрівки</p>
+                        </div>
+                        <button
+                          onClick={hundleUserBuyCourse}
+                          className="flex items-center gap-2 px-6 py-3 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors"
+                        >
+                          <span>Придбати</span>
+                          <LuPlus className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {/* ✅ Modules Section */}
-                  <div className="mt-16">
-                    <div className="text-[#D2D2FF] text-xl lg:text-4xl font-semibold text-start lg:text-center">
-                      Модулі мандрівки
-                    </div>
-                    <div className="mt-5 lg:mt-12 mb-[103px]">
-                      {data?.modules?.map((module: ModuleDetail, index) => (
-                        <ModuleAccordion
-                          key={module.id}
-                          index={index}
-                          data={module}
-                          handleToggle={handleToggle}
-                          isOpen={openId === module.id}
-                          courseId={id || ''}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-6">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {data?.discount ? (
-                        <span className="text-white text-4xl line-through">{data?.price} $</span>
-                      ) : null}
-                      <span className="text-white text-4xl font-semibold">{data?.sell_price} $</span>
-                    </div>
-                    <p className="text-white text-lg font-medium">Вартість мандрівки</p>
-                  </div>
-                  <button
-                    onClick={hundleUserBuyCourse}
-                    className="flex items-center gap-2 px-6 py-3 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors"
-                  >
-                    <span>Придбати</span>
-                    <LuPlus className="w-5 h-5" />
-                  </button>
                 </div>
-              )}
+                {/* ✅ Modules Section */}
+                <div className="mt-16">
+                  <div className="text-[#D2D2FF] text-xl lg:text-4xl font-semibold text-start lg:text-center">
+                    Модулі мандрівки
+                  </div>
+                  <div className="mt-5 lg:mt-12 mb-[103px]">
+                    {data?.modules?.map((module: ModuleDetail, index) => (
+                      <ModuleAccordion
+                        key={module.id}
+                        index={index}
+                        data={module}
+                        handleToggle={handleToggle}
+                        isOpen={openId === module.id}
+                        courseId={id || ''}
+                        hundleUserBuyCourse={hundleUserBuyCourse}
+                        is_course_mine={data?.mine}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+
+
 
             </div>
 

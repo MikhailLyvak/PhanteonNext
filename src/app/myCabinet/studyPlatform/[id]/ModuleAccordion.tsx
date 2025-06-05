@@ -1,5 +1,5 @@
 import { ModuleDetail } from '@/api/StudyPlatform/types'
-import { LuCheck } from "react-icons/lu";
+import { LuCheck, LuPlus, LuLock } from "react-icons/lu";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import React from 'react'
 import IconWithToolTip from './components/IconWithToolTip';
@@ -11,9 +11,11 @@ interface Props {
   isOpen: boolean;
   index: number;
   courseId: string;
+  hundleUserBuyCourse: () => void;
+  is_course_mine: boolean;
 }
 
-const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, courseId }) => {
+const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, courseId, hundleUserBuyCourse, is_course_mine }) => {
   return (
     <div className="bg-[#242433] rounded-3xl px-6 pt-3 lg:py-7 my-3 lg:my-6">
       <div
@@ -46,7 +48,7 @@ const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, c
         </div>
         <div className="text-start text-sm lg:text-lg font-semibold text-[#D2D2FF] max-lg:mt-3">{data.lessons_count} лекції</div>
         <div className='mt-3 text-sm lg:text-base font-normal text-[#D2D2FF] max-w-6xl'>{data.description}</div>
-        {data.is_free || data.mine ? (
+        {data.mine ? (
           <div className="flex items-center gap-4 w-full mt-3 lg:mt-8">
             <div className="relative w-full h-2 rounded-full bg-gray-700 overflow-hidden">
               <div
@@ -57,52 +59,65 @@ const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, c
             <div className="text-xl font-semibold text-[#D2D2FF]">{data.module_progress}%</div>
           </div>
         ) : (
-          <button className="flex gap-3 px-5 py-3 border border-[#E9E9E9] mt-3 rounded-full text-gray-800">
-            <div className='text-base font-semibold'>До кошика</div>
-            <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-r rounded-full text-white text-2xl from-[#434343] to-[#007E6C]">+</div>
+          <button
+            onClick={hundleUserBuyCourse}
+            className="flex items-center gap-2 px-6 py-3 mt-2 lg:mt-4 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors"
+          >
+            <span>Придбати</span>
+            <LuPlus className="w-5 h-5" />
           </button>
         )}
       </div>
       {isOpen && data.lessons_list && data.lessons_list.length > 0 && (
         <div className="max-lg:my-3 my-7">
-          {data.lessons_list.map((lesson, lesson_index) => (
-            // If the course is free or bought, render an active Link.
-            <Link
-              href={`/myCabinet/studyPlatform/${courseId}/lesson/${lesson.id}`}
-              key={lesson.id}
-              className="flex items-start rounded-md max-lg:mt-3 mt-7"
-            >
-              <div
-                className={`w-6 h-6 flex items-center justify-center rounded-full ${lesson.is_passed ? 'bg-[#D2D2FF] text-[#242433]' : 'border-gray-500 border-[1px]  text-white'
-                  } shrink-0 mr-2 lg:mr-[14px]`}
-              >
-                <LuCheck size={14} />
-              </div>
-              <div className="text-gray-800 text-sm lg:text-lg font-semibold h-6 flex items-center">
-                <div className="flex items-center rounded-3xl hover:underline">
-                  <div className="hidden lg:flex text-[#D2D2FF]">
-                    Тема {lesson_index + 1}.&nbsp;
+          {data.lessons_list.map((lesson, lesson_index) => {
+            const isAccessible = is_course_mine || lesson.is_free;
+            const LessonContent = (
+              <div className="flex items-start rounded-md max-lg:mt-3 mt-7">
+                <div
+                  className={`w-6 h-6 flex items-center justify-center rounded-full ${lesson.is_passed ? 'bg-[#D2D2FF] text-[#242433]' : 'border-gray-500 border-[1px] text-white'
+                    } ${isAccessible ? 'border-gray-500 border-[1px] text-white' : ' bg-[#D2D2FF] text-[#242433]'} shrink-0 mr-2 lg:mr-[14px]`}
+                >
+                  {isAccessible ? <LuCheck size={14} /> : <LuLock size={14} />}
+                </div>
+                <div className="text-gray-800 text-sm lg:text-lg font-semibold h-6 flex items-center">
+                  <div className="flex items-center rounded-3xl hover:underline">
+                    <div className="hidden lg:flex text-[#D2D2FF]">
+                      Тема {lesson_index + 1}.&nbsp;
+                    </div>
+                    <div className="truncate text-[#D2D2FF]">{lesson.name}</div>
                   </div>
-                  <div className="truncate text-[#D2D2FF]">{lesson.name}</div>
-                </div>
-                <div className="flex gap-1 lg:gap-[10px] ml-2 lg:ml-7">
-                  <IconWithToolTip
-                    imgPath="/CourseDetail/MiniIcons/VideoIcon.svg"
-                    title="Відео"
-                  />
-                  <IconWithToolTip
-                    imgPath="/CourseDetail/MiniIcons/PresentationIcon.svg"
-                    title="Презентація"
-                  />
-                  <IconWithToolTip
-                    imgPath="/CourseDetail/MiniIcons/QuizeIcon.svg"
-                    title="Тест"
-                  />
+                  <div className="flex gap-1 lg:gap-[10px] ml-2 lg:ml-7">
+                    <IconWithToolTip
+                      imgPath="/CourseDetail/MiniIcons/VideoIcon.svg"
+                      title="Відео"
+                    />
+                    <IconWithToolTip
+                      imgPath="/CourseDetail/MiniIcons/PresentationIcon.svg"
+                      title="Презентація"
+                    />
+                    <IconWithToolTip
+                      imgPath="/CourseDetail/MiniIcons/QuizeIcon.svg"
+                      title="Тест"
+                    />
+                  </div>
                 </div>
               </div>
-            </Link>
+            );
 
-          ))}
+            return isAccessible ? (
+              <Link
+                href={`/myCabinet/studyPlatform/${courseId}/lesson/${lesson.id}`}
+                key={lesson.id}
+              >
+                {LessonContent}
+              </Link>
+            ) : (
+              <div key={lesson.id} className="cursor-not-allowed opacity-70">
+                {LessonContent}
+              </div>
+            );
+          })}
         </div>
       )}
 

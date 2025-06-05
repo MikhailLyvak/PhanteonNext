@@ -40,8 +40,8 @@ const Footer = () => {
               <Link href="/study-platform" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Навчальної платформа
               </Link>
-              <Link href="/survey" className="text-[#D2D2FF] hover:text-white transition-colors">
-                Опитування
+              <Link href="/dashboard" className="text-[#D2D2FF] hover:text-white transition-colors">
+                Графіки
               </Link>
             </div>
 

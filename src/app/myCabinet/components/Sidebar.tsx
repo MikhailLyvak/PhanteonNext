@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { User, Settings, LogOut, GraduationCap, CheckCircle } from "lucide-react";
 import { usePathname } from 'next/navigation';
+import { LuChartLine } from 'react-icons/lu';
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -23,10 +24,10 @@ const Sidebar = () => {
         active={pathname.includes('/myCabinet/studyPlatform')}
       />
       <NavItem
-        icon={<CheckCircle size={20} />}
-        text="Опитування"
-        href="/myCabinet/surveys"
-        active={pathname === '/myCabinet/surveys'}
+        icon={<LuChartLine size={20} />}
+        text="Графіки"
+        href="/dashboard"
+        active={pathname === '/dashboard'}
       />
       <NavItem
         icon={<Settings size={20} />}

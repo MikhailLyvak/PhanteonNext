@@ -30,13 +30,13 @@ export interface Lesson {
   id: number;
   name: string;
   is_passed: boolean;
+  is_free: boolean;
 }
 
 export interface ModuleDetail {
   id: number;
   name: string;
   description: string;
-  is_free: boolean;
   mine: boolean;
   module_progress: number;
   lessons_count: number;
@@ -75,6 +75,7 @@ export interface NavLesson {
   id: number;
   passed: boolean;
   name: string;
+  is_accessible: boolean;
 }
 
 export interface NavModule {
@@ -89,6 +90,7 @@ export interface LessonDetail {
   name: string;
   description: string;
   text_home_task: string;
+  is_free: boolean;
   quize: number;
   videos: Video[];
   nava_data: NavModule[];
@@ -111,6 +113,7 @@ interface NaviLesson {
   id: number;
   name: string;
   passed: boolean;
+  is_accessible: boolean;
 }
 
 interface NaviData {

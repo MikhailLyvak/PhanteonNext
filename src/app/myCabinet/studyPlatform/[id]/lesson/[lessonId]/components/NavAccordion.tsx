@@ -2,7 +2,7 @@ import { NavModule } from '@/api/StudyPlatform/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react'
-import { LuCheck } from "react-icons/lu";
+import { LuCheck, LuLock } from "react-icons/lu";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 
 interface NavAccordionProps {
@@ -77,15 +77,27 @@ const NavAccordion: React.FC<NavAccordionProps> = ({ modules }) => {
           {/* Module Lessons (expanded) */}
           {openModule === module.id && (
             <div className={`px-2 pb-4 space-y-2 ${openModule === module.id && 'bg-[#FFFFFF12] rounded-b-xl pt-3'}`}>
-              {module.lessons.map((lesson) => (
-                <Link href={`/myCabinet/studyPlatform/${courseId}/lesson/${lesson.id}`} key={lesson.id} className="flex items-center pl-1 pt-[6px]">
-                  {/* Checkmark icon for each lesson */}
-                  <div className={`w-5 h-5 flex items-center justify-center rounded-full ${lesson.passed ? 'bg-[#D2D2FF] text-[#242433]' : 'border-gray-500 border-[1px] text-white'} text-white shrink-0 mr-2 lg:mr-[19px]`}>
-                    <LuCheck className='w-3 h-3' />
+              {module.lessons.map((lesson) => {
+                const LessonContent = (
+                  <div className="flex items-center pl-1 pt-[6px]">
+                    {/* Checkmark or Lock icon for each lesson */}
+                    <div className={`w-5 h-5 flex items-center justify-center rounded-full ${lesson.passed ? 'bg-[#D2D2FF] text-[#242433]' : lesson.is_accessible ? 'border-gray-500 border-[1px] text-white' : 'bg-[#D2D2FF] text-[#242433]'} text-white shrink-0 mr-2 lg:mr-[19px]`}>
+                      {lesson.is_accessible ? <LuCheck className='w-3 h-3' /> : <LuLock className='w-3 h-3' />}
+                    </div>
+                    <span className={`text-[#D2D2FF font-semibold text-sm ${lesson.id === +lessonId && 'underline'} ${lesson.is_accessible ? 'hover:underline' : ''}`}>{lesson.name}</span>
                   </div>
-                  <span className={`text-[#D2D2FF font-semibold text-sm ${lesson.id === +lessonId && 'underline'} hover:underline`}>{lesson.name}</span>
-                </Link>
-              ))}
+                );
+
+                return lesson.is_accessible ? (
+                  <Link href={`/myCabinet/studyPlatform/${courseId}/lesson/${lesson.id}`} key={lesson.id}>
+                    {LessonContent}
+                  </Link>
+                ) : (
+                  <div key={lesson.id} className="cursor-not-allowed opacity-70">
+                    {LessonContent}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

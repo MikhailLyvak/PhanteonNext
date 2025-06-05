@@ -44,7 +44,7 @@ export default function RootLayout({
           <LoginModal />
           <Drawer />
           <MainDrawer />
-          <main className="flex-1 pt-[73px] md:pt-[120px]">
+          <main className="flex-1 pt-1 md:pt-2">
             {children}
           </main>
           <Footer />

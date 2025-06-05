@@ -32,8 +32,7 @@ const LessonDetail = () => {
   const { data, isLoading, error } = useGetLessonDetail(id || '');
   return (
     <>
-      <InnerWhiteHeader />
-      <div className='pt-[120px] max-w-7xl mx-auto'>
+      <div className='pt-2 max-w-7xl mx-auto'>
         <div className="flex flex-col max-lg:mx-4">
 
           {/* ✅ First Row: Breadcrumbs */}
@@ -67,7 +66,7 @@ const LessonDetail = () => {
             </nav>
           </div>
 
-          <div onClick={() => setIsModalOpen(!isModalOpen)} className={`max-lg:flex hidden justify-between mt-8 bg-gradient-to-r to-[#007E6C] from-[#494949] text-white text-base font-semibold items-center p-[10px] ${isModalOpen ? 'rounded-t-xl' : 'rounded-xl'}`}>
+          <div onClick={() => setIsModalOpen(!isModalOpen)} className={`max-lg:flex hidden justify-between mt-8 bg-[#242433] text-white text-base font-semibold items-center p-[10px] ${isModalOpen ? 'rounded-t-xl' : 'rounded-xl'}`}>
             <div>Теми уроків</div>
             <div className='border-2 rounded-xl h-9 w-9 flex items-center justify-center border-white text-white '>
               <LuChevronDown className={isModalOpen ? ' transition-transform -rotate-90' : ' transition-transform'} />

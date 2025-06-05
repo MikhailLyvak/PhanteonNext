@@ -76,10 +76,8 @@ const MainDrawer = () => {
             {drawerMode === "main" && (
               <div className="flex flex-col space-y-6 text-xl font-semibold">
                 <Link href="/myCabinet/studyPlatform" onClick={closeMainDrawer}>Навчальна платформа</Link>
-                <Link href="/blog" onClick={closeMainDrawer}>Блог</Link>
                 <Link href="/about" onClick={closeMainDrawer}>Про нас</Link>
-                <Link href="/courses" onClick={closeMainDrawer}>Курси</Link>
-                <Link href="/myCabinet/surveys" onClick={closeMainDrawer}>Опитування</Link>
+                <Link href="/dashboard" onClick={closeMainDrawer}>Графіки</Link>
               </div>
             )}
           </nav>

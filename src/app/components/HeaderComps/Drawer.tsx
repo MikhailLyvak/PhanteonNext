@@ -20,6 +20,7 @@ import Link from "next/link";
 import LoginButton from "./LoginButton";
 import Image from "next/image";
 import { useMainDrawerStore } from "@/store/Nav/useMainDrawerStore";
+import { LuChartLine } from "react-icons/lu";
 
 const Drawer = () => {
   const { isDrawerOpen, closeDrawer } = useDrawerStore();
@@ -81,7 +82,7 @@ const Drawer = () => {
       <nav className="flex-grow px-3">
         <NavItem icon={<User size={20} />} text="Персональні дані" closeDrawer={closeDrawer} link="/myCabinet/profile" />
         <NavItem icon={<GraduationCap size={20} />} text="Навчальна платформа" closeDrawer={closeDrawer} link="/myCabinet/studyPlatform" />
-        <NavItem icon={<CheckCircle size={20} />} text="Опитування" closeDrawer={closeDrawer} link="/myCabinet/surveys" />
+        <NavItem icon={<LuChartLine size={20} />} text="Графіки" closeDrawer={closeDrawer} link="/dashboard" />
         <NavItem icon={<Settings size={20} />} text="Налаштування" closeDrawer={closeDrawer} link="/myCabinet/settings" />
       </nav>
 
