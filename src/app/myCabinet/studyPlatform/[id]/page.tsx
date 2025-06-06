@@ -114,10 +114,7 @@ const CourseDetail = () => {
             <div className="w-full">
               <>
                 <div className="mx-2 md:mx-0">
-                  <div className="flex items-end max-md:justify-between gap-2 mb-2">
-
-
-
+                  <div className="flex flex-col items-end max-md:justify-between gap-2 mb-2">
                     {data?.mine ? (
                       <>
                         <div className="flex items-center gap-2 mt-6 md:mt-11 justify-between w-full">
