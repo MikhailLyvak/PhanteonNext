@@ -1,6 +1,5 @@
 'use client'
 
-import InnerWhiteHeader from '@/app/components/LayoutItems/components/Header/InnerWhiteHeader'
 import { useParams } from 'next/navigation'
 import React, { useState } from 'react'
 import useGetQuizeDetail from '@/hooks/StudyPlatform/useGetQuizDetail'
@@ -66,7 +65,6 @@ const QuizPage = () => {
 
   return (
     <>
-      <InnerWhiteHeader />
       <div className="pt-[120px] max-w-7xl mx-auto">
         <div className="flex flex-col max-lg:mx-4">
           {/* ✅ First Row: Breadcrumbs */}
