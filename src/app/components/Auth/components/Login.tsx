@@ -92,7 +92,7 @@ const LoginModalFormComponent = () => {
         />
         <p className="mt-4 text-xs text-gray-500 text-center">
           Продовжуючи, ви підтверджуєте, що згодні увійти до облікового запису
-          Vitalis Balance та надаєте згоду на обробку персональних даних
+          PantheonX та надаєте згоду на обробку персональних даних
         </p>
         <button
           type="submit"

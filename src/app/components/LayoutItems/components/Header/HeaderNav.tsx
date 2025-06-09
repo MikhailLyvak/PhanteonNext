@@ -29,7 +29,7 @@ const HeaderNav: React.FC<Props> = ({ textColor = "text-black" }) => {
         <Link href="/" className="group">
           <Image
             src="/Header/LogoColored.png"
-            alt="Vitalis Balance Logo"
+            alt="PantheonX Logo"
             width={184}
             height={58}
             className="object-contain w-[130px] h-[48px] xl:w-[184px] md:h-[58px] hidden lg:group-hover:block"
