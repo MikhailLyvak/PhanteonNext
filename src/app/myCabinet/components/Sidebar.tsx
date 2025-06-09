@@ -14,12 +14,12 @@ const Sidebar = () => {
       <NavItem
         icon={<User size={20} />}
         text="Персональні дані"
-        href="/myCabinet/profile"
-        active={pathname === '/myCabinet/profile'}
+        href="/404page"
+        active={pathname === '/404page'}
       />
       <NavItem
         icon={<GraduationCap size={20} />}
-        text="Навчальна платформа"
+        text="Академія"
         href="/myCabinet/studyPlatform"
         active={pathname.includes('/myCabinet/studyPlatform')}
       />
@@ -32,8 +32,8 @@ const Sidebar = () => {
       <NavItem
         icon={<Settings size={20} />}
         text="Налаштування"
-        href="/myCabinet/settings"
-        active={pathname === '/myCabinet/settings'}
+        href="/404page"
+        active={pathname === '/404page'}
       />
       <NavItem
         icon={<LogOut size={20} />}

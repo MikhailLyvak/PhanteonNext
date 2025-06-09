@@ -59,7 +59,7 @@ const CourseDetail = () => {
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <a href="/myCabinet/studyPlatform/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Навчальна платформа
+                    Академія
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
@@ -83,7 +83,7 @@ const CourseDetail = () => {
               <div className="mb-8">
                 <h2 className="text-2xl text-white font-normal mb-2">Мета:</h2>
                 <p className="text-xl font-bold lg:text-xl text-white">
-                  Глибоке розуміння теми + практичні навички
+                  {data?.course_goal}
                 </p>
               </div>
 
@@ -143,7 +143,7 @@ const CourseDetail = () => {
                             ) : null}
                             <span className="text-white text-4xl font-semibold">{data?.sell_price} $</span>
                           </div>
-                          <p className="text-white text-lg font-medium">Вартість мандрівки</p>
+                          <p className="text-white text-lg font-medium">Вартість кусу</p>
                         </div>
                         <button
                           onClick={hundleUserBuyCourse}
@@ -159,7 +159,7 @@ const CourseDetail = () => {
                 {/* ✅ Modules Section */}
                 <div className="mt-16">
                   <div className="text-[#D2D2FF] text-xl lg:text-4xl font-semibold text-start lg:text-center">
-                    Модулі мандрівки
+                    Модулі курсу
                   </div>
                   <div className="mt-5 lg:mt-12 mb-[103px]">
                     {data?.modules?.map((module: ModuleDetail, index) => (

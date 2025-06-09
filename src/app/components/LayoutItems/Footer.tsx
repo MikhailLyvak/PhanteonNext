@@ -6,8 +6,11 @@ import Link from "next/link";
 
 import { LuInstagram } from "react-icons/lu";
 import { PiTelegramLogo } from "react-icons/pi";
+import { useGetLastVebinar } from "@/hooks/Vebinars/useGetLastVebinar";
 
 const Footer = () => {
+  const { data: lastVebinar } = useGetLastVebinar();
+
   return (
     <footer className="bg-[#171723]">
       {/* Main footer content */}
@@ -28,14 +31,14 @@ const Footer = () => {
             </div>
 
             <div className="flex max-md:flex-col max-md:my-10 items-center gap-3 md:gap-8">
-              <Link href="/about" className="text-[#D2D2FF] hover:text-white transition-colors">
+              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Про нас
               </Link>
-              <Link href="/blog" className="text-[#D2D2FF] hover:text-white transition-colors">
+              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Блог
               </Link>
-              <Link href="/courses" className="text-[#D2D2FF] hover:text-white transition-colors">
-                Курси
+              <Link target='_blank' href={lastVebinar?.link || ''} className="text-[#D2D2FF] hover:text-white transition-colors">
+                Вебінари
               </Link>
               <Link href="/study-platform" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Навчальної платформа
@@ -46,10 +49,10 @@ const Footer = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+              <Link href="https://www.instagram.com/igor_porokh/" target="_blank" rel="noopener noreferrer">
                 <LuInstagram size={32} className="text-[#D2D2FF] hover:text-white transition-colors" />
               </Link>
-              <Link href="https://telegram.org" target="_blank" rel="noopener noreferrer">
+              <Link href="t.me/roadfromatoz" target="_blank" rel="noopener noreferrer">
                 <PiTelegramLogo size={32} className="text-[#D2D2FF] hover:text-white transition-colors" />
               </Link>
             </div>

@@ -61,10 +61,10 @@ const Drawer = () => {
           />
         </Link>
         <button
-          onClick={() => { closeDrawer(); toggleMainDrawer(); }}
-          className="flex items-center justify-center text-white bg-[#58587B] pr-1 rounded-xl h-12 w-12"
+          onClick={() => closeDrawer()}
+          className="flex items-center justify-center text-white bg-[#58587B] rounded-xl h-12 w-12"
         >
-          <MdArrowBackIosNew size={32} />
+          <X size={40} />
         </button>
       </div>
 
@@ -80,17 +80,17 @@ const Drawer = () => {
 
       {/* Middle Section: Navigation */}
       <nav className="flex-grow px-3">
-        <NavItem icon={<User size={20} />} text="Персональні дані" closeDrawer={closeDrawer} link="/myCabinet/profile" />
-        <NavItem icon={<GraduationCap size={20} />} text="Навчальна платформа" closeDrawer={closeDrawer} link="/myCabinet/studyPlatform" />
+        <NavItem icon={<User size={20} />} text="Персональні дані" closeDrawer={closeDrawer} link="/404page" />
+        <NavItem icon={<GraduationCap size={20} />} text="Академія" closeDrawer={closeDrawer} link="/myCabinet/studyPlatform" />
         <NavItem icon={<LuChartLine size={20} />} text="Графіки" closeDrawer={closeDrawer} link="/dashboard" />
-        <NavItem icon={<Settings size={20} />} text="Налаштування" closeDrawer={closeDrawer} link="/myCabinet/settings" />
+        <NavItem icon={<Settings size={20} />} text="Налаштування" closeDrawer={closeDrawer} link="/404page" />
       </nav>
 
       {/* Bottom Section: Logout Button */}
       <div className="p-4 mt-auto">
         <button
           onClick={logout}
-          className="w-full flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-[#2F2F40] transition"
+          className="w-full flex items-center space-x-3 text-[#D2D2FF] p-3 rounded-lg hover:bg-[#2F2F40] transition"
         >
           <span className="w-10 h-10 flex items-center justify-center bg-[#a7a7ca] rounded-full text-white">
             <LogOut size={20} />
@@ -104,7 +104,7 @@ const Drawer = () => {
 
 const NavItem = ({ icon, text, link, closeDrawer }: { icon: React.ReactNode; text: string; link?: string, closeDrawer: () => void; }) => (
   <Link href={link || "#"} className="w-full">
-    <button className="w-full flex items-center space-x-2 text-[#58587B] py-3 rounded-lg hover:bg-[#2F2F40] transition" onClick={() => closeDrawer()}>
+    <button className="w-full flex items-center space-x-2 text-[#D2D2FF]] py-3 rounded-lg hover:bg-[#2F2F40] transition" onClick={() => closeDrawer()}>
       <span className="w-10 h-10 flex items-center justify-center rounded-full">
         {icon}
       </span>

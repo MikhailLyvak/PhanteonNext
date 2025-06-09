@@ -47,7 +47,7 @@ const LessonDetail = () => {
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <a href="/myCabinet/studyPlatform/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Навчальна платформа
+                    Академія
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>

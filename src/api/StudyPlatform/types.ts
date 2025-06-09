@@ -62,6 +62,7 @@ export interface CourseDetail {
   mine: boolean;
   course_progress: number;
   lessons_amount: number;
+  course_goal: string;
   modules: ModuleDetail[];
 }
 

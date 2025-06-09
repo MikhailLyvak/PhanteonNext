@@ -5,8 +5,12 @@ import Link from 'next/link'
 import React from 'react'
 import AdaptiveButtons from './AdaptiveButtons'
 import CryptoTicker from './CryptoTicker' // ✅ Import it
+import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
+
 
 const InnerWhiteHeader = () => {
+  const { data: lastVebinar } = useGetLastVebinar();
+
   return (
     <>
       {/* 🔼 Header */}
@@ -38,10 +42,10 @@ const InnerWhiteHeader = () => {
 
           {/* ✅ Center - Navigation */}
           <div className="2xl:gap-10 gap-5 hidden lg:flex">
-            <div className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</div>
-            <div className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Блог</div>
-            <div className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Курси</div>
-            <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Навчальна платформа</Link>
+            <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</Link>
+            <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Блог</Link>
+            <Link target='_blank' href={lastVebinar?.link || ''} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Вебінари</Link>
+            <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>
             <Link href="/dashboard" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Графіки</Link>
           </div>
 

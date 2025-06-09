@@ -34,15 +34,15 @@ const CourseCard = ({ course }: { course: Course }) => {
               {course.is_discount ? (
                 <div className="flex flex-col items-end">
                   <span className="text-white line-through text-sm">
-                    {course.price} ₴
+                    {course.price} $
                   </span>
                   <span className="text-white font-bold text-xl">
-                    {course.sell_price} ₴
+                    {course.sell_price} $
                   </span>
                 </div>
               ) : (
                 <span className="text-white font-bold text-xl">
-                  {course.price} ₴
+                  {course.price} $
                 </span>
               )}
             </div>
@@ -77,15 +77,15 @@ const CourseCard = ({ course }: { course: Course }) => {
                 {course.is_discount ? (
                   <div className="flex flex-col items-end">
                     <span className="text-white line-through text-xs sm:text-sm">
-                      {course.price} ₴
+                      {course.price} $
                     </span>
                     <span className="text-white font-bold text-lg sm:text-xl">
-                      {course.sell_price} ₴
+                      {course.sell_price} $
                     </span>
                   </div>
                 ) : (
                   <span className="text-white font-bold text-lg sm:text-xl">
-                    {course.price} ₴
+                    {course.price} $
                   </span>
                 )}
               </div>

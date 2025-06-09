@@ -22,9 +22,6 @@ const AdaptiveButtons: React.FC<Props> = ({ textColor = 'text-black', hoverTextC
       <div className='flex'>
         <LoginButton />
       </div>
-      <div className='bg-[#58587B] rounded-xl h-12 w-12 sm:h-16 sm:w-16 flex items-center justify-center bg-opacity-40'>
-        <Burger toggled={false} onToggle={toggleMainDrawer} />
-      </div>
       <div className={`border-[1px] border-gray-500 ${textColor} ${hoverTextColorClass} hidden lg:flex rounded-3xl w-12 lg:w-16 h-12 lg:h-16 items-center justify-center font-bold`}>
         UA
       </div>

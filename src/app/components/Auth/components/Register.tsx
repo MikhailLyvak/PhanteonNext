@@ -8,7 +8,6 @@ import { Triangle } from 'react-loader-spinner'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { register } from '@/api/Auth/PostRegister';
-import { useMainDrawerStore } from '@/store/Nav/useMainDrawerStore';
 
 const schema = z
   .object({

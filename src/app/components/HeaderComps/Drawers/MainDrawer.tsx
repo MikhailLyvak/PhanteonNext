@@ -10,11 +10,9 @@ import Image from "next/image";
 import LoginButton from "../LoginButton";
 import Link from "next/link";
 
-type DrawerMode = "main" | "shop" | "about";
 
 const MainDrawer = () => {
   const { isMainDrawerOpen, closeMainDrawer } = useMainDrawerStore();
-  const [drawerMode, setDrawerMode] = useState<DrawerMode>("main");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -51,14 +49,6 @@ const MainDrawer = () => {
               />
             </Link>
             <div className="flex gap-[10px]">
-              {drawerMode !== 'main' ? (
-                <button
-                  onClick={() => setDrawerMode("main")}
-                  className="flex items-center justify-center text-gray-800 bg-[#E8E8E8] rounded-xl h-12 w-12"
-                >
-                  <LuChevronLeft size={40} />
-                </button>
-              ) : (
                 <>
                   <LoginButton isSideBar={true} />
                   <button
@@ -68,19 +58,9 @@ const MainDrawer = () => {
                     <X size={40} />
                   </button>
                 </>
-              )}
             </div>
           </div>
 
-          <nav className="flex flex-col text-[#D2D2FFAB] pl-[74px] items-start justify-center mt-[107px]">
-            {drawerMode === "main" && (
-              <div className="flex flex-col space-y-6 text-xl font-semibold">
-                <Link href="/myCabinet/studyPlatform" onClick={closeMainDrawer}>Навчальна платформа</Link>
-                <Link href="/about" onClick={closeMainDrawer}>Про нас</Link>
-                <Link href="/dashboard" onClick={closeMainDrawer}>Графіки</Link>
-              </div>
-            )}
-          </nav>
         </div>
       </aside>
     </>

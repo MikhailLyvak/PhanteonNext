@@ -12,13 +12,13 @@ const StudyPlatformPage = () => {
         <div className="max-w-8xl mx-auto px-4 md:px-6">
           {/* ✅ First Row: Breadcrumbs */}
           <div className="mt-6">
-            <MyCabinetBreadCrump currentPageTitle="Навчальна платформа" />
+            <MyCabinetBreadCrump currentPageTitle="Академія" />
           </div>
 
           {/* ✅ Second Row: Page Title */}
           <div className="mt-6">
             <h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-              Навчальна платформа
+              Академія
             </h6>
           </div>
 
@@ -34,7 +34,7 @@ const StudyPlatformPage = () => {
             {/* Right Content */}
             <div className="flex flex-col w-full sm:ml-10">
               {/* ✅ Filters */}
-              <div className="flex flex-wrap gap-2 sm:gap-x-4 sm:gap-y-2 mb-8">
+              {/* <div className="flex flex-wrap gap-2 sm:gap-x-4 sm:gap-y-2 mb-8">
                 <button className="h-10 px-5 bg-[#D2D2FF] text-[#171723] font-semibold sm:font-bold text-xs sm:text-base rounded-full text-nowrap">
                   Всe
                 </button>
@@ -50,7 +50,7 @@ const StudyPlatformPage = () => {
                 <button className="h-10 px-5 bg-[#242433] text-[#D2D2FF] font-semibold sm:font-bold text-xs sm:text-base rounded-full text-nowrap">
                   Духовні практики
                 </button>
-              </div>
+              </div> */}
 
               {/* ✅ Course List */}
               <CourseList />
