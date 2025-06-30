@@ -31,6 +31,7 @@ export interface Lesson {
   name: string;
   is_passed: boolean;
   is_free: boolean;
+  is_comming_soon: boolean;
 }
 
 export interface ModuleDetail {
@@ -96,6 +97,7 @@ export interface LessonDetail {
   videos: Video[];
   nava_data: NavModule[];
   pdf_task: string;
+  is_comming_soon: boolean;
 }
 
 interface Answer {
@@ -107,7 +109,8 @@ interface Answer {
 interface Question {
   id: number;
   question: string;
-  answers: Answer[];
+  question_type: 'multiple_choice' | 'text';
+  answers?: Answer[];
 }
 
 interface NaviLesson {
@@ -133,7 +136,8 @@ export interface Quiz {
 
 export interface QuizAnswerPayload {
   question: number;
-  selected_answer: number;
+  selected_answer?: number;
+  text_answer?: string;
 }
 
 export interface QuizSubmissionPayload {
@@ -162,4 +166,17 @@ export interface PaymentResponse {
 
 export interface PaymentStatusCheckResponse {
   status: string;
+}
+
+export interface QuizAnswerResult {
+  id: number;
+  text_answer: string | null;
+  mentor_comment: string | null;
+  submission: number;
+  question: number;
+  selected_answer: number | null;
+}
+
+export interface QuizResult {
+  answers: QuizAnswerResult[];
 }

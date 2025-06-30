@@ -6,10 +6,13 @@ import React from 'react'
 import AdaptiveButtons from './AdaptiveButtons'
 import CryptoTicker from './CryptoTicker' // ✅ Import it
 import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
+import { useUserStore } from '@/store/UserData/useUserStore'
 
 
 const InnerWhiteHeader = () => {
   const { data: lastVebinar } = useGetLastVebinar();
+  const user = useUserStore(state => state.user);
+  if (!user) return null;
 
   return (
     <>

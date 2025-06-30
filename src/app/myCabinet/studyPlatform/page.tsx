@@ -18,7 +18,7 @@ const StudyPlatformPage = () => {
           {/* ✅ Second Row: Page Title */}
           <div className="mt-6">
             <h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-              Академія
+              Особистий кабінет
             </h6>
           </div>
 

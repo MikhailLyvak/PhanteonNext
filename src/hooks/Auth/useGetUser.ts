@@ -1,5 +1,3 @@
-"use client";
-
 import { getProfile } from "@/api/Auth/getProfile";
 import { useUserStore } from "@/store/UserData/useUserStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

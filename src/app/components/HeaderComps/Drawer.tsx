@@ -80,7 +80,7 @@ const Drawer = () => {
 
       {/* Middle Section: Navigation */}
       <nav className="flex-grow px-3">
-        <NavItem icon={<User size={20} />} text="Персональні дані" closeDrawer={closeDrawer} link="/404page" />
+        <NavItem icon={<User size={20} />} text="Персональні дані" closeDrawer={closeDrawer} link="/myCabinet/personalData" />
         <NavItem icon={<GraduationCap size={20} />} text="Академія" closeDrawer={closeDrawer} link="/myCabinet/studyPlatform" />
         <NavItem icon={<LuChartLine size={20} />} text="Графіки" closeDrawer={closeDrawer} link="/dashboard" />
         <NavItem icon={<Settings size={20} />} text="Налаштування" closeDrawer={closeDrawer} link="/404page" />

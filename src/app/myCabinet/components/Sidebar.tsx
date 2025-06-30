@@ -14,8 +14,8 @@ const Sidebar = () => {
       <NavItem
         icon={<User size={20} />}
         text="Персональні дані"
-        href="/404page"
-        active={pathname === '/404page'}
+        href="/myCabinet/personalData"
+        active={pathname === '/myCabinet/personalData'}
       />
       <NavItem
         icon={<GraduationCap size={20} />}

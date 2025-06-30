@@ -1,5 +1,3 @@
-"use client";
-
 import { Cookies } from "react-cookie";
 import { User } from "./types";
 import axiosInterceptor from "@/interceptor/axiosClient";
