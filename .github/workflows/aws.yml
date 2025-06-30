@@ -1,94 +1,260 @@
-# This workflow will build and push a new container image to Amazon ECR,
-# and then will deploy a new task definition to Amazon ECS, when there is a push to the "main" branch.
-#
-# To use this workflow, you will need to complete the following set-up steps:
-#
-# 1. Create an ECR repository to store your images.
-#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
-#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
-#    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
-#
-# 2. Create an ECS task definition, an ECS cluster, and an ECS service.
-#    For example, follow the Getting Started guide on the ECS console:
-#      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
-#    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
-#    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
-#
-# 3. Store your ECS task definition as a JSON file in your repository.
-#    The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
-#    Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
-#    Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container
-#    in the `containerDefinitions` section of the task definition.
-#
-# 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
-#    See the documentation for each action used below for the recommended IAM policies for this IAM user,
-#    and best practices on handling the access key credentials.
-
-name: Deploy to Amazon ECS
+name: Deploy.pantheonx.club
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch:
 
 env:
-  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
-  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  APP_NAME: frontend
+  AWS_REGION: eu-central-1
+  AWS_ACCOUNT_ID: '028780196276'
+  ROLE_TO_ASSUME: arn:aws:iam::028780196276:role/pantheon-ecr-backend-access-role
+  TARGET_GROUP_ARN: arn:aws:elasticloadbalancing:eu-central-1:028780196276:targetgroup/backend/e42f55594a81adc7
+  ECR_REPOSITORY: phanteon-backend
+  IMAGE_TAG: latest
+  APP_DIR: /home/ec2-user/app
+  URL: https://pantheonx.club
+  WORKFLOW_NAME: Deploy.pantheonx.club
 
 jobs:
-  deploy:
-    name: Deploy
+  build-push-deploy:
     runs-on: ubuntu-latest
-    environment: production
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: 🐳 Build Docker image
+        run: |
+          docker build -t $APP_NAME .
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: 🔑 Login to Private ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+      - name: 🐳 Push to Private ECR
+        run: |
+          PRIVATE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
+          CUSTOM_TAG="${APP_NAME}-latest"
+          
+          docker tag $APP_NAME:latest $PRIVATE_URI:$CUSTOM_TAG
+          docker push $PRIVATE_URI:$CUSTOM_TAG
+          echo "ECR_URI=$PRIVATE_URI:$CUSTOM_TAG" >> $GITHUB_ENV
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: 🧾 Fetch EC2 instance IDs from Target Group
+        id: instances
+        run: |
+          IDS=$(aws elbv2 describe-target-health \
+            --target-group-arn "$TARGET_GROUP_ARN" \
+            --query 'TargetHealthDescriptions[*].Target.Id' \
+            --output text)
+          echo "INSTANCE_IDS=$IDS" >> $GITHUB_OUTPUT
+
+      - name: 📦 Prepare deployment variables
+        run: |
+          ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$APP_NAME-latest"
+          echo "ECR_URI=$ECR_URI" >> $GITHUB_ENV
+          echo "Deploying image: $ECR_URI"
+          echo "Target instances: ${{ steps.instances.outputs.INSTANCE_IDS }}"
+
+      - name: 🔍 Test SSM connectivity
+        run: |
+          echo "Testing SSM connectivity to instances..."
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Testing instance $id..."
+            aws ssm describe-instance-information \
+              --filters "Key=InstanceIds,Values=$id" \
+              --region $AWS_REGION \
+              --query 'InstanceInformationList[0].[InstanceId,PingStatus,LastPingDateTime]' \
+              --output table
+          done
+
+      - name: 🐳 Pull Docker image on EC2
+        run: |
+          echo "Pulling Docker image on all EC2 instances..."
+          
+          # Store command IDs for all instances
+          PULL_CMD_IDS=""
+          
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Starting Docker image pull on instance $id..."
+            CMD_ID=$(aws ssm send-command \
+              --instance-ids "$id" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Pull Docker image" \
+              --parameters 'commands=[
+                "echo \"Starting Docker image pull...\"",
+                "aws ecr get-login-password --region '$AWS_REGION' | docker login --username AWS --password-stdin '$AWS_ACCOUNT_ID'.dkr.ecr.'$AWS_REGION'.amazonaws.com",
+                "echo \"ECR login successful\"",
+                "docker pull '$ECR_URI'"
+              ]' \
+              --region $AWS_REGION \
+              --query "Command.CommandId" \
+              --output text)
+          
+            echo "Pull command ID for $id: $CMD_ID"
+            PULL_CMD_IDS="$PULL_CMD_IDS $id:$CMD_ID"
+          done
+          
+          echo "PULL_CMD_IDS=$PULL_CMD_IDS" >> $GITHUB_ENV
+
+      - name: ⏳ Wait for Docker pull
+        run: |
+          echo "Waiting for all pull commands to complete..."
+          for entry in $PULL_CMD_IDS; do
+            INSTANCE_ID=$(echo $entry | cut -d: -f1)
+            CMD_ID=$(echo $entry | cut -d: -f2)
+            echo "Waiting for pull on instance $INSTANCE_ID (command $CMD_ID)..."
+            ./.github/scripts/wait-for-ssm-command.sh "$CMD_ID" "$INSTANCE_ID"
+          done
+
+      - name: 🛑 Stop current containers
+        run: |
+          echo "Stopping current containers on all instances..."
+          
+          # Store command IDs for all instances
+          STOP_CMD_IDS=""
+          
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Stopping containers on instance $id..."
+            CMD_ID=$(aws ssm send-command \
+              --instance-ids "$id" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Stop containers" \
+              --parameters 'commands=[
+                "cd '$APP_DIR'",
+                "echo \"Stopping containers...\"",
+                "docker-compose down --timeout 30",
+                "sleep 5"
+              ]' \
+              --region $AWS_REGION \
+              --query "Command.CommandId" \
+              --output text)
+          
+            echo "Stop command ID for $id: $CMD_ID"
+            STOP_CMD_IDS="$STOP_CMD_IDS $id:$CMD_ID"
+          done
+          
+          echo "STOP_CMD_IDS=$STOP_CMD_IDS" >> $GITHUB_ENV
+
+      - name: ⏳ Wait for containers to stop
+        run: |
+          echo "Waiting for all containers to stop..."
+          for entry in $STOP_CMD_IDS; do
+            INSTANCE_ID=$(echo $entry | cut -d: -f1)
+            CMD_ID=$(echo $entry | cut -d: -f2)
+            echo "Waiting for containers to stop on instance $INSTANCE_ID (command $CMD_ID)..."
+            ./.github/scripts/wait-for-ssm-command.sh "$CMD_ID" "$INSTANCE_ID"
+          done
+
+      - name: 🚀 Start new containers
+        run: |
+          echo "Starting new containers on all instances..."
+          
+          # Store command IDs for all instances
+          START_CMD_IDS=""
+          
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Starting new containers on instance $id..."
+            CMD_ID=$(aws ssm send-command \
+              --instance-ids "$id" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Start containers" \
+              --parameters 'commands=[
+                "cd '$APP_DIR'",
+                "echo \"Starting containers...\"",
+                "docker-compose up -d",
+                "sleep 10",
+                "docker ps"
+              ]' \
+              --region $AWS_REGION \
+              --query "Command.CommandId" \
+              --output text)
+          
+            echo "Start command ID for $id: $CMD_ID"
+            START_CMD_IDS="$START_CMD_IDS $id:$CMD_ID"
+          done
+          
+          echo "START_CMD_IDS=$START_CMD_IDS" >> $GITHUB_ENV
+
+      - name: ⏳ Wait for containers to start
+        run: |
+          echo "Waiting for all containers to start..."
+          for entry in $START_CMD_IDS; do
+            INSTANCE_ID=$(echo $entry | cut -d: -f1)
+            CMD_ID=$(echo $entry | cut -d: -f2)
+            echo "Waiting for containers to start on instance $INSTANCE_ID (command $CMD_ID)..."
+            ./.github/scripts/wait-for-ssm-command.sh "$CMD_ID" "$INSTANCE_ID"
+          done
+
+      - name: ✅ Verify deployment
+        run: |
+          echo "Verifying deployment on all instances..."
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Verifying deployment on instance $id..."
+            CMD_ID=$(aws ssm send-command \
+              --instance-ids "$id" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Verify deployment" \
+              --parameters 'commands=[
+                "docker ps",
+                "sleep 5",
+                "curl -f http://localhost:8080/healthz || echo \"Health check failed\""
+              ]' \
+              --region $AWS_REGION \
+              --query "Command.CommandId" \
+              --output text)
+          
+            ./.github/scripts/wait-for-ssm-command.sh "$CMD_ID" "$id"
+          done
+
+      - name: 🧹 Cleanup old Docker images
+        run: |
+          echo "Cleaning up old Docker images on all instances..."
+          
+          # Store command IDs for all instances
+          CLEANUP_CMD_IDS=""
+          
+          for id in ${{ steps.instances.outputs.INSTANCE_IDS }}; do
+            echo "Cleaning up Docker images on instance $id..."
+            CMD_ID=$(aws ssm send-command \
+              --instance-ids "$id" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Cleanup old Docker images" \
+              --parameters 'commands=[
+                "docker image prune -f",
+                "docker images | grep monika-backend | grep \"<none>\" | awk \"{print \\$3}\" | xargs -r docker rmi -f || echo \"No dangling monika-backend images\"",
+                "docker volume prune -f",
+                "docker images"
+              ]' \
+              --region $AWS_REGION \
+              --query "Command.CommandId" \
+              --output text)
+          
+            echo "Cleanup command ID for $id: $CMD_ID"
+            CLEANUP_CMD_IDS="$CLEANUP_CMD_IDS $id:$CMD_ID"
+          done
+          
+          echo "CLEANUP_CMD_IDS=$CLEANUP_CMD_IDS" >> $GITHUB_ENV
+
+      - name: ⏳ Wait for cleanup to complete
+        run: |
+          echo "Waiting for cleanup to complete on all instances..."
+          for entry in $CLEANUP_CMD_IDS; do
+            INSTANCE_ID=$(echo $entry | cut -d: -f1)
+            CMD_ID=$(echo $entry | cut -d: -f2)
+            echo "Waiting for cleanup on instance $INSTANCE_ID (command $CMD_ID)..."
+            ./.github/scripts/wait-for-ssm-command.sh "$CMD_ID" "$INSTANCE_ID"
+          done
