@@ -31,7 +31,7 @@ const Footer = () => {
             </div>
 
             <div className="flex max-md:flex-col max-md:my-10 items-center gap-3 md:gap-8">
-              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
+              <Link href="/About" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Про нас
               </Link>
               <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">

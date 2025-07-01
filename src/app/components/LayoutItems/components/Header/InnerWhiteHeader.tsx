@@ -45,7 +45,7 @@ const InnerWhiteHeader = () => {
 
           {/* ✅ Center - Navigation */}
           <div className="2xl:gap-10 gap-5 hidden lg:flex">
-            <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</Link>
+            <Link href="/About" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</Link>
             <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Блог</Link>
             <Link target='_blank' href={lastVebinar?.link || ''} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Вебінари</Link>
             <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>
