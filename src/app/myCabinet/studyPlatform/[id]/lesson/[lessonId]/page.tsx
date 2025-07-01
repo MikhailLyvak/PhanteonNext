@@ -9,6 +9,7 @@ import NavAccordion from './components/NavAccordion';
 import VitalisGreenButton from '@/app/components/Buttons/VitalisGreenButton';
 import Link from 'next/link';
 import { Divide } from 'lucide-react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 function getYouTubeId(url?: string): string {
   const fallbackVideoId = 'unYKqbwdK3M';
@@ -33,6 +34,7 @@ const LessonDetail = () => {
   const { data, isLoading, error } = useGetLessonDetail(id || '');
   return (
     <>
+    <ProtectedRoute>
       <div className='pt-2 max-w-7xl mx-auto'>
         <div className="flex flex-col max-lg:mx-4">
 
@@ -154,6 +156,7 @@ const LessonDetail = () => {
         </div>
 
       </div>
+      </ProtectedRoute>
     </>
   )
 }
