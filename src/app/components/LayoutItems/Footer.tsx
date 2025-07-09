@@ -35,13 +35,16 @@ const Footer = () => {
                 Про нас
               </Link>
               <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
-                Блог
+                  Блог
+                </Link>
+              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
+                АІ-агенти
               </Link>
               <Link target='_blank' href={lastVebinar?.link || ''} className="text-[#D2D2FF] hover:text-white transition-colors">
-                Вебінари
+                Воркшопи
               </Link>
-              <Link href="/study-platform" className="text-[#D2D2FF] hover:text-white transition-colors">
-                Навчальної платформа
+              <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
+                Академія
               </Link>
               <Link href="/dashboard" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Графіки
