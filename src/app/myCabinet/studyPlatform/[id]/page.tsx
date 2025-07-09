@@ -8,6 +8,9 @@ import ModuleAccordion from "./ModuleAccordion";
 import { ModuleDetail } from "@/api/StudyPlatform/types";
 import { usePostPaymentPage } from "@/hooks/StudyPlatform/usePostPaymentPage";
 import InnerWhiteHeader from "@/app/components/LayoutItems/components/Header/InnerWhiteHeader";
+import Modal from 'react-modal';
+import axios from 'axios';
+import { Triangle } from 'react-loader-spinner';
 
 const CourseDetail = () => {
   const params = useParams();
@@ -19,6 +22,14 @@ const CourseDetail = () => {
   const { data: paymentData, isPending, mutate } = usePostPaymentPage()
 
   const [openId, setOpenId] = useState<number | null>(1);
+  const [promocode, setPromocode] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [promoStep, setPromoStep] = useState<'ask' | 'input' | 'checked'>('ask');
+  const [promoCheckLoading, setPromoCheckLoading] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoResult, setPromoResult] = useState<any>(null);
+  const [finalPrice, setFinalPrice] = useState<number | null>(null);
+
   const handleToggle = (id: number) => {
     setOpenId(openId === id ? null : id);
   };
@@ -29,18 +40,88 @@ const CourseDetail = () => {
       return;
     }
 
-    mutate(+id, {
-      onSuccess: (data) => {
-        if (data.payment_url) {
-          window.location.href = data.payment_url;
-        } else {
-          console.error("No payment URL in response");
-        }
-      },
-      onError: (error) => {
-        console.error("Payment request failed:", error);
-      },
-    });
+    mutate(
+      { courseId: +id, promocode: promocode || undefined },
+      {
+        onSuccess: (data) => {
+          if (data.payment_url) {
+            window.location.href = data.payment_url;
+          } else {
+            console.error("No payment URL in response");
+          }
+        },
+        onError: (error) => {
+          console.error("Payment request failed:", error);
+        },
+      }
+    );
+  };
+
+  const openBuyModal = () => {
+    setIsModalOpen(true);
+    setPromoStep('ask');
+    setPromoError(null);
+    setPromoResult(null);
+    setFinalPrice(null);
+  };
+
+  const closeBuyModal = () => {
+    setIsModalOpen(false);
+    setPromoStep('ask');
+    setPromoError(null);
+    setPromoResult(null);
+    setFinalPrice(null);
+    setPromocode("");
+  };
+
+  const handlePromoCheck = async () => {
+    setPromoCheckLoading(true);
+    setPromoError(null);
+    try {
+      const res = await axios.post('http://127.0.0.1:8000/api/check_promocode/', { promocode });
+      if (res.data.valid) {
+        setPromoResult(res.data);
+        const discount = Number(res.data.discount_percent) || 0;
+        const price = Number(data?.sell_price) || 0;
+        setFinalPrice(price - (price * discount / 100));
+        setPromoStep('checked');
+      } else {
+        setPromoError('Промокод недійсний');
+      }
+    } catch (e) {
+      setPromoError('Помилка перевірки промокоду');
+    } finally {
+      setPromoCheckLoading(false);
+    }
+  };
+
+  const proceedToPayment = () => {
+    closeBuyModal();
+    hundleUserBuyCourse();
+  };
+
+  const proceedToPaymentWithPromo = () => {
+    if (!id) {
+      console.error("Course not found");
+      closeBuyModal();
+      return;
+    }
+    closeBuyModal();
+    mutate(
+      { courseId: +id, promocode: promocode || undefined },
+      {
+        onSuccess: (data) => {
+          if (data.payment_url) {
+            window.location.href = data.payment_url;
+          } else {
+            console.error("No payment URL in response");
+          }
+        },
+        onError: (error) => {
+          console.error("Payment request failed:", error);
+        },
+      }
+    );
   };
 
   return (
@@ -141,17 +222,86 @@ const CourseDetail = () => {
                             {data?.discount ? (
                               <span className="text-white text-4xl line-through">{data?.price} $</span>
                             ) : null}
-                            <span className="text-white text-4xl font-semibold">{data?.sell_price} $</span>
+                            <span className="text-white text-4xl font-semibold">{finalPrice !== null ? finalPrice : data?.sell_price} $</span>
                           </div>
                           <p className="text-white text-lg font-medium">Вартість кусу</p>
                         </div>
                         <button
-                          onClick={hundleUserBuyCourse}
+                          onClick={openBuyModal}
                           className="flex items-center gap-2 px-6 py-3 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors"
                         >
                           <span>Придбати</span>
                           <LuPlus className="w-5 h-5" />
                         </button>
+                        <Modal
+                          isOpen={isModalOpen}
+                          onRequestClose={closeBuyModal}
+                          className="bg-[#242433] p-8 rounded-xl max-w-md mx-auto mt-32 text-white"
+                          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+                          ariaHideApp={false}
+                        >
+                          {promoStep === 'ask' && (
+                            <div className="flex flex-col gap-4">
+                              <div className="text-lg font-semibold">Використати промокод?</div>
+                              <div className="flex gap-4 mt-2">
+                                <button
+                                  className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold"
+                                  onClick={() => setPromoStep('input')}
+                                >
+                                  Так
+                                </button>
+                                <button
+                                  className="bg-gray-500 px-4 py-2 rounded text-white font-bold"
+                                  onClick={proceedToPayment}
+                                >
+                                  Ні
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          {promoStep === 'input' && (
+                            <div className="flex flex-col gap-4">
+                              <div className="text-lg font-semibold">Введіть промокод</div>
+                              <input
+                                type="text"
+                                value={promocode}
+                                onChange={e => setPromocode(e.target.value)}
+                                placeholder="Промокод"
+                                className="px-4 py-2 rounded border border-gray-400 text-black"
+                              />
+                              <button
+                                className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold"
+                                onClick={handlePromoCheck}
+                                disabled={promoCheckLoading}
+                              >
+                                {promoCheckLoading ? 'Перевірка...' : 'Перевірити промокод'}
+                              </button>
+                              {promoError && <div className="text-red-400">{promoError}</div>}
+                            </div>
+                          )}
+                          {promoStep === 'checked' && promoResult && (
+                            <div className="flex flex-col gap-4">
+                              <div className="text-lg font-semibold text-green-400">Промокод дійсний! Знижка: {promoResult.discount_percent}%</div>
+                              <div>Нова ціна: <span className="font-bold">{finalPrice} $</span></div>
+                              <button
+                                className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold flex items-center justify-center gap-2"
+                                onClick={proceedToPaymentWithPromo}
+                                disabled={isPending}
+                              >
+                                {isPending && (
+                                  <Triangle
+                                    visible={true}
+                                    height={16}
+                                    width={16}
+                                    color="#fff"
+                                    ariaLabel="triangle-loading"
+                                  />
+                                )}
+                                Перейти до оплати
+                              </button>
+                            </div>
+                          )}
+                        </Modal>
                       </div>
                     )}
                   </div>
@@ -172,20 +322,14 @@ const CourseDetail = () => {
                         courseId={id || ''}
                         hundleUserBuyCourse={hundleUserBuyCourse}
                         is_course_mine={data?.mine}
+                        openBuyModal={openBuyModal}
                       />
                     ))}
                   </div>
                 </div>
               </>
-
-
-
             </div>
-
-
           </div>
-
-
         </div>
       </div>
     </>

@@ -9,8 +9,8 @@ export function usePostPaymentPage() {
   return useMutation<
     PaymentResponse,
     Error,
-    number
+    { courseId: number; promocode?: string }
   >({
-    mutationFn: (courseId: number) => postPaymentPage(courseId),
+    mutationFn: ({ courseId, promocode }) => postPaymentPage({ courseId, promocode }),
   });
 }

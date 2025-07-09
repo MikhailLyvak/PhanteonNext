@@ -13,9 +13,10 @@ interface Props {
   courseId: string;
   hundleUserBuyCourse: () => void;
   is_course_mine: boolean;
+  openBuyModal: () => void;
 }
 
-const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, courseId, hundleUserBuyCourse, is_course_mine }) => {
+const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, courseId, hundleUserBuyCourse, is_course_mine, openBuyModal }) => {
   return (
     <div className="bg-[#242433] rounded-3xl px-6 pt-3 lg:py-7 my-3 lg:my-6">
       <div
@@ -60,7 +61,7 @@ const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, c
           </div>
         ) : (
           <button
-            onClick={hundleUserBuyCourse}
+            onClick={openBuyModal}
             className="flex items-center gap-2 px-6 py-3 mt-2 lg:mt-4 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors"
           >
             <span>Придбати</span>
