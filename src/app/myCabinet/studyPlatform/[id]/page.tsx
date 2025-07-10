@@ -7,10 +7,9 @@ import { LuPlus, LuCheck } from "react-icons/lu";
 import ModuleAccordion from "./ModuleAccordion";
 import { ModuleDetail } from "@/api/StudyPlatform/types";
 import { usePostPaymentPage } from "@/hooks/StudyPlatform/usePostPaymentPage";
-import InnerWhiteHeader from "@/app/components/LayoutItems/components/Header/InnerWhiteHeader";
 import Modal from 'react-modal';
-import axios from 'axios';
 import { Triangle } from 'react-loader-spinner';
+import axiosInterceptor from "@/interceptor/axiosClient";
 
 const CourseDetail = () => {
   const params = useParams();
@@ -78,7 +77,7 @@ const CourseDetail = () => {
     setPromoCheckLoading(true);
     setPromoError(null);
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/check_promocode/', { promocode });
+      const res = await axiosInterceptor.post('/api/check_promocode/', { promocode });
       if (res.data.valid) {
         setPromoResult(res.data);
         const discount = Number(res.data.discount_percent) || 0;
