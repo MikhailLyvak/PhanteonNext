@@ -76,7 +76,10 @@ const NavAccordion: React.FC<NavAccordionProps> = ({ modules }) => {
 
           {/* Module Lessons (expanded) */}
           {openModule === module.id && (
-            <div className={`px-2 pb-4 space-y-2 ${openModule === module.id && 'bg-[#FFFFFF12] rounded-b-xl pt-3'}`}>
+            <div
+              className={`px-2 pb-4 space-y-2 ${openModule === module.id && 'bg-[#FFFFFF12] rounded-b-xl pt-3'}`}
+              style={{ maxHeight: 240, overflowY: 'auto' }}
+            >
               {module.lessons.map((lesson) => {
                 const LessonContent = (
                   <div className="flex items-center pl-1 pt-[6px]">
