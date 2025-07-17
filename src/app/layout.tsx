@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "@/app/globals.css";
 import Footer from "./components/LayoutItems/Footer";
 import LoginModal from "./components/Auth/AuthModal";
@@ -7,16 +7,6 @@ import QueryProvider from "@/providers/QueryProvider";
 import Drawer from "./components/HeaderComps/Drawer";
 import MainDrawer from "./components/HeaderComps/Drawers/MainDrawer";
 import InnerWhiteHeader from "./components/LayoutItems/components/Header/InnerWhiteHeader";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -40,7 +30,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/Header/LogoColoredSmall.svg" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-[#171723] antialiased min-h-screen flex flex-col`}
+        className={`bg-[#171723] antialiased min-h-screen flex flex-col`}
       >
         <QueryProvider>
           <InnerWhiteHeader />

@@ -40,12 +40,12 @@ export default function CryptoTicker() {
 
     fetchPrices()
 
-    // Add event listener for window focus
-    window.addEventListener('focus', fetchPrices)
+    // Refresh prices every 30 seconds instead of on focus
+    const interval = setInterval(fetchPrices, 30000)
 
     // Cleanup function
     return () => {
-      window.removeEventListener('focus', fetchPrices)
+      clearInterval(interval)
     }
   }, [])
 
