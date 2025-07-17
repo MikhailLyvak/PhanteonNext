@@ -10,7 +10,7 @@ env:
   AWS_REGION: eu-central-1
   AWS_ACCOUNT_ID: '816988559151'
   ROLE_TO_ASSUME: arn:aws:iam::816988559151:role/pantheonx-ecr-backend-access-role
-  TARGET_GROUP_ARN: arn:aws:elasticloadbalancing:eu-central-1:028780196276:targetgroup/backend/e42f55594a81adc7
+  TARGET_GROUP_ARN: arn:aws:elasticloadbalancing:eu-central-1:816988559151:targetgroup/PANTHEONX-PRODUCTION/e5eb5d894808cb37
   ECR_REPOSITORY: pantheonx
   IMAGE_TAG: latest
   APP_DIR: /home/ec2-user/app
