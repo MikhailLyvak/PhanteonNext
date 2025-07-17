@@ -3,11 +3,22 @@
 import React from 'react';
 import Link from 'next/link';
 import { User, Settings, LogOut, GraduationCap, CheckCircle } from "lucide-react";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LuChartLine } from 'react-icons/lu';
+import { useUserStore } from "@/store/UserData/useUserStore";
+import { Cookies } from "react-cookie";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { clearUser } = useUserStore();
+
+  const logout = () => {
+    const cookies = new Cookies();
+    cookies.remove("local_access_token", { path: "/" });
+    clearUser();
+    router.push("/");
+  };
 
   return (
     <div className="min-w-[312px] p-4 bg-[#242433] rounded-2xl flex flex-col gap-1">
@@ -35,10 +46,10 @@ const Sidebar = () => {
         href="/404page"
         active={pathname === '/404page'}
       />
-      <NavItem
+      <LogoutNavItem
         icon={<LogOut size={20} />}
         text="Вихід"
-        href="/logout"
+        onClick={logout}
       />
     </div>
   );
@@ -66,6 +77,26 @@ const NavItem = ({
       </span>
     </button>
   </Link>
+);
+
+const LogoutNavItem = ({
+  icon,
+  text,
+  onClick
+}: {
+  icon: React.ReactNode;
+  text: string;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-colors duration-200 hover:bg-[#2F2F40] text-[#58587B]"
+  >
+    {icon}
+    <span className="text-base text-[#58587B]">
+      {text}
+    </span>
+  </button>
 );
 
 export default Sidebar;

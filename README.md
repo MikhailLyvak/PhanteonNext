@@ -1,9 +1,12 @@
 ```bash
-npm install // запусти разок щоб стоврити node_modules бо в мене ярн їх не створював
+npm install --force
+ // запусти разок щоб стоврити node_modules бо в мене ярн їх не створював
 
-yarn install // Щоб закачати потрібні пакенти
+yarn install
+ // Щоб закачати потрібні пакенти
 
-yarn dev // Щоб запустити сервер
+yarn dev
+ // Щоб запустити сервер
 
 ```
 # PhanteonNext
