@@ -9,7 +9,7 @@ import { PiTelegramLogo } from "react-icons/pi";
 import { useGetLastVebinar } from "@/hooks/Vebinars/useGetLastVebinar";
 
 const Footer = () => {
-  const { data: lastVebinar } = useGetLastVebinar();
+  const { data: lastVebinar, isLoading } = useGetLastVebinar();
 
   return (
     <footer className="bg-[#171723]">
@@ -40,9 +40,13 @@ const Footer = () => {
               <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
                 АІ-агенти
               </Link>
-              <Link target='_blank' href={lastVebinar?.link || ''} className="text-[#D2D2FF] hover:text-white transition-colors">
-                Воркшопи
-              </Link>
+              {isLoading ? (
+                <span className="text-[#D2D2FF]">Воркшопи</span>
+              ) : (
+                <Link target='_blank' href={lastVebinar?.link || '#'} className="text-[#D2D2FF] hover:text-white transition-colors">
+                  Воркшопи
+                </Link>
+              )}
               <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Академія
               </Link>
@@ -55,9 +59,9 @@ const Footer = () => {
               <Link href="https://www.instagram.com/igor_porokh/" target="_blank" rel="noopener noreferrer">
                 <LuInstagram size={32} className="text-[#D2D2FF] hover:text-white transition-colors" />
               </Link>
-              <Link href="t.me/roadfromatoz" target="_blank" rel="noopener noreferrer">
+              <a href="https://t.me/roadfromatoz" target="_blank" rel="noopener noreferrer">
                 <PiTelegramLogo size={32} className="text-[#D2D2FF] hover:text-white transition-colors" />
-              </Link>
+              </a>
             </div>
           </div>
         </div>
