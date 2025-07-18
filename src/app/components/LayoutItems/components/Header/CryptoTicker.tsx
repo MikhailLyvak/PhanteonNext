@@ -29,21 +29,26 @@ export default function CryptoTicker() {
   const [isRetrying, setIsRetrying] = useState(false)
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let retryTimeoutId: NodeJS.Timeout
     let intervalId: NodeJS.Timeout
+    let abortController: AbortController | null = null
 
     async function fetchPrices() {
       if (isRetrying) return
       
       try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        abortController = new AbortController()
+        const fetchTimeoutId = setTimeout(() => {
+          if (abortController) {
+            abortController.abort()
+          }
+        }, 30000) // Increased timeout to 30 seconds
         
         const res = await fetch('https://api.binance.com/api/v3/ticker/price', {
-          signal: controller.signal
+          signal: abortController.signal
         })
         
-        clearTimeout(timeoutId)
+        clearTimeout(fetchTimeoutId)
         
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`)
@@ -55,14 +60,23 @@ export default function CryptoTicker() {
         setRetryCount(0) // Reset retry count on success
         setIsRetrying(false)
       } catch (err) {
-        console.error('Failed to fetch Binance prices:', err)
+        // Only log error if it's not an abort error from cleanup
+        if (err instanceof Error && err.name !== 'AbortError') {
+          console.error('Failed to fetch Binance prices:', err)
+        }
+        
+        // Don't retry if component is unmounting (aborted)
+        if (err instanceof Error && err.name === 'AbortError') {
+          return
+        }
+        
         setIsRetrying(true)
         
         // Exponential backoff: 5s, 10s, 20s, 40s, then 60s max
         const delay = Math.min(5000 * Math.pow(2, retryCount), 60000)
         setRetryCount(prev => prev + 1)
         
-        timeoutId = setTimeout(() => {
+        retryTimeoutId = setTimeout(() => {
           setIsRetrying(false)
         }, delay)
       }
@@ -76,7 +90,10 @@ export default function CryptoTicker() {
     // Cleanup function
     return () => {
       clearInterval(intervalId)
-      clearTimeout(timeoutId)
+      clearTimeout(retryTimeoutId)
+      if (abortController) {
+        abortController.abort()
+      }
     }
   }, [retryCount, isRetrying])
 
