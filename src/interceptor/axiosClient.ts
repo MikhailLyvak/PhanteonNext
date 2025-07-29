@@ -1,3 +1,5 @@
+'use client'
+
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Cookies } from 'react-cookie';
 
