@@ -7,6 +7,7 @@ export interface LoginResponse {
 export interface UserLoginData {
   email: string;
   password: string;
+  referalId?: string;
 }
 
 interface UserEmail {

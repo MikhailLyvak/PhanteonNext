@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AdaptiveButtons from "./AdaptiveButtons";
+import {useUserStore} from "@/store/UserData/useUserStore";
 
 interface Props {
   textColor?: string;

@@ -1,6 +1,5 @@
 "use client";
-
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -8,7 +7,20 @@ import LoginModalFormComponent from "./components/Login";
 import Register from "./components/Register";
 
 const LoginModal = () => {
-  const { isOpen, toggleModal, activeTab, setActiveTab } = useAuthModalStore();
+  const { isOpen, toggleModal, activeTab, setActiveTab, setReferralId } = useAuthModalStore();
+
+  const params = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search)
+    : null;
+  const referalId = params?.get("referal_id") ?? null;
+  const register = params?.get("register");
+
+  useEffect(() => {
+    if (referalId && register) {
+      setActiveTab("register");
+      setReferralId(referalId);
+    }
+  }, []);
 
   if (!isOpen) return null;
 
