@@ -38,7 +38,7 @@ const Drawer = () => {
     cookies.remove("local_access_token", { path: "/" });
     clearUser();
     closeDrawer();
-    router.push("/");
+    router.push("/login");
   };
 
   if (!mounted) return null;
