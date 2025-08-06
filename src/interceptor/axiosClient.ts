@@ -1,3 +1,5 @@
+'use client'
+
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Cookies } from 'react-cookie';
 
@@ -12,7 +14,7 @@ const axiosInterceptor = axios.create({
 axiosInterceptor.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	// Skip token for login and register endpoints
 	const isAuthEndpoint = config.url?.includes('/auth/api/login/') || config.url?.includes('/auth/api/register/');
-	
+
 	if (!isAuthEndpoint) {
 		const cookies = new Cookies();
 		const token = cookies.get('local_access_token');

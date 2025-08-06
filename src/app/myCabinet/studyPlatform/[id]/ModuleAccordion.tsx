@@ -18,7 +18,7 @@ interface Props {
 
 const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, courseId, hundleUserBuyCourse, is_course_mine, openBuyModal }) => {
   return (
-    <div className="bg-[#242433] rounded-3xl px-6 pt-3 lg:py-7 my-3 lg:my-6">
+    <div className="bg-[#242433] rounded-3xl px-6 pt-3 py-4 lg:py-7 my-3 lg:my-6">
       <div
         className="flex flex-col justify-between items-start cursor-pointer"
         onClick={() => handleToggle(data.id)}
@@ -81,12 +81,12 @@ const ModuleAccordion: React.FC<Props> = ({ data, handleToggle, isOpen, index, c
                 >
                   {isAccessible ? <LuCheck size={14} /> : <LuLock size={14} />}
                 </div>
-                <div className="text-gray-800 text-sm lg:text-lg font-semibold h-6 flex items-center">
-                  <div className="flex items-center rounded-3xl hover:underline">
+                <div className="text-gray-800 text-sm lg:text-lg font-semibold h-6 flex items-center min-w-0">
+                  <div className="flex items-center rounded-3xl hover:underline flex-1 min-w-0">
                     <div className="hidden lg:flex text-[#D2D2FF]">
                       Тема {lesson_index + 1}.&nbsp;
                     </div>
-                    <div className="truncate text-[#D2D2FF]">{lesson.name}</div>
+                    <div className="flex-1 min-w-0 truncate whitespace-nowrap text-[#D2D2FF]">{lesson.name}</div>
                   </div>
                   <div className="flex gap-1 lg:gap-[10px] ml-2 lg:ml-7">
                     <IconWithToolTip

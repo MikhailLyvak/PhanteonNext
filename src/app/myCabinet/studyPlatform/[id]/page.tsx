@@ -215,7 +215,7 @@ const CourseDetail = () => {
                         </div>
                       </>
                     ) : (
-                      <div className="flex max-lg:flex-col items-center gap-6">
+                      <div className="flex items-center justify-between w-full">
                         <div>
                           <div className="flex items-center gap-2">
                             {data?.discount ? (
@@ -259,24 +259,37 @@ const CourseDetail = () => {
                             </div>
                           )}
                           {promoStep === 'input' && (
-                            <div className="flex flex-col gap-4">
-                              <div className="text-lg font-semibold">Введіть промокод</div>
-                              <input
-                                type="text"
-                                value={promocode}
-                                onChange={e => setPromocode(e.target.value)}
-                                placeholder="Промокод"
-                                className="px-4 py-2 rounded border border-gray-400 text-black"
-                              />
-                              <button
-                                className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold"
-                                onClick={handlePromoCheck}
-                                disabled={promoCheckLoading}
-                              >
-                                {promoCheckLoading ? 'Перевірка...' : 'Перевірити промокод'}
-                              </button>
-                              {promoError && <div className="text-red-400">{promoError}</div>}
-                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={closeBuyModal}
+                                    className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2"
+                                    aria-label="Закрити"
+                                  >
+                                    ×
+                                </button>
+                              </div>
+                              {/* Title and close button in a row, with space between */}
+                              <div className="flex flex-col gap-2 mb-4">
+                                <div className="text-lg text-center font-semibold">Введіть промокод</div>
+                                  <input
+                                    type="text"
+                                    value={promocode}
+                                    onChange={e => setPromocode(e.target.value)}
+                                    placeholder="Промокод"
+                                    className="px-4 py-2 rounded border border-gray-400 text-black"
+                                  />
+                                  <button
+                                    className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold"
+                                    onClick={handlePromoCheck}
+                                    disabled={promoCheckLoading}
+                                  >
+                                    {promoCheckLoading ? 'Перевірка...' : 'Перевірити промокод'}
+                                  </button>
+                                  {promoError && <div className="text-red-400">{promoError}</div>}
+                                </div>
+                              </div>
                           )}
                           {promoStep === 'checked' && promoResult && (
                             <div className="flex flex-col gap-4">

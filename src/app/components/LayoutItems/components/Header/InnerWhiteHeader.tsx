@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, {useState} from 'react'
 import AdaptiveButtons from './AdaptiveButtons'
 import CryptoTicker from './CryptoTicker' // ✅ Import it
 import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
@@ -12,7 +12,17 @@ import { useUserStore } from '@/store/UserData/useUserStore'
 const InnerWhiteHeader = () => {
   const { data: lastVebinar } = useGetLastVebinar();
   const user = useUserStore(state => state.user);
+  const [copied, setCopied] = useState(false);
   if (!user) return null;
+
+  const refferalRegisterLink = `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(refferalRegisterLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
 
   return (
     <>
@@ -46,7 +56,14 @@ const InnerWhiteHeader = () => {
           {/* ✅ Center - Navigation */}
           <div className="2xl:gap-10 gap-5 hidden lg:flex">
             <Link href="/About" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</Link>
-            <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Блог</Link>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+            >
+              {copied ? "Скопійовано!" : "Реферали"}
+            </button>
             <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">АІ-агенти</Link>
             <Link target='_blank' href={lastVebinar?.link || ''} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Воркшопи</Link>
             <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>

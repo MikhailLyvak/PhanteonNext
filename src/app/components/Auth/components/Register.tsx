@@ -14,6 +14,7 @@ const schema = z
     email: z.string().min(1, 'Email обовʼязковий').email('Невірний формат email'),
     password: z.string().min(6, 'Мінімум 6 символів'),
     confirm_password: z.string().min(6, 'Мінімум 6 символів'),
+    referalId: z.string().optional(),
   })
   .refine((data) => data.password === data.confirm_password, {
     message: 'Паролі не співпадають',
@@ -22,10 +23,14 @@ const schema = z
 
 type RegisterFormData = z.infer<typeof schema>;
 
+
 const RegisterModalFormComponent = () => {
   const { setUser } = useUserStore();
+  const { referral_id } = useAuthModalStore();
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  console.log(referral_id);
 
   const { mutate: handleRegister, isPending } = useMutation({
     mutationFn: register,
@@ -45,6 +50,7 @@ const RegisterModalFormComponent = () => {
       email: '',
       password: '',
       confirm_password: '',
+      referalId: referral_id ? referral_id : '',
     },
   });
 
@@ -52,6 +58,7 @@ const RegisterModalFormComponent = () => {
     handleRegister({
       email: data.email,
       password: data.password,
+      referalId: data.referalId ? data.referalId : '',
     });
   };
 
