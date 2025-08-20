@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useUserStore } from '@/store/UserData/useUserStore';
+import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import { getProfile } from '@/api/Auth/getProfile';
 import { Triangle } from 'react-loader-spinner'
 
@@ -16,6 +17,7 @@ type LoginFormData = z.infer<typeof schema>;
 
 const LoginModalFormComponent = () => {
   const { setUser } = useUserStore();
+  const { closeModal } = useAuthModalStore();
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
@@ -24,6 +26,7 @@ const LoginModalFormComponent = () => {
     onSuccess: async () => {
       const profileData = await getProfile();
       setUser(profileData);
+      closeModal(); // Close modal on successful login
     },
     onError: (error: any) => {
       setErrorMessage(true);
