@@ -7,13 +7,13 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('local_access_token');
-  const isValid = token && token.value.startsWith('Token ');
-
-  if (!isValid) {
-    redirect('/login');
-  }
+  // const cookieStore = await cookies();
+  // const token = cookieStore.get('local_access_token');
+  // const isValid = token && token.value.startsWith('Token ');
+  //
+  // if (!isValid) {
+  //   redirect('/login');
+  // }
 
   return <>{children}</>;
 }
