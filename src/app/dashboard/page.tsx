@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 // Dynamically import the TradingView widget with no SSR
 const TradingViewWidget = dynamic(
@@ -26,7 +25,6 @@ const DashboardPage = () => {
   }
 
   return (
-    <ProtectedRoute>
     <div className='max-w-[1320px] mx-auto'>
       <div style={{ height: 500 }}>
         <TradingViewWidget
@@ -37,7 +35,6 @@ const DashboardPage = () => {
         />
       </div>
     </div>
-    </ProtectedRoute>
   );
 };
 

@@ -26,7 +26,7 @@ type RegisterFormData = z.infer<typeof schema>;
 
 const RegisterModalFormComponent = () => {
   const { setUser } = useUserStore();
-  const { referral_id } = useAuthModalStore();
+  const { referral_id, closeModal } = useAuthModalStore();
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -36,6 +36,7 @@ const RegisterModalFormComponent = () => {
     mutationFn: register,
     onSuccess: (data) => {
       setUser(data.user);
+      closeModal(); // Close modal on successful registration
     },
     onError: (error: any) => {
       const msg =

@@ -1,11 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export default function About() {
   return (
     <>
-    <ProtectedRoute>
       <div className="bg-[#0F0F1B] pb-20">
         <div className="max-w-[1320px] w-full mx-auto px-4 flex flex-col lg:flex-row items-center gap-[136px]">
           <div className="flex-shrink-0 relative">
@@ -120,7 +118,6 @@ export default function About() {
           </div>
         </div>
       </div>
-      </ProtectedRoute>
     </>
   );
 }

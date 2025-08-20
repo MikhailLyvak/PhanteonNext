@@ -3,6 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useUserStore } from "@/store/UserData/useUserStore";
+import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 
 import { LuInstagram } from "react-icons/lu";
 import { PiTelegramLogo } from "react-icons/pi";
@@ -10,6 +12,15 @@ import { useGetLastVebinar } from "@/hooks/Vebinars/useGetLastVebinar";
 
 const Footer = () => {
   const { data: lastVebinar, isLoading } = useGetLastVebinar();
+  const user = useUserStore(state => state.user);
+  const { toggleModal } = useAuthModalStore();
+
+  const handleAcademyClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      toggleModal(); // Open login modal if not authenticated
+    }
+  };
 
   return (
     <footer className="bg-[#171723]">
@@ -47,9 +58,18 @@ const Footer = () => {
                   Воркшопи
                 </Link>
               )}
-              <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
-                Академія
-              </Link>
+              {user ? (
+                <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
+                  Академія
+                </Link>
+              ) : (
+                <button
+                  onClick={handleAcademyClick}
+                  className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
+                >
+                  Академія
+                </button>
+              )}
               <Link href="/dashboard" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Графіки
               </Link>
