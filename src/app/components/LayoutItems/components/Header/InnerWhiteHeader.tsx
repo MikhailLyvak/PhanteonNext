@@ -63,6 +63,7 @@ const InnerWhiteHeader = () => {
           {/* ✅ Center - Navigation */}
           <div className="2xl:gap-10 gap-5 hidden lg:flex">
             <Link href="/About" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Про нас</Link>
+            <Link href="/Blog" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Блог</Link>
             {user && (
               <button
                 type="button"
@@ -74,9 +75,6 @@ const InnerWhiteHeader = () => {
               </button>
             )}
             <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">АІ-агенти</Link>
-            {isEnabled && lastVebinar?.link && (
-              <Link target='_blank' href={lastVebinar.link} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Воркшопи</Link>
-            )}
             {user ? (
               <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>
             ) : (

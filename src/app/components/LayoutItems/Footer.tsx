@@ -45,19 +45,12 @@ const Footer = () => {
               <Link href="/About" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Про нас
               </Link>
-              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
-                  Блог
-                </Link>
+              <Link href="/Blog" className="text-[#D2D2FF] hover:text-white transition-colors">
+                Блог
+              </Link>
               <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
                 АІ-агенти
               </Link>
-              {isLoading ? (
-                <span className="text-[#D2D2FF]">Воркшопи</span>
-              ) : (
-                <Link target='_blank' href={lastVebinar?.link || '#'} className="text-[#D2D2FF] hover:text-white transition-colors">
-                  Воркшопи
-                </Link>
-              )}
               {user ? (
                 <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
                   Академія
