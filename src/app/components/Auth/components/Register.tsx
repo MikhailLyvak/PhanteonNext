@@ -39,9 +39,66 @@ const RegisterModalFormComponent = () => {
       closeModal(); // Close modal on successful registration
     },
     onError: (error: any) => {
-      const msg =
-        error?.response?.data?.detail || 'Сталася помилка при реєстрації';
-      setErrorMessage(msg);
+      console.error('Registration error details:', error);
+      
+      let errorMessage = 'Сталася помилка при реєстрації';
+      
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+        
+        // Handle validation errors
+        if (responseData.details) {
+          const details = responseData.details;
+          
+          // Check for specific field errors
+          if (details.email) {
+            if (Array.isArray(details.email)) {
+              errorMessage = details.email[0]; // Take first error message
+            } else {
+              errorMessage = details.email;
+            }
+          } else if (details.password) {
+            if (Array.isArray(details.password)) {
+              errorMessage = details.password[0];
+            } else {
+              errorMessage = details.password;
+            }
+          } else if (details.referalId) {
+            if (Array.isArray(details.referalId)) {
+              errorMessage = details.referalId[0];
+            } else {
+              errorMessage = details.referalId;
+            }
+          } else if (details.non_field_errors) {
+            if (Array.isArray(details.non_field_errors)) {
+              errorMessage = details.non_field_errors[0];
+            } else {
+              errorMessage = details.non_field_errors;
+            }
+          }
+        }
+        // Handle general error messages
+        else if (responseData.error) {
+          errorMessage = responseData.error;
+        }
+        // Handle other error formats
+        else if (responseData.message) {
+          errorMessage = responseData.message;
+        }
+      }
+      
+      // Translate common error messages to Ukrainian
+      if (errorMessage.includes('user with this email already exists')) {
+        errorMessage = 'Користувач з таким email вже існує';
+      } else if (errorMessage.includes('This field may not be blank')) {
+        errorMessage = 'Це поле не може бути порожнім';
+      } else if (errorMessage.includes('This field is required')) {
+        errorMessage = 'Це поле обов\'язкове';
+      } else if (errorMessage.includes('Ensure this field has at least')) {
+        errorMessage = 'Це поле має містити мінімум символів';
+      }
+      
+      setErrorMessage(errorMessage);
     },
   });
 
@@ -56,11 +113,19 @@ const RegisterModalFormComponent = () => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    handleRegister({
+    console.log('Form data submitted:', data);
+    const registerData: any = {
       email: data.email,
       password: data.password,
-      referalId: data.referalId ? data.referalId : '',
-    });
+    };
+    
+    // Only include referalId if it's not empty
+    if (data.referalId && data.referalId.trim()) {
+      registerData.referalId = data.referalId;
+    }
+    
+    console.log('Data being sent to API:', registerData);
+    handleRegister(registerData);
   };
 
   return (
@@ -89,12 +154,21 @@ const RegisterModalFormComponent = () => {
         name="password"
         render={({ field, fieldState }) => (
           <>
-            <input
-              {...field}
-              type={isVisible ? 'text' : 'password'}
-              placeholder="Пароль"
-              className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                {...field}
+                type={isVisible ? 'text' : 'password'}
+                placeholder="Пароль"
+                className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsVisible(!isVisible)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {isVisible ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
             {fieldState.error && (
               <p className="text-red-500 text-sm">{fieldState.error.message}</p>
             )}
@@ -107,12 +181,21 @@ const RegisterModalFormComponent = () => {
         name="confirm_password"
         render={({ field, fieldState }) => (
           <>
-            <input
-              {...field}
-              type={isVisible ? 'text' : 'password'}
-              placeholder="Повторіть пароль"
-              className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                {...field}
+                type={isVisible ? 'text' : 'password'}
+                placeholder="Повторіть пароль"
+                className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsVisible(!isVisible)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {isVisible ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
             {fieldState.error && (
               <p className="text-red-500 text-sm">{fieldState.error.message}</p>
             )}
