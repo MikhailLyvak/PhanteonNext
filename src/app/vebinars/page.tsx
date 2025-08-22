@@ -67,7 +67,6 @@ const VebinarsPage = () => {
       <div className="min-h-screen bg-[#171723] flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 text-lg">Наразі немає доступних вебінарів</p>
-          <p className="text-gray-500 text-sm mt-2">Спробуйте оновити сторінку або зверніться до адміністратора</p>
         </div>
       </div>
     );
