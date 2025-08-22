@@ -48,7 +48,8 @@ const HeaderNav: React.FC<Props> = ({ textColor = "text-black" }) => {
         <div className="2xl:gap-10 gap-5 hidden lg:flex">
           <div className="font-bold text-sm xl:text-base">МАГАЗИН</div>
           <div className="font-bold text-sm xl:text-base">E-BALANCE PRO</div>
-          <div className="font-bold text-sm xl:text-base">АКАДЕМІЯ VB</div>
+          <Link href="/myCabinet/studyPlatform" className="font-bold text-sm xl:text-base hover:text-[#D2D2FF] transition-colors">АКАДЕМІЯ VB</Link>
+          <Link href="/vebinars" className="font-bold text-sm xl:text-base hover:text-[#D2D2FF] transition-colors">ВЕБІНАРИ</Link>
           <div className="font-bold text-sm xl:text-base">ПРО НАС</div>
           <div className="font-bold text-sm xl:text-base">БЛОГ</div>
         </div>
@@ -74,7 +75,7 @@ const HeaderNav: React.FC<Props> = ({ textColor = "text-black" }) => {
             </div>
             <div className="text-gray-800 text-base font-normal flex-col space-y-3">
               <Link href='/customCources/EmotInt'>Емоційний інтелект</Link>
-              <div>Кастомний курс</div>
+              <Link href='/myCabinet/vebinars'>Вебінари</Link>
               <div>Кастомний курс</div>
               <div>Кастомний курс</div>
               <div>Кастомний курс</div>
