@@ -23,9 +23,10 @@ const CourseCard = ({ course }: { course: Course }) => {
         <div className="">
           <div className="flex justify-between">
             <div className="flex mb-4 sm:mb-6 items-center flex-1 min-w-0">
-              <div className="w-6 h-6 flex items-center justify-center rounded-full border-gray-500 border-[1px] text-gray-500 shrink-0">
+              <div className={`w-6 h-6 flex items-center justify-center rounded-full ${course.course_progress === 100 ? 'bg-[#D2D2FF] text-[#242433]' : 'border-gray-500 border-[1px] text-gray-500'}  shrink-0`}>
                 <LuCheck size={12} className="font-semibold" />
               </div>
+              
               <div className="ml-3 w-full min-w-0 overflow-hidden">
                 <h3 className="font-semibold sm:font-bold text-[#D2D2FF] text-lg truncate">{course.name}</h3>
               </div>

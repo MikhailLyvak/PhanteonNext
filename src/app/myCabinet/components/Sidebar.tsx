@@ -5,9 +5,15 @@ import Link from 'next/link';
 import { User, Settings, LogOut, GraduationCap, CheckCircle } from "lucide-react";
 import { usePathname } from 'next/navigation';
 import { LuChartLine } from 'react-icons/lu';
+import { Cookies } from 'react-cookie';
+import router from 'next/router';
+import { useDrawerStore } from '@/store/Nav/useDrawerStore';
+import { useUserStore } from '@/store/UserData/useUserStore';
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { isDrawerOpen, closeDrawer } = useDrawerStore();
+  const { user, clearUser } = useUserStore();
 
   return (
     <div className="min-w-[312px] p-4 bg-[#242433] rounded-2xl flex flex-col gap-1">
@@ -38,7 +44,13 @@ const Sidebar = () => {
       <NavItem
         icon={<LogOut size={20} />}
         text="Вихід"
-        href="/logout"
+        onClick={() => {
+          const cookies = new Cookies();
+          cookies.remove("local_access_token", { path: "/" });
+          clearUser();
+          closeDrawer();
+          router.push("/login");
+        }}
       />
     </div>
   );
@@ -48,14 +60,16 @@ const NavItem = ({
   icon,
   text,
   active,
-  href
+  href,
+  onClick
 }: {
   icon: React.ReactNode;
   text: string;
   active?: boolean;
-  href: string;
+  href?: string;
+  onClick?: (() => void) | undefined;
 }) => (
-  <Link href={href} className="block">
+  <Link href={href ? href : ''} onClick={()=> onClick ? onClick() : null} className="block">
     <button
       className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-colors duration-200 hover:bg-[#2F2F40]
       ${active ? 'text-[#D2D2FF] font-semibold' : 'text-[#58587B]'}`}

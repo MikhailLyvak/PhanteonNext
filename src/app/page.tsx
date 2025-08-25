@@ -9,13 +9,11 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-import InnerWhiteHeader from "./components/LayoutItems/components/Header/InnerWhiteHeader";
+import { useEffect } from "react";
 
 export default function Home() {
-
-  return (
-    <div className={`${montserrat.variable}`}>
-      <InnerWhiteHeader />
-    </div>
-  );
+  useEffect(() => {
+    window.location.href = "/myCabinet/studyPlatform";
+  }, []);
+  return;
 }

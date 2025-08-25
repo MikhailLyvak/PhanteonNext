@@ -65,7 +65,7 @@ const InnerWhiteHeader = () => {
               {copied ? "Скопійовано!" : "Реферали"}
             </button>
             <Link href="/404page" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">АІ-агенти</Link>
-            <Link target='_blank' href={lastVebinar?.link || ''} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Воркшопи</Link>
+            <Link target={lastVebinar?.link ? '_blank' : '_self'} href={lastVebinar?.link || ''} className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Воркшопи</Link>
             <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>
             <Link href="/dashboard" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Графіки</Link>
           </div>
