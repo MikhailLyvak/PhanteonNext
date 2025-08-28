@@ -74,7 +74,7 @@ const InnerWhiteHeader = () => {
                 {copied ? "Скопійовано!" : "Реферали"}
               </button>
             )}
-            <Link href="AI-Agent" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">АІ-агенти</Link>
+            <Link href="/AI-Agent" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">АІ-агенти</Link>
             {user ? (
               <Link href="/myCabinet/studyPlatform" className="font-bold text-sm text-[#D2D2FFAB] xl:text-base">Академія</Link>
             ) : (
