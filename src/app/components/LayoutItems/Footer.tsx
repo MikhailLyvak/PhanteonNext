@@ -48,7 +48,7 @@ const Footer = () => {
               <Link href="/Blog" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Блог
               </Link>
-              <Link href="/404page" className="text-[#D2D2FF] hover:text-white transition-colors">
+              <Link href="/AI-Agent" className="text-[#D2D2FF] hover:text-white transition-colors">
                 АІ-агенти
               </Link>
               {user ? (
