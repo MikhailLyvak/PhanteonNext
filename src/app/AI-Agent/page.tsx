@@ -2,11 +2,55 @@
 import useChatAgent from '@/hooks/AIAgent/useChatAgent'
 import { Send, Trash } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import 'highlight.js/styles/github-dark.css'
 
 interface Message {
 	text: string
 	date: string // ISO string
 	sender: 'user' | 'agent' | 'error'
+}
+
+// Custom components for markdown rendering
+const markdownComponents = {
+	code: ({ node, inline, className, children, ...props }: any) => {
+		const match = /language-(\w+)/.exec(className || '')
+		return !inline && match ? (
+			<pre className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
+				<code className={className} {...props}>
+					{children}
+				</code>
+			</pre>
+		) : (
+			<code className="bg-gray-800 text-blue-300 px-1 py-0.5 rounded text-sm" {...props}>
+				{children}
+			</code>
+		)
+	},
+	blockquote: ({ children }: any) => (
+		<blockquote className="border-l-4 border-gray-600 bg-gray-800 rounded-lg px-4 py-2 text-gray-300">
+			{children}
+		</blockquote>
+	),
+	table: ({ children }: any) => (
+		<div className="overflow-x-auto">
+			<table className="min-w-full border-collapse border border-gray-700">
+				{children}
+			</table>
+		</div>
+	),
+	th: ({ children }: any) => (
+		<th className="border border-gray-700 bg-gray-800 px-4 py-2 text-left text-white font-semibold">
+			{children}
+		</th>
+	),
+	td: ({ children }: any) => (
+		<td className="border border-gray-700 px-4 py-2 text-white">
+			{children}
+		</td>
+	),
 }
 
 export default function AIPage() {
@@ -128,7 +172,26 @@ export default function AIPage() {
 								<div
 									className={`inline-block max-w-[80%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-[#1f1f30] text-white' : msg.sender === 'agent' ? 'bg-gray-700 text-white' : 'bg-red-600 text-white'}`}
 								>
-									{msg.text}
+									{msg.sender === 'agent' ? (
+										<div className="prose prose-invert prose-sm max-w-none 
+											prose-headings:text-white prose-headings:font-semibold
+											prose-p:text-white prose-p:leading-relaxed
+											prose-strong:text-white prose-strong:font-semibold
+											prose-em:text-gray-300 prose-em:italic
+											prose-ul:text-white prose-ol:text-white prose-li:text-white
+											prose-a:text-blue-400 prose-a:underline prose-a:decoration-blue-400 prose-a:underline-offset-2
+											prose-hr:border-gray-600">
+											<ReactMarkdown
+												remarkPlugins={[remarkGfm]}
+												rehypePlugins={[rehypeHighlight]}
+												components={markdownComponents}
+											>
+												{msg.text}
+											</ReactMarkdown>
+										</div>
+									) : (
+										msg.text
+									)}
 								</div>
 								<div className='text-xs text-gray-400 mt-1'>
 									{new Date(msg.date).toLocaleTimeString()}
