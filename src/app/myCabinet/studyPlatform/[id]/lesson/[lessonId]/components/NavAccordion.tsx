@@ -35,7 +35,7 @@ const NavAccordion: React.FC<NavAccordionProps> = ({ modules }) => {
   };
 
   return (
-    <div className="w-full max-w-[424px] bg-[#242433] max-h-[466px] rounded-b-3xl lg:rounded-3xl shadow-xl p-3">
+    <div className="w-full min-w-full md:min-w-[424px] bg-[#242433] max-h-[466px] rounded-b-3xl lg:rounded-3xl shadow-xl p-3">
       {modules.map((module) => (
         <div key={module.id} className="mb-2">
           {/* Module Header */}

@@ -65,14 +65,16 @@ const NavItem = ({
   icon,
   text,
   active,
-  href
+  href,
+  onClick
 }: {
   icon: React.ReactNode;
   text: string;
   active?: boolean;
-  href: string;
+  href?: string;
+  onClick?: (() => void) | undefined;
 }) => (
-  <Link href={href} className="block">
+  <Link href={href ? href : ''} onClick={()=> onClick ? onClick() : null} className="block">
     <button
       className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-colors duration-200 hover:bg-[#2F2F40]
       ${active ? 'text-[#D2D2FF] font-semibold' : 'text-[#58587B]'}`}

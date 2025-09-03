@@ -27,6 +27,17 @@ export default function CryptoTicker() {
   const [prices, setPrices] = useState<Price[]>([])
   const [retryCount, setRetryCount] = useState(0)
   const [isRetrying, setIsRetrying] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(true)
+
+  useEffect(() => {
+    function handleResize() {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     let retryTimeoutId: NodeJS.Timeout
@@ -99,7 +110,7 @@ export default function CryptoTicker() {
 
   return (
     <div className="mt-2">
-      <Marquee speed={40} pauseOnHover gradient={false}>
+      <Marquee speed={40}  pauseOnHover={isDesktop} gradient={false}>
         {prices.map((item, i) => (
           <CryptoBadge key={i} price={item.price} symbol={item.symbol} />
         ))}

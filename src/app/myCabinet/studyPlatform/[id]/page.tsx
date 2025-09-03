@@ -153,7 +153,7 @@ const CourseDetail = () => {
           </div>
 
           {/* ✅ Course Content */}
-          <div className="flex flex-col lg:flex-row justify-between gap-8 mb-16">
+          <div className="flex flex-col-reverse lg:flex-row justify-between gap-8 mb-16">
             {/* Left Column */}
             <div className="lg:w-1/2">
               <h1 className="text-3xl lg:text-5xl font-extrabold text-[#D2D2FF] mb-12">
