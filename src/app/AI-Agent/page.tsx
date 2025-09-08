@@ -1,6 +1,6 @@
 'use client'
 import useChatAgent from '@/hooks/AIAgent/useChatAgent'
-import { Send, Trash } from 'lucide-react'
+import { Loader, Send, Trash } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -18,38 +18,39 @@ const markdownComponents = {
 	code: ({ node, inline, className, children, ...props }: any) => {
 		const match = /language-(\w+)/.exec(className || '')
 		return !inline && match ? (
-			<pre className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
+			<pre className='bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto'>
 				<code className={className} {...props}>
 					{children}
 				</code>
 			</pre>
 		) : (
-			<code className="bg-gray-800 text-blue-300 px-1 py-0.5 rounded text-sm" {...props}>
+			<code
+				className='bg-gray-800 text-blue-300 px-1 py-0.5 rounded text-sm'
+				{...props}
+			>
 				{children}
 			</code>
 		)
 	},
 	blockquote: ({ children }: any) => (
-		<blockquote className="border-l-4 border-gray-600 bg-gray-800 rounded-lg px-4 py-2 text-gray-300">
+		<blockquote className='border-l-4 border-gray-600 bg-gray-800 rounded-lg px-4 py-2 text-gray-300'>
 			{children}
 		</blockquote>
 	),
 	table: ({ children }: any) => (
-		<div className="overflow-x-auto">
-			<table className="min-w-full border-collapse border border-gray-700">
+		<div className='overflow-x-auto'>
+			<table className='min-w-full border-collapse border border-gray-700'>
 				{children}
 			</table>
 		</div>
 	),
 	th: ({ children }: any) => (
-		<th className="border border-gray-700 bg-gray-800 px-4 py-2 text-left text-white font-semibold">
+		<th className='border border-gray-700 bg-gray-800 px-4 py-2 text-left text-white font-semibold'>
 			{children}
 		</th>
 	),
 	td: ({ children }: any) => (
-		<td className="border border-gray-700 px-4 py-2 text-white">
-			{children}
-		</td>
+		<td className='border border-gray-700 px-4 py-2 text-white'>{children}</td>
 	),
 }
 
@@ -173,14 +174,16 @@ export default function AIPage() {
 									className={`inline-block max-w-[80%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-[#1f1f30] text-white' : msg.sender === 'agent' ? 'bg-gray-700 text-white' : 'bg-red-600 text-white'}`}
 								>
 									{msg.sender === 'agent' ? (
-										<div className="prose prose-invert prose-sm max-w-none 
+										<div
+											className='prose prose-invert prose-sm max-w-none 
 											prose-headings:text-white prose-headings:font-semibold
 											prose-p:text-white prose-p:leading-relaxed
 											prose-strong:text-white prose-strong:font-semibold
 											prose-em:text-gray-300 prose-em:italic
 											prose-ul:text-white prose-ol:text-white prose-li:text-white
 											prose-a:text-blue-400 prose-a:underline prose-a:decoration-blue-400 prose-a:underline-offset-2
-											prose-hr:border-gray-600">
+											prose-hr:border-gray-600'
+										>
 											<ReactMarkdown
 												remarkPlugins={[remarkGfm]}
 												rehypePlugins={[rehypeHighlight]}
@@ -210,6 +213,7 @@ export default function AIPage() {
 							type='text'
 							name='message'
 							placeholder='Type your message...'
+							autoComplete='off'
 							value={message}
 							onChange={e => setMessage(e.target.value)}
 							className='bg-[#171723] rounded-full p-4 w-full focus:outline-none'
@@ -219,7 +223,7 @@ export default function AIPage() {
 							disabled={isLoading}
 							className='bg-[#6A56E4] text-white p-4 rounded-full text-base font-semibold hover:bg-[#5848c2] transition disabled:opacity-50 disabled:cursor-not-allowed'
 						>
-							<Send />
+							{isLoading ? <Loader className='animate-spin' /> : <Send />}
 						</button>
 					</div>
 				</form>
