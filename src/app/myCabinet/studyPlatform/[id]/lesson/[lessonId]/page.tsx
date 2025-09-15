@@ -97,7 +97,7 @@ const LessonDetail = () => {
             <div className='flex justify-between gap-6'>
               <div className="flex flex-col w-full">
                 <div className='mt-7 w-full'>
-                  {data?.video_url.length === 0 ? (
+                  {data?.video_url === null ? (
                     <div className='w-full aspect-video self-stretch rounded-3xl h-full shadow-xl bg-[#242433] flex justify-center items-center'>
                       <div className='text-white text-base lg:text-4xl font-semibold'>
                         Контент уроку в розробці
@@ -107,7 +107,7 @@ const LessonDetail = () => {
                     (isLoading === false && data?.video_url !== null) &&
                     <iframe
                       className="w-full aspect-video self-stretch rounded-3xl h-full shadow-xl"
-                      src={`https://www.youtube.com/embed/${getYouTubeId(data?.video_url)}?rel=0&modestbranding=1&showinfo=0&controls=1`}
+                      src={`https://www.youtube.com/embed/${getYouTubeId(data?.video_url)}`}
                       frameBorder="0"
                       title="Product Overview Video"
                       aria-hidden="true"
@@ -150,10 +150,9 @@ const LessonDetail = () => {
                       </div>
                     </div>
 
-                {/*Шо це взагалі?
-                data?.videos.length === 0 && (
+                {data?.video_url === null && (
                   <div className='w-full my-10'></div>
-                )*/}
+                )}
 
               </div>
               <div className="hidden lg:flex mt-7">
