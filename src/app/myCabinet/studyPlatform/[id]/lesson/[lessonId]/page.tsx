@@ -1,73 +1,86 @@
 'use client'
 
-import InnerWhiteHeader from '@/app/components/LayoutItems/components/Header/InnerWhiteHeader'
-import useGetLessonDetail from '@/hooks/StudyPlatform/useGetLessonDetail';
-import { useParams } from 'next/navigation';
-import { LuArrowBigDown, LuChevronDown } from "react-icons/lu";
+import useGetLessonDetail from '@/hooks/StudyPlatform/useGetLessonDetail'
+import { useParams } from 'next/navigation'
+import { LuArrowBigDown, LuChevronDown } from 'react-icons/lu'
 import React, { useState } from 'react'
-import NavAccordion from './components/NavAccordion';
-import VitalisGreenButton from '@/app/components/Buttons/VitalisGreenButton';
-import Link from 'next/link';
-import { Divide } from 'lucide-react';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import NavAccordion from './components/NavAccordion'
+import VitalisGreenButton from '@/app/components/Buttons/VitalisGreenButton'
+import Link from 'next/link'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 function getYouTubeId(url?: string): string {
-  const fallbackVideoId = 'unYKqbwdK3M';
-  if (!url) return fallbackVideoId;
-  try {
-    const urlObj = new URL(url);
-    return urlObj.searchParams.get("v") || fallbackVideoId;
-  } catch {
-    return fallbackVideoId;
-  }
+	const fallbackVideoId = ''
+	if (!url) return fallbackVideoId
+	try {
+		const urlObj = new URL(url)
+		return urlObj.searchParams.get('v') || fallbackVideoId
+	} catch {
+		return fallbackVideoId
+	}
 }
 
-
 const LessonDetail = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const params = useParams();
-  const idParam = params?.lessonId;
-  const courseId = params?.id
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+	const params = useParams()
+	const idParam = params?.lessonId
+	const courseId = params?.id
 
-  const id = Array.isArray(idParam) ? idParam[0] : idParam;
+	const id = Array.isArray(idParam) ? idParam[0] : idParam
 
-  const { data, isLoading, error } = useGetLessonDetail(id || '');
-  return (
-    <>
-      <ProtectedRoute>
-        <div className='pt-2 max-w-7xl mx-auto'>
-          <div className="flex flex-col max-lg:mx-4">
+	const { data, isLoading, error } = useGetLessonDetail(id || '')
+	console.log(data)
 
-            {/* ✅ First Row: Breadcrumbs */}
-            <div className="mt-8">
-              <nav className="flex items-center" aria-label="Breadcrumb">
-                <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                  <li>
-                    <a href="/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                      Головна
-                    </a>
-                  </li>
-                  <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
-                  <li>
-                    <a href="/myCabinet/studyPlatform/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                      Академія
-                    </a>
-                  </li>
-                  <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
-                  <li>
-                    <a href={`/myCabinet/studyPlatform/${courseId}`} className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                      Курс
-                    </a>
-                  </li>
-                  <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
-                  <li>
-                    <span className="text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]">
-                      Урок
-                    </span>
-                  </li>
-                </ol>
-              </nav>
-            </div>
+	return (
+		<>
+			<ProtectedRoute>
+				<div className='pt-2 max-w-7xl mx-auto'>
+					<div className='flex flex-col max-lg:mx-4'>
+						{/* ✅ First Row: Breadcrumbs */}
+						<div className='mt-8'>
+							<nav className='flex items-center' aria-label='Breadcrumb'>
+								<ol className='inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse'>
+									<li>
+										<a
+											href='/'
+											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
+										>
+											Головна
+										</a>
+									</li>
+									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
+										•
+									</li>
+									<li>
+										<a
+											href='/myCabinet/studyPlatform/'
+											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
+										>
+											Академія
+										</a>
+									</li>
+									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
+										•
+									</li>
+									<li>
+										<a
+											href={`/myCabinet/studyPlatform/${courseId}`}
+											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
+										>
+											Курс
+										</a>
+									</li>
+									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
+										•
+									</li>
+									<li>
+										<span className='text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]'>
+											Урок
+										</span>
+									</li>
+								</ol>
+							</nav>
+						</div>
 
             <div onClick={() => setIsModalOpen(!isModalOpen)} className={`max-lg:flex hidden justify-between mt-8 bg-[#242433] text-white text-base font-semibold items-center p-[10px] ${isModalOpen ? 'rounded-t-xl' : 'rounded-xl'}`}>
               <div>Теми уроків</div>

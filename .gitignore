@@ -45,3 +45,4 @@ package-lock.json
 package-lock.json
 
 nft-service/node_modules
+yarn.lock
