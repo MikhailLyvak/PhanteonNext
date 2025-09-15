@@ -84,17 +84,17 @@ const LessonDetail = () => {
             <div className='flex justify-between gap-6'>
               <div className="flex flex-col w-full">
                 <div className='mt-7 w-full'>
-                  {data?.videos.length === 0 ? (
+                  {data?.video_url.length === 0 ? (
                     <div className='w-full aspect-video self-stretch rounded-3xl h-full shadow-xl bg-[#242433] flex justify-center items-center'>
                       <div className='text-white text-base lg:text-4xl font-semibold'>
                         Контент уроку в розробці
                       </div>
                     </div>
                   ) : (
-                    (isLoading === false && data?.videos[0] !== null) &&
+                    (isLoading === false && data?.video_url !== null) &&
                     <iframe
                       className="w-full aspect-video self-stretch rounded-3xl h-full shadow-xl"
-                      src={`https://www.youtube.com/embed/${getYouTubeId(data?.videos?.[0]?.url)}`}
+                      src={`https://www.youtube.com/embed/${getYouTubeId(data?.video_url)}?rel=0&modestbranding=1&showinfo=0&controls=1`}
                       frameBorder="0"
                       title="Product Overview Video"
                       aria-hidden="true"
@@ -109,11 +109,9 @@ const LessonDetail = () => {
                   className="text-white text-sm lg:text-base font-normal mt-5 lg:mt-6"
                   dangerouslySetInnerHTML={{ __html: data?.text_home_task || '' }}
                 />
-                {data?.videos && data?.videos?.length > 0 && (
-                  <>
-                    <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 lg:mt-14 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
-                      <div className='text-lg lg:text-2xl font-semibold'>Матеріал уроку у форматі .PDF</div>
-                      <div className='max-lg:mt-5'>
+                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 lg:mt-14 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
+                    <div className='text-lg lg:text-2xl font-semibold'>Матеріал уроку у форматі .PDF</div>
+                    <div className='max-lg:mt-5'>
                         <VitalisGreenButton>
                           <a
                             href={data?.pdf_task}
@@ -138,12 +136,11 @@ const LessonDetail = () => {
                         </VitalisGreenButton>
                       </div>
                     </div>
-                  </>
-                )}
 
-                {data?.videos.length === 0 && (
+                {/*Шо це взагалі?
+                data?.videos.length === 0 && (
                   <div className='w-full my-10'></div>
-                )}
+                )*/}
 
               </div>
               <div className="hidden lg:flex mt-7">

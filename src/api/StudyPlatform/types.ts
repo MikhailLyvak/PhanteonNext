@@ -94,10 +94,10 @@ export interface LessonDetail {
   text_home_task: string;
   is_free: boolean;
   quize: number;
-  videos: Video[];
   nava_data: NavModule[];
   pdf_task: string;
   is_comming_soon: boolean;
+  video_url: string;
 }
 
 interface Answer {
@@ -161,12 +161,16 @@ export interface PaymentResponse {
     user: number;
     course: number;
   };
-  payment_url: string;
+  payment_url: string | null;
+  free_course?: boolean;
+  message?: string;
 }
 
 export interface PaymentStatusCheckResponse {
   status: string;
 }
+
+
 
 export interface QuizAnswerResult {
   id: number;
