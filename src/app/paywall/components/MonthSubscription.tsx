@@ -16,7 +16,7 @@ const MonthSubscriptions = () => {
 					<div className='lg:text-4xl font-bold  text-2xl'>$75/міс </div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
-					Змінено 01.11
+					Лише до 01.11
 				</div>
 			</div>
 			<form className='flex items-start lg:gap-3 gap-6 mb-6'>

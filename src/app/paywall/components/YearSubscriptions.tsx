@@ -16,7 +16,7 @@ const YearSubscriptions = () => {
 					<div className='lg:text-4xl font-bold  text-2xl'>$900/рік</div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
-					Змінено 01.11
+					Лише до 01.11
 				</div>
 			</div>
 			<form className='flex items-start gap-3 mb-6'>
