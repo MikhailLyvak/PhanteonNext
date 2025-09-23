@@ -16,7 +16,7 @@ const PaywallPage = () => {
 					</h6>
 				</div>
 				<div className='border-2 border-[#D2D2FF] rounded-[48px] bg-[#2424336B] mt-20 py-6 pl-4 pr-6 items-center w-full text-white gap-6 relative hidden lg:flex'>
-					<div className='flex flex-col items-start justify-center gap-[36px] flex-1 mt-[18px]'>
+					<div className='flex flex-col items-start justify-center gap-[36px] flex-1 mt-[42px]'>
 						<div className='ml-6 font-medium'>Модулі</div>
 						<div className='ml-6 font-medium'>Воркбук</div>
 						<div className='ml-6 font-medium'>Воркшопи</div>
@@ -26,7 +26,7 @@ const PaywallPage = () => {
 						<div className='ml-6 font-medium'>Блог</div>
 					</div>
 					<MonthSubscriptions />
-					<div className='flex flex-col gap-[58px] mt-5 absolute w-auto left-[15px] right-[40px]'>
+					<div className='flex flex-col gap-[58px] mt-12 absolute w-auto left-[15px] right-[40px]'>
 						<div className=' h-px rounded-full bg-[#FFFFFF1A]' />
 						<div className=' h-px rounded-full bg-[#FFFFFF1A]' />
 						<div className=' h-px rounded-full bg-[#FFFFFF1A]' />

@@ -6,10 +6,19 @@ const MonthSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'1' | '3'>('1')
 	const nameId = useId()
 
-
 	return (
 		<div className='flex flex-col items-center justify-start bg-[#242433] rounded-[32px] pt-[30px] pb-[26px] flex-1 lg:border-none border-2 border-[#D2D2FF]'>
-			<div className='lg:text-4xl font-bold mb-5 text-2xl'>€13.99/ міс.</div>
+			<div className='mb-5'>
+				<div className='flex gap-2 items-start mb-1'>
+					<div className='line-through lg:text-2xl text-xl text-gray-300'>
+						$125/міс
+					</div>
+					<div className='lg:text-4xl font-bold  text-2xl'>$75/міс </div>
+				</div>
+				<div className='text-sx text-gray-400 text-center mx-auto'>
+					Змінено 01.11
+				</div>
+			</div>
 			<form className='flex items-start lg:gap-3 gap-6 mb-6'>
 				<div className='flex gap-2.5 items-center'>
 					<label
