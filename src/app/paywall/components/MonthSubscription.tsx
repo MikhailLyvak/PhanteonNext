@@ -13,7 +13,7 @@ const MonthSubscriptions = () => {
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
 						$125/міс
 					</div>
-					<div className='lg:text-4xl font-bold  text-2xl'>$75/міс </div>
+					<div className='lg:text-4xl font-bold  text-2xl'>$50/міс </div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
 					Лише до 01.11

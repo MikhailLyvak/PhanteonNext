@@ -11,7 +11,7 @@ const YearSubscriptions = () => {
 			<div className='mb-5'>
 				<div className='flex gap-2 items-start mb-1'>
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
-						$1500/рік
+						$1200/рік
 					</div>
 					<div className='lg:text-4xl font-bold  text-2xl'>$900/рік</div>
 				</div>
