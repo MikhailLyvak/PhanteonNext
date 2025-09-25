@@ -4,7 +4,7 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Cookies } from 'react-cookie';
 
 const axiosInterceptor = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000',
 	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',

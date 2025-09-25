@@ -12,7 +12,7 @@ export async function postCkeckPaymentStatus({
   orderReference,
 }: PaymentStatusRequest): Promise<PaymentStatusCheckResponse> {
   const response = await axiosInterceptor.post(
-    `/api/payments/check/${courseId}/${orderReference}/`,
+    `/api/payments/checkCoursePayment/${courseId}/${orderReference}/`,
     {},
     {
       headers: { 'Content-Type': 'application/json' },

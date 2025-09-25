@@ -75,6 +75,12 @@ const InnerWhiteHeader = () => {
 						>
 							Блог
 						</Link>
+						<Link
+							href='/paywall'
+							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+						>
+							Підписки
+						</Link>
 						{user && (
 							<button
 								type='button'

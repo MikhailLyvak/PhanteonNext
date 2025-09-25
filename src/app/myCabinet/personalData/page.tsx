@@ -21,12 +21,14 @@ const PersonalDataPage = () => {
 			first_name: data?.first_name ?? '',
 			last_name: data?.last_name ?? '',
 			phone: data?.phone ?? '',
+			solana_wallet: data?.solana_wallet ?? '',
 		},
 		values: data
 			? {
 				first_name: data.first_name ?? '',
 				last_name: data.last_name ?? '',
 				phone: data.phone ?? '',
+				solana_wallet: data.solana_wallet ?? '',
 			}
 			: undefined,
 	});
@@ -135,6 +137,28 @@ const PersonalDataPage = () => {
 													{fieldState.error && (
 														<p className="text-red-500 text-sm">{fieldState.error.message}</p>
 													)}
+												</>
+											)}
+										/>
+
+										<Controller
+											control={control}
+											name='solana_wallet'
+											render={({ field, fieldState }) => (
+												<>
+													<input
+														{...field}
+														value={field.value ?? ''}
+														type='text'
+														placeholder='Solana гаманець (для отримання сертифікатів)'
+														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
+													/>
+													{fieldState.error && (
+														<p className="text-red-500 text-sm">{fieldState.error.message}</p>
+													)}
+													<p className="text-gray-400 text-xs mt-1">
+														Введіть адресу вашого Solana гаманця для отримання NFT сертифікатів
+													</p>
 												</>
 											)}
 										/>

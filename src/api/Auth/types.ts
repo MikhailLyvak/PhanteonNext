@@ -31,12 +31,14 @@ export interface MyContactData {
   "first_name": "string",
   "last_name": "string",
   "phone": "string",
+  "solana_wallet": "string",
 }
 
 export const ProfileSchema = z.object({
   first_name: z.string().min(1, "Ім'я обов'язкове").optional().nullable(),
   last_name: z.string().min(1, "Прізвище обов'язкове").optional().nullable(),
   phone: z.string().min(10, "Невірний формат телефону").optional().nullable(),
+  solana_wallet: z.string().min(32, "Невірний формат Solana адреси").optional().nullable(),
 });
 
 const OptionalString = z
@@ -48,6 +50,7 @@ export const ProfileUpdateSchema = z.object({
   first_name: OptionalString,
   last_name: OptionalString,
   phone: OptionalString,
+  solana_wallet: OptionalString,
 });
 
 export type ProfileData = z.infer<typeof ProfileSchema>;

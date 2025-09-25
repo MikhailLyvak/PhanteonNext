@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { User, Settings, LogOut, GraduationCap, CheckCircle, Video } from "lucide-react";
+import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard } from "lucide-react";
 import { usePathname, useRouter } from 'next/navigation';
 import { LuChartLine } from 'react-icons/lu';
 import { useUserStore } from "@/store/UserData/useUserStore";
@@ -12,6 +12,7 @@ const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { clearUser } = useUserStore();
+
 
   const logout = () => {
     const cookies = new Cookies();
@@ -32,7 +33,19 @@ const Sidebar = () => {
         icon={<GraduationCap size={20} />}
         text="Академія"
         href="/myCabinet/studyPlatform"
-        active={pathname.includes('/myCabinet/studyPlatform')}
+        active={pathname === '/myCabinet/studyPlatform'}
+      />
+      <NavItem
+        icon={<Award size={20} />}
+        text="Сертифікати"
+        href="/myCabinet/certificates"
+        active={pathname === '/myCabinet/certificates'}
+      />
+      <NavItem
+        icon={<CreditCard size={20} />}
+        text="Керування підписками"
+        href="/myCabinet/subscriptions"
+        active={pathname === '/myCabinet/subscriptions'}
       />
       <NavItem
         icon={<Video size={20} />}

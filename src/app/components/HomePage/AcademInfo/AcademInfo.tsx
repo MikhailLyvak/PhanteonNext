@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import "./AcademInfo.scss";
 import BioHack from "./InnerComponents/BigGrid";
 import EmoInt from "./InnerComponents/EmoInt";
@@ -12,9 +13,9 @@ const AcademInfo = () => {
           Академія VB
         </h6>
         <div>
-          <button className="border-2 border-green-700 text-green-700 px-5 py-2 text-xs lg:text-base rounded-3xl flex items-center">
-            Всі курси ...
-          </button>
+          <Link href="/myCabinet/studyPlatform" className="border-2 border-green-700 text-green-700 px-5 py-2 text-xs lg:text-base rounded-3xl flex items-center hover:bg-green-700 hover:text-white transition-colors">
+            Всі курси
+          </Link>
         </div>
       </div>
 

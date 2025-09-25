@@ -1,9 +1,9 @@
 'use client'
 
-import MyCabinetBreadCrump from './components/BreadCrump'
-import CourseList from './components/CourseList'
-import Sidebar from '../components/Sidebar'
-import { ProtectedRoute } from '@/components/ProtectedRoute'
+import MyCabinetBreadCrump from './components/BreadCrump';
+import CourseList from './components/CourseList';
+import Sidebar from '../components/Sidebar';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useState } from 'react'
 
 const StudyPlatformPage = () => {
@@ -53,15 +53,6 @@ const StudyPlatformPage = () => {
 								>
 									Ваші курси
 								</button>
-								{/* <button className="h-10 px-5 bg-[#242433] text-[#D2D2FF] font-semibold sm:font-bold text-xs sm:text-base rounded-full text-nowrap">
-                  Фізичний розвиток
-                </button>
-                <button className="h-10 px-5 bg-[#242433] text-[#D2D2FF] font-semibold sm:font-bold text-xs sm:text-base rounded-full text-nowrap">
-                  Ментальна рівновага
-                </button>
-                <button className="h-10 px-5 bg-[#242433] text-[#D2D2FF] font-semibold sm:font-bold text-xs sm:text-base rounded-full text-nowrap">
-                  Духовні практики
-                </button> */}
 							</div>
 
 							{/* ✅ Course List */}

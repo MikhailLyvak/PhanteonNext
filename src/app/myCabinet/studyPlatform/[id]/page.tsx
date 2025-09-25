@@ -43,7 +43,16 @@ const CourseDetail = () => {
       { courseId: +id, promocode: promocode || undefined },
       {
         onSuccess: (data) => {
-          if (data.payment_url) {
+          if (data.free_course) {
+            // Course is free - show message and update data
+            alert(data.message || "Курс успішно додано завдяки промокоду!");
+            refetch(); // Refresh course data
+            closeBuyModal(); // Close modal window
+            // Redirect to course page
+            window.location.href = `/myCabinet/studyPlatform/${id}`;
+          } else if (data.payment_url) {
+            // Regular payment - go to payment page
+            closeBuyModal(); // Close modal window before redirect
             window.location.href = data.payment_url;
           } else {
             console.error("No payment URL in response");
@@ -58,14 +67,15 @@ const CourseDetail = () => {
 
   const openBuyModal = () => {
     setIsModalOpen(true);
-    setPromoStep('ask');
-    setPromoError(null);
-    setPromoResult(null);
-    setFinalPrice(null);
+    resetPromoState();
   };
 
   const closeBuyModal = () => {
     setIsModalOpen(false);
+    resetPromoState();
+  };
+
+  const resetPromoState = () => {
     setPromoStep('ask');
     setPromoError(null);
     setPromoResult(null);
@@ -77,13 +87,20 @@ const CourseDetail = () => {
     setPromoCheckLoading(true);
     setPromoError(null);
     try {
-      const res = await axiosInterceptor.post('/api/check_promocode/', { promocode });
+      const res = await axiosInterceptor.post('/api/promocode/check/', { promocode });
       if (res.data.valid) {
         setPromoResult(res.data);
         const discount = Number(res.data.discount_percent) || 0;
         const price = Number(data?.sell_price) || 0;
-        setFinalPrice(price - (price * discount / 100));
-        setPromoStep('checked');
+        const finalPriceValue = price - (price * discount / 100);
+        setFinalPrice(finalPriceValue);
+        
+        // If discount is 100%, show special message
+        if (discount === 100) {
+          setPromoStep('checked');
+        } else {
+          setPromoStep('checked');
+        }
       } else {
         setPromoError('Промокод недійсний');
       }
@@ -95,8 +112,16 @@ const CourseDetail = () => {
   };
 
   const proceedToPayment = () => {
-    closeBuyModal();
-    hundleUserBuyCourse();
+    if (promocode && promoResult?.discount_percent === 100) {
+      // If promo code gives 100% discount, use it
+      proceedToPaymentWithPromo();
+    } else if (promocode && promoResult) {
+      // If there's a promo code with other discount, use it
+      proceedToPaymentWithPromo();
+    } else {
+      // Otherwise proceed to regular payment
+      hundleUserBuyCourse();
+    }
   };
 
   const proceedToPaymentWithPromo = () => {
@@ -105,12 +130,20 @@ const CourseDetail = () => {
       closeBuyModal();
       return;
     }
-    closeBuyModal();
     mutate(
       { courseId: +id, promocode: promocode || undefined },
       {
         onSuccess: (data) => {
-          if (data.payment_url) {
+          if (data.free_course) {
+            // Course is free - show message and update data
+            alert(data.message || "Курс успішно додано завдяки промокоду!");
+            refetch(); // Refresh course data
+            closeBuyModal(); // Close modal window
+            // Redirect to course page
+            window.location.href = `/myCabinet/studyPlatform/${id}`;
+          } else if (data.payment_url) {
+            // Regular payment - go to payment page
+            closeBuyModal(); // Close modal window before redirect
             window.location.href = data.payment_url;
           } else {
             console.error("No payment URL in response");
@@ -241,33 +274,40 @@ const CourseDetail = () => {
                         >
                           {promoStep === 'ask' && (
                             <div className="flex flex-col gap-4">
-                              <div className="text-lg font-semibold">Використати промокод?</div>
+                              <div className="text-lg font-semibold">Чи маєте промокод для знижки?</div>
                               <div className="flex gap-4 mt-2">
                                 <button
                                   className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold"
                                   onClick={() => setPromoStep('input')}
                                 >
-                                  Так
+                                  Ввести промокод
                                 </button>
                                 <button
                                   className="bg-gray-500 px-4 py-2 rounded text-white font-bold"
                                   onClick={proceedToPayment}
                                 >
-                                  Ні
+                                  Без промокоду
                                 </button>
                               </div>
                             </div>
                           )}
                           {promoStep === 'input' && (
                             <div className="flex flex-col">
-                              <div className="flex justify-end">
+                              <div className="flex justify-between items-center mb-4">
                                 <button
-                                    type="button"
-                                    onClick={closeBuyModal}
-                                    className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2"
-                                    aria-label="Закрити"
-                                  >
-                                    ×
+                                  type="button"
+                                  onClick={() => setPromoStep('ask')}
+                                  className="text-[#D2D2FF] hover:text-white text-sm"
+                                >
+                                  ← Назад
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={closeBuyModal}
+                                  className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2"
+                                  aria-label="Закрити"
+                                >
+                                  ×
                                 </button>
                               </div>
                               {/* Title and close button in a row, with space between */}
@@ -293,8 +333,33 @@ const CourseDetail = () => {
                           )}
                           {promoStep === 'checked' && promoResult && (
                             <div className="flex flex-col gap-4">
-                              <div className="text-lg font-semibold text-green-400">Промокод дійсний! Знижка: {promoResult.discount_percent}%</div>
-                              <div>Нова ціна: <span className="font-bold">{finalPrice} $</span></div>
+                              <div className="flex justify-between items-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setPromoStep('input')}
+                                  className="text-[#D2D2FF] hover:text-white text-sm"
+                                >
+                                  ← Змінити промокод
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={closeBuyModal}
+                                  className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2"
+                                  aria-label="Закрити"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                              <div className="text-lg font-semibold text-green-400">
+                                Промокод дійсний! Знижка: {promoResult.discount_percent}%
+                              </div>
+                              {promoResult.discount_percent === 100 ? (
+                                <div className="text-xl font-bold text-green-400">
+                                  Курс безкоштовний! 🎉
+                                </div>
+                              ) : (
+                                <div>Нова ціна: <span className="font-bold">{finalPrice} $</span></div>
+                              )}
                               <button
                                 className="bg-[#6A56E4] px-4 py-2 rounded text-white font-bold flex items-center justify-center gap-2"
                                 onClick={proceedToPaymentWithPromo}
@@ -309,7 +374,7 @@ const CourseDetail = () => {
                                     ariaLabel="triangle-loading"
                                   />
                                 )}
-                                Перейти до оплати
+                                {promoResult.discount_percent === 100 ? 'Отримати безкоштовно' : 'Перейти до оплати'}
                               </button>
                             </div>
                           )}

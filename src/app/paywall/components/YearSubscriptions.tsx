@@ -1,19 +1,62 @@
 'use client'
 
 import { useId, useState } from 'react'
+import { useCreateSubscriptionPayment } from '@/hooks/Subscriptions/useCreateSubscriptionPayment'
+import { Triangle } from 'react-loader-spinner'
+import { SubscriptionPaymentResponse } from '../../../api/Subscriptions'
 
 const YearSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'6' | '12'>('6')
 	const nameId = useId()
+	const { mutate: createPayment, isPending } = useCreateSubscriptionPayment()
+
+	
+
+	const handlePurchase = () => {
+		const durationMonths = selectedMonth === '6' ? 6 : 12
+		
+		createPayment(
+			{
+				subscription_type: 'yearly',
+				duration_months: durationMonths,
+			},
+			{
+				onSuccess: (data: SubscriptionPaymentResponse) => {
+					if (data.payment_url) {
+						window.location.href = data.payment_url
+					} else {
+						alert('Помилка: Не отримано URL для оплати. Спробуйте ще раз.')
+						console.error('No payment URL in response')
+					}
+				},
+				onError: (error: any) => {
+					console.error('Payment request failed:', error)
+					
+					// Обробляємо різні типи помилок
+					if (error.response?.status === 400) {
+						const errorDetail = error.response.data?.detail || 'Помилка валідації даних'
+						alert(`Помилка: ${errorDetail}`)
+					} else if (error.response?.status === 500) {
+						alert('Помилка сервера. Спробуйте пізніше або зверніться до підтримки.')
+					} else if (error.response?.data?.error === 'Payment gateway error') {
+						const detail = error.response.data.detail || 'Помилка платіжного шлюзу'
+						alert(`Помилка платіжного шлюзу: ${detail}`)
+					} else {
+						alert('Сталася неочікувана помилка. Спробуйте ще раз.')
+					}
+				},
+			}
+		)
+	}
 
 	return (
 		<div className='flex flex-col items-center justify-start bg-[#242433] rounded-[32px] pt-[30px] pb-[26px] flex-1 lg:border-none border-2 border-[#D2D2FF]'>
 			<div className='mb-5'>
 				<div className='flex gap-2 items-start mb-1'>
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
-						$1200/рік
+						€1200/рік
 					</div>
-					<div className='lg:text-4xl font-bold  text-2xl'>$900/рік</div>
+					<div className='lg:text-4xl font-bold  text-2xl'>$900/рік </div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
 					Лише до 01.11
@@ -133,8 +176,19 @@ const YearSubscriptions = () => {
 			</div>
 			<button
 				type='button'
-				className='bg-[#6A56E4] rounded-full py-[19px] px-[39px] font-semibold mt-[36px]'
+				className='bg-[#6A56E4] rounded-full py-[19px] px-[39px] font-semibold mt-[36px] text-white flex items-center justify-center gap-2'
+				onClick={handlePurchase}
+				disabled={isPending}
 			>
+				{isPending && (
+					<Triangle
+						visible={true}
+						height={16}
+						width={16}
+						color="#fff"
+						ariaLabel="triangle-loading"
+					/>
+				)}
 				Придбати
 			</button>
 		</div>
