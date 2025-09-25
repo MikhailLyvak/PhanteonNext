@@ -188,7 +188,7 @@ const SubscriptionsPage = () => {
 													<div>
 														<p className="text-sm text-[#58587B]">Сума оплати</p>
 														<p className="text-white font-semibold">
-															€{subscription.payment.price}
+															${subscription.payment.price}
 														</p>
 													</div>
 												</div>
