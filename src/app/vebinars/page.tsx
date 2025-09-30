@@ -88,7 +88,12 @@ const VebinarsPage = () => {
                  {/* Vebinars Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
            {vebinars.map((vebinar) => (
-             <VebinarCard key={vebinar.id} vebinar={vebinar} />
+             <VebinarCard 
+               key={vebinar.id} 
+               vebinar={vebinar} 
+               hasAccess={vebinar.has_access}
+               subscriptionTypes={vebinar.subscription_types}
+             />
            ))}
          </div>
       </div>

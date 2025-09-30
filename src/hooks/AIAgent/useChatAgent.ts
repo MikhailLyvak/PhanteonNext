@@ -1,43 +1,54 @@
 import { useState, useCallback } from 'react'
+import axiosInterceptor from '@/interceptor/axiosClient'
 
-const useChatAgent = () => {
+export interface ChatResponse {
+	response: string
+	thread_id: string
+	status?: string
+	search_count?: number
+}
+
+export interface UseChatAgentReturn {
+	sendMessage: (message: string) => Promise<ChatResponse>
+	isLoading: boolean
+	resetChat: () => void
+	isLimited: boolean
+}
+
+const useChatAgent = (): UseChatAgentReturn => {
 	const [isLoading, setIsLoading] = useState(false)
-	const [threadId, setThreadId] = useState(null)
+	const [threadId, setThreadId] = useState<string | null>(null)
+	const [isLimited, setIsLimited] = useState(false)
 
 	const sendMessage = useCallback(
-		async (message: string) => {
+		async (message: string): Promise<ChatResponse> => {
+			if (isLimited) {
+				throw new Error('Daily limit reached')
+			}
 			setIsLoading(true)
 			try {
-				const response = await fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/chat`,
-					{
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							message,
-							thread_id: threadId,
-						}),
-					}
-				)
-
-				if (!response.ok) throw new Error(`HTTP ${response.status}`)
-
-				const data = await response.json()
-				setThreadId(data.thread_id)
+				const resp = await axiosInterceptor.post('/auth/api/ai/chat/', {
+					message,
+					thread_id: threadId,
+				})
+				const data = resp.data as ChatResponse
+				if (data?.thread_id) setThreadId(data.thread_id)
 				return data
-			} catch (error) {
-				console.error('Chat error:', error)
-				throw error
+			} catch (err: any) {
+				if (err?.response?.status === 429) {
+					setIsLimited(true)
+				}
+				throw err
 			} finally {
 				setIsLoading(false)
 			}
 		},
-		[threadId]
+		[threadId, isLimited]
 	)
 
 	const resetChat = () => setThreadId(null)
 
-	return { sendMessage, isLoading, resetChat }
+	return { sendMessage, isLoading, resetChat, isLimited }
 }
 
 export default useChatAgent

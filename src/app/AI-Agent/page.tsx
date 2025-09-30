@@ -59,7 +59,7 @@ const markdownComponents = {
 export default function AIPage() {
 	const [message, setMessage] = useState('')
 	const [conversation, setConversation] = useState<Message[]>([])
-	const { sendMessage, isLoading, resetChat } = useChatAgent()
+    const { sendMessage, isLoading, resetChat, isLimited } = useChatAgent()
 	const [isConversationLoaded, setIsConversationLoaded] = useState(false)
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 	const inputRef = useRef<HTMLDivElement>(null)
@@ -126,8 +126,8 @@ export default function AIPage() {
 
 	const handleSubmit = async (e: Event) => {
 		e.preventDefault()
-		if (!message.trim()) return
-		if (isLoading) return
+        if (!message.trim()) return
+        if (isLoading || isLimited) return
 
 		const userMessage = {
 			sender: 'user',
@@ -146,13 +146,23 @@ export default function AIPage() {
 				date: new Date().toISOString(),
 			} as Message
 			setConversation(prev => [...prev, agentMessage])
-		} catch (error) {
-			const errorMessage = {
-				sender: 'error',
-				text: 'Виникла неочікувана помилка, спробуйте будь ласка ще раз',
-				date: new Date().toISOString(),
-			} as Message
-			setConversation(prev => [...prev, errorMessage])
+        } catch (error: any) {
+            if (error?.response?.status === 429) {
+                const limitMessage = {
+                    sender: 'error',
+                    text: 'Ви досягли денного ліміту у 10 запитів. Оформіть підписку для безлімітного доступу.',
+                    date: new Date().toISOString(),
+                } as Message
+                // Show only once
+                setConversation(prev => (prev.some(m => m.text === limitMessage.text) ? prev : [...prev, limitMessage]))
+            } else {
+                const errorMessage = {
+                    sender: 'error',
+                    text: 'Виникла неочікувана помилка, спробуйте будь ласка ще раз',
+                    date: new Date().toISOString(),
+                } as Message
+                setConversation(prev => [...prev, errorMessage])
+            }
 		}
 	}
 
@@ -234,9 +244,9 @@ export default function AIPage() {
 							onChange={e => setMessage(e.target.value)}
 							className='bg-transparent rounded-full p-4 w-full focus:outline-none'
 						/>
-						<button
+                        <button
 							type='submit'
-							disabled={isLoading}
+                            disabled={isLoading || isLimited}
 							className='bg-[#6A56E4] text-white p-2.5 rounded-full text-base font-semibold hover:bg-[#5848c2] transition disabled:opacity-50 disabled:cursor-not-allowed m-3'
 						>
 							{isLoading ? (
@@ -246,6 +256,9 @@ export default function AIPage() {
 							)}
 						</button>
 					</div>
+                    {isLimited && (
+                        <p className='text-sm text-red-400 ml-2'>Ви досягли денного ліміту у 10 запитів. Оформіть підписку для безлімітного доступу.</p>
+                    )}
 					{conversation.length > 2 && (
 						<div className='relative inline-block group self-center'>
 							<button
