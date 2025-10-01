@@ -2,38 +2,14 @@
 
 import React from 'react';
 import { useUserStore } from '@/store/UserData/useUserStore';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Triangle } from 'react-loader-spinner';
 import { useGetVebinarsList } from '@/hooks/Vebinars/useGetVebinarsList';
 import VebinarCard from '../myCabinet/vebinars/components/VebinarCard';
 
 const VebinarsPage = () => {
   const { user } = useUserStore();
-  const router = useRouter();
   const { data: vebinars, isLoading, error } = useGetVebinarsList();
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/');
-    }
-  }, [user, router]);
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#171723] flex items-center justify-center">
-        <Triangle
-          height="80"
-          width="80"
-          color="#D2D2FF"
-          ariaLabel="triangle-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-          visible={true}
-        />
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (

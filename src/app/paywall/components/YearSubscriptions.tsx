@@ -4,15 +4,24 @@ import { useId, useState } from 'react'
 import { useCreateSubscriptionPayment } from '@/hooks/Subscriptions/useCreateSubscriptionPayment'
 import { Triangle } from 'react-loader-spinner'
 import { SubscriptionPaymentResponse } from '../../../api/Subscriptions'
+import { useUserStore } from '@/store/UserData/useUserStore'
+import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
 const YearSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'6' | '12'>('6')
 	const nameId = useId()
 	const { mutate: createPayment, isPending } = useCreateSubscriptionPayment()
+  const { user } = useUserStore()
+  const { toggleModal, setActiveTab } = useAuthModalStore()
 
 	
 
-	const handlePurchase = () => {
+  const handlePurchase = () => {
+    if (!user) {
+      setActiveTab('register')
+      toggleModal()
+      return
+    }
 		const durationMonths = selectedMonth === '6' ? 6 : 12
 		
 		createPayment(

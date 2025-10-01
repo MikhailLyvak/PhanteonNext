@@ -7,16 +7,11 @@ export const getVebinarsList = async (): Promise<Vebinar[]> => {
     const cookies = new Cookies();
     const token = cookies.get('local_access_token');
     
-    // If no token, return empty array instead of making the request
-    if (!token) {
-      return [];
-    }
-    
-    const data = await axiosInterceptor.get('/api/vebinar/list/', {
-      headers: {
-        Authorization: token,
-      },
-    });
+    const config = token
+      ? { headers: { Authorization: token } }
+      : undefined;
+
+    const data = await axiosInterceptor.get('/api/vebinar/list/', config);
 
     return data.data as Vebinar[];
   } catch (error) {

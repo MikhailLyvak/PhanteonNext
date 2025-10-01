@@ -4,6 +4,8 @@ import React from 'react';
 import { Vebinar } from '@/api/Vebinars/types';
 import { Calendar, Clock, ExternalLink, ShoppingCart } from 'lucide-react';
 import { Cookies } from 'react-cookie';
+import { useUserStore } from '@/store/UserData/useUserStore';
+import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 
 interface VebinarCardProps {
   vebinar: Vebinar;
@@ -13,6 +15,8 @@ interface VebinarCardProps {
 }
 
 const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, subscriptionTypes = [], purchaseStatus }) => {
+  const { user } = useUserStore();
+  const { toggleModal, setActiveTab } = useAuthModalStore();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('uk-UA', {
@@ -34,6 +38,13 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
     if (hasAccess) {
       window.open(vebinar.link, '_blank');
     } else {
+      // If not logged in, open auth modal (register tab)
+      if (!user) {
+        setActiveTab('register');
+        toggleModal();
+        return;
+      }
+
       // Handle purchase logic
       try {
         const cookies = new Cookies();

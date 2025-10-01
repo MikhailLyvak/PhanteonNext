@@ -51,6 +51,12 @@ const Footer = () => {
               <Link href="/AI-Agent" className="text-[#D2D2FF] hover:text-white transition-colors">
                 АІ-агенти
               </Link>
+              <Link href="/vebinars" className="text-[#D2D2FF] hover:text-white transition-colors">
+                Вебінари
+              </Link>
+              <Link href="/myCabinet/subscriptions" className="text-[#D2D2FF] hover:text-white transition-colors">
+                Підписки
+              </Link>
               {user ? (
                 <Link href="/myCabinet/studyPlatform" className="text-[#D2D2FF] hover:text-white transition-colors">
                   Академія

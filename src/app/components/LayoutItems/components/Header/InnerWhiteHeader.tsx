@@ -132,27 +132,12 @@ const InnerWhiteHeader = () => {
 								Академія
 							</button>
 						)}
-						{user ? (
-							<Link
-								href='/vebinars'
-								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-							>
-								Вебінари
-							</Link>
-						) : (
-							<button
-								type='button'
-								onClick={handleAcademyClick}
-								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-								style={{
-									background: 'none',
-									border: 'none',
-									cursor: 'pointer',
-								}}
-							>
-								Вебінари
-							</button>
-						)}
+						<Link
+							href='/vebinars'
+							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+						>
+							Вебінари
+						</Link>
 						<Link
 							href='/dashboard'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
