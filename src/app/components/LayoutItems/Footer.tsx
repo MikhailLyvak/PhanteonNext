@@ -54,7 +54,7 @@ const Footer = () => {
               <Link href="/vebinars" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Вебінари
               </Link>
-              <Link href="/myCabinet/subscriptions" className="text-[#D2D2FF] hover:text-white transition-colors">
+              <Link href="/paywall" className="text-[#D2D2FF] hover:text-white transition-colors">
                 Підписки
               </Link>
               {user ? (
