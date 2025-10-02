@@ -62,7 +62,7 @@ const MonthSubscriptions = () => {
 			<div className='mb-5'>
 				<div className='flex gap-2 items-start mb-1'>
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
-						€125/міс
+						$125/міс
 					</div>
 					<div className='lg:text-4xl font-bold  text-2xl'>$50/міс </div>
 				</div>
