@@ -6,6 +6,7 @@ import { Calendar, Clock, ExternalLink, ShoppingCart } from 'lucide-react';
 import { Cookies } from 'react-cookie';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
+import axiosInterceptor from '@/interceptor/axiosClient';
 
 interface VebinarCardProps {
   vebinar: Vebinar;
@@ -47,65 +48,35 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
 
       // Handle purchase logic
       try {
-        const cookies = new Cookies();
-        const token = cookies.get('local_access_token');
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vebinar/purchase/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token,
-          },
-          body: JSON.stringify({
-            vebinar_id: vebinar.id
-          })
+        const { data } = await axiosInterceptor.post('/api/vebinar/purchase/', {
+          vebinar_id: vebinar.id,
         });
 
-        const data = await response.json();
-        
-        if (response.ok && data.payment_url) {
-          // Redirect to payment page
+        if (data?.payment_url) {
           window.location.href = data.payment_url;
         } else {
-          console.error('Purchase failed:', data.error);
-          alert('Помилка при створенні платежу: ' + (data.error || 'Невідома помилка'));
+          console.error('Purchase failed:', data);
+          alert('Помилка при створенні платежу: ' + (data?.error || 'Невідома помилка'));
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Purchase error:', error);
-        alert('Помилка при створенні платежу');
+        const message = error?.response?.data?.error || 'Помилка при створенні платежу';
+        alert(message);
       }
     }
   };
 
   const handleCancelPurchase = async () => {
     try {
-      const cookies = new Cookies();
-      const token = cookies.get('local_access_token');
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vebinar/cancel-purchase/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: JSON.stringify({
-          vebinar_id: vebinar.id
-        })
+      await axiosInterceptor.post('/api/vebinar/cancel-purchase/', {
+        vebinar_id: vebinar.id,
       });
-
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert('Покупку скасовано успішно');
-        // Reload the page to update the status
-        window.location.reload();
-      } else {
-        console.error('Cancel failed:', data.error);
-        alert('Помилка при скасуванні покупки: ' + (data.error || 'Невідома помилка'));
-      }
-    } catch (error) {
+      alert('Покупку скасовано успішно');
+      window.location.reload();
+    } catch (error: any) {
       console.error('Cancel error:', error);
-      alert('Помилка при скасуванні покупки');
+      const message = error?.response?.data?.error || 'Помилка при скасуванні покупки';
+      alert(message);
     }
   };
 
