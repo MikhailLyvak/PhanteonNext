@@ -1,8 +1,30 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 import MyCabinetBreadCrump from '../myCabinet/studyPlatform/components/BreadCrump'
 import MonthSubscriptions from './components/MonthSubscription'
 import YearSubscriptions from './components/YearSubscriptions'
 
 const PaywallPage = () => {
+	const router = useRouter()
+	const {
+		data: subscriptionsData,
+		isLoading,
+		error,
+	} = useGetUserSubscriptions()
+
+	useEffect(() => {
+		if (!isLoading && subscriptionsData?.has_active_subscription) {
+			router.push('/myCabinet/subscriptions')
+		}
+	}, [subscriptionsData, isLoading, router])
+
+	if (isLoading) {
+		return <div></div>
+	}
+
 	return (
 		<div className='w-full mb-5'>
 			<div className='max-w-8xl mx-auto px-4 md:px-6'>

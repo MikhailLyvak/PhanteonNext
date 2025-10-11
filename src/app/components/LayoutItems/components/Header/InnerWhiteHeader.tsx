@@ -9,11 +9,18 @@ import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
+import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
+
 const InnerWhiteHeader = () => {
 	const { data: lastVebinar, isEnabled } = useGetLastVebinar()
 	const user = useUserStore(state => state.user)
 	const { toggleModal } = useAuthModalStore()
 	const [copied, setCopied] = useState(false)
+	const {
+		data: subscriptionsData,
+		isLoading,
+		error,
+	} = useGetUserSubscriptions()
 
 	const refferalRegisterLink = user
 		? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
@@ -75,12 +82,14 @@ const InnerWhiteHeader = () => {
 						>
 							Блог
 						</Link>
-						<Link
-							href='/paywall'
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Підписки
-						</Link>
+						{!subscriptionsData?.has_active_subscription && (
+							<Link
+								href='/paywall'
+								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+							>
+								Підписки
+							</Link>
+						)}
 						{user && (
 							<button
 								type='button'
