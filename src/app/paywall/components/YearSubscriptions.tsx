@@ -11,19 +11,17 @@ const YearSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'6' | '12'>('6')
 	const nameId = useId()
 	const { mutate: createPayment, isPending } = useCreateSubscriptionPayment()
-  const { user } = useUserStore()
-  const { toggleModal, setActiveTab } = useAuthModalStore()
+	const { user } = useUserStore()
+	const { toggleModal, setActiveTab } = useAuthModalStore()
 
-	
-
-  const handlePurchase = () => {
-    if (!user) {
-      setActiveTab('register')
-      toggleModal()
-      return
-    }
+	const handlePurchase = () => {
+		if (!user) {
+			setActiveTab('register')
+			toggleModal()
+			return
+		}
 		const durationMonths = selectedMonth === '6' ? 6 : 12
-		
+
 		createPayment(
 			{
 				subscription_type: 'yearly',
@@ -40,15 +38,19 @@ const YearSubscriptions = () => {
 				},
 				onError: (error: any) => {
 					console.error('Payment request failed:', error)
-					
+
 					// Обробляємо різні типи помилок
 					if (error.response?.status === 400) {
-						const errorDetail = error.response.data?.detail || 'Помилка валідації даних'
+						const errorDetail =
+							error.response.data?.detail || 'Помилка валідації даних'
 						alert(`Помилка: ${errorDetail}`)
 					} else if (error.response?.status === 500) {
-						alert('Помилка сервера. Спробуйте пізніше або зверніться до підтримки.')
+						alert(
+							'Помилка сервера. Спробуйте пізніше або зверніться до підтримки.'
+						)
 					} else if (error.response?.data?.error === 'Payment gateway error') {
-						const detail = error.response.data.detail || 'Помилка платіжного шлюзу'
+						const detail =
+							error.response.data.detail || 'Помилка платіжного шлюзу'
 						alert(`Помилка платіжного шлюзу: ${detail}`)
 					} else {
 						alert('Сталася неочікувана помилка. Спробуйте ще раз.')
@@ -194,8 +196,8 @@ const YearSubscriptions = () => {
 						visible={true}
 						height={16}
 						width={16}
-						color="#fff"
-						ariaLabel="triangle-loading"
+						color='#fff'
+						ariaLabel='triangle-loading'
 					/>
 				)}
 				Придбати

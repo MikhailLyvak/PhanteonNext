@@ -31,13 +31,12 @@ const Footer = () => {
 				<div className='max-w-8xl mx-auto px-4 md:py-6'>
 					<div className='flex max-md:flex-col justify-between items-center py-6'>
 						<div className='flex items-center'>
-							<Link href='/' className='flex items-center'>
+							<Link href='/' className='flex items-center relative'>
 								<Image
 									src='/Header/LogoColored.svg'
 									alt='Pantheon'
-									width={246}
-									height={32}
-									className='object-contain'
+									fill={true}
+									className='object-contain !relative'
 									priority
 								/>
 							</Link>

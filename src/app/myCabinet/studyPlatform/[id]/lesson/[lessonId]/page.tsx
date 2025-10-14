@@ -29,7 +29,7 @@ const LessonDetail = () => {
 	const id = Array.isArray(idParam) ? idParam[0] : idParam
 
 	const { data, isLoading, error } = useGetLessonDetail(id || '')
-	console.log(data)
+	//console.log(data)
 
 	return (
 		<>

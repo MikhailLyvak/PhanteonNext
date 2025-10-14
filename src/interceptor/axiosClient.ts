@@ -39,7 +39,7 @@ const REDIRECT_TTL_MS = 5000
 
 axiosInterceptor.interceptors.response.use(
 	response => {
-		console.log('Response received:', response)
+		//console.log('Response received:', response)
 		return response
 	},
 	async error => {
@@ -50,9 +50,7 @@ axiosInterceptor.interceptors.response.use(
 
 		if (status === 401) {
 			const isAuthEndpoint =
-				url.includes('/auth/api/login/') ||
-				url.includes('/auth/api/register/') ||
-				url.includes('/auth/api/refresh/')
+				url.includes('/auth/api/login/') || url.includes('/auth/api/register/')
 
 			if (!isAuthEndpoint && !isLoggingOut) {
 				const onLoginPage =
@@ -80,7 +78,7 @@ axiosInterceptor.interceptors.response.use(
 						} finally {
 							if (typeof window !== 'undefined') {
 								sessionStorage.setItem(REDIRECT_GUARD_KEY, String(Date.now()))
-								window.location.assign(`${LOGIN_PATH}?reason=expired`)
+								window.location.assign(`${LOGIN_PATH}`)
 							}
 						}
 					}
