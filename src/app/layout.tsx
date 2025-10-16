@@ -17,6 +17,11 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
 	title: 'PantheonX',
 	description: 'PantheonX crypto dashboard',
+	icons: {
+		icon: '/favicon.ico',
+		shortcut: '/favicon.ico',
+		apple: '/favicon.png',
+	},
 }
 
 export default function RootLayout({
