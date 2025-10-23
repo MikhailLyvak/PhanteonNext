@@ -107,9 +107,9 @@ const ModuleAccordion: React.FC<Props> = ({
 									</div>
 									<div className='text-gray-800 text-sm lg:text-lg font-semibold h-6 flex items-center min-w-0'>
 										<div className='flex items-center rounded-3xl hover:underline flex-1 min-w-0'>
-											<div className='hidden lg:flex text-[#D2D2FF]'>
+											{/* <div className='hidden lg:flex text-[#D2D2FF]'>
 												Тема {lesson_index + 1}.&nbsp;
-											</div>
+											</div> */}
 											<div className='flex-1 min-w-0 truncate whitespace-nowrap text-[#D2D2FF]'>
 												{lesson.name}
 											</div>
