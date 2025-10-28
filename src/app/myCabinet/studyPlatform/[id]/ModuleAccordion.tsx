@@ -114,7 +114,7 @@ const ModuleAccordion: React.FC<Props> = ({
 												{lesson.name}
 											</div>
 										</div>
-										<div className='flex gap-1 lg:gap-[10px] ml-2 lg:ml-7'>
+										{/* <div className='flex gap-1 lg:gap-[10px] ml-2 lg:ml-7'>
 											<IconWithToolTip
 												imgPath='/CourseDetail/MiniIcons/VideoIcon.svg'
 												title='Відео'
@@ -127,7 +127,7 @@ const ModuleAccordion: React.FC<Props> = ({
 												imgPath='/CourseDetail/MiniIcons/QuizeIcon.svg'
 												title='Тест'
 											/>
-										</div>
+										</div> */}
 									</div>
 								</div>
 							)
