@@ -122,8 +122,8 @@ const LessonDetail = () => {
                   className="text-white text-sm lg:text-base font-normal mt-5 lg:mt-6"
                   dangerouslySetInnerHTML={{ __html: data?.text_home_task || '' }}
                 />
-                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 lg:mt-14 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
-                  <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .PDF</div>
+                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
+                  <div className='text-lg lg:text-2xl font-semibold'>Матеріал уроку у форматі .PDF</div>
                   <div className='max-lg:mt-5'>
                     <VitalisGreenButton>
                       <a
@@ -141,41 +141,45 @@ const LessonDetail = () => {
                     </VitalisGreenButton>
                   </div>
                 </div>
-                <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .DOC/.DOCX</div>
-                <div className='max-lg:mt-5'>
-                  <VitalisGreenButton>
-                    <a
-                      href={data?.doc_task}
-                      download
-                      target='_black'
-                      className="flex"
-                    >
-                      <div className='mr-[10px]'>Завантажити</div>
-                      <LuArrowBigDown
-                        className="w-6 h-6 text-white"
-                        style={{ fill: 'currentColor', stroke: 'none' }}
-                      />
-                    </a>
-                  </VitalisGreenButton>
+                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
+                  <div className='text-lg lg:text-2xl font-semibold'>Матеріал уроку у форматі .DOC/.DOCX</div>
+                  <div className='max-lg:mt-5'>
+                    <VitalisGreenButton>
+                      <a
+                        href={data?.doc_task}
+                        download
+                        target='_black'
+                        className="flex"
+                      >
+                        <div className='mr-[10px]'>Завантажити</div>
+                        <LuArrowBigDown
+                          className="w-6 h-6 text-white"
+                          style={{ fill: 'currentColor', stroke: 'none' }}
+                        />
+                      </a>
+                    </VitalisGreenButton>
+                  </div>
                 </div>
-                <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .XLSX</div>
-                <div className='max-lg:mt-5'>
-                  <VitalisGreenButton>
-                    <a
-                      href={data?.xlsx_task}
-                      download
-                      target='_black'
-                      className="flex"
-                    >
-                      <div className='mr-[10px]'>Завантажити</div>
-                      <LuArrowBigDown
-                        className="w-6 h-6 text-white"
-                        style={{ fill: 'currentColor', stroke: 'none' }}
-                      />
-                    </a>
-                  </VitalisGreenButton>
+                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
+                  <div className='text-lg lg:text-2xl font-semibold'>Матеріал уроку у форматі .XLSX</div>
+                  <div className='max-lg:mt-5'>
+                    <VitalisGreenButton>
+                      <a
+                        href={data?.xlsx_task}
+                        download
+                        target='_black'
+                        className="flex"
+                      >
+                        <div className='mr-[10px]'>Завантажити</div>
+                        <LuArrowBigDown
+                          className="w-6 h-6 text-white"
+                          style={{ fill: 'currentColor', stroke: 'none' }}
+                        />
+                      </a>
+                    </VitalisGreenButton>
+                  </div>
                 </div>
-                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 mb-10 lg:mb-[100px] text-white flex flex-col lg:flex-row justify-between items-center px-5 max-lg:py-5 max-lg:text-center lg:px-6'>
+                <div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 mb-10 lg:mb-[100px] text-white flex flex-col lg:flex-row justify-between items-center px-5 max-lg:py-5 max-lg:text-center lg:px-6'>
                   <div className='text-lg lg:text-2xl font-semibold lg:w-8/12'>Для завершення уроку виконайте задання з тесту</div>
                   <div className='max-lg:mt-5'>
                     <VitalisGreenButton>
