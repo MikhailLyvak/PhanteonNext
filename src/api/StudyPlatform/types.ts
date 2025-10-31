@@ -96,6 +96,8 @@ export interface LessonDetail {
   quize: number;
   nava_data: NavModule[];
   pdf_task: string;
+  doc_task: string;
+  xlsx_task: string;
   is_comming_soon: boolean;
   video_url: string;
 }
