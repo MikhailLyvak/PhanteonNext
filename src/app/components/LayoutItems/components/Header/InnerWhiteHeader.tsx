@@ -9,11 +9,18 @@ import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
+import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
+
 const InnerWhiteHeader = () => {
 	const { data: lastVebinar, isEnabled } = useGetLastVebinar()
 	const user = useUserStore(state => state.user)
 	const { toggleModal } = useAuthModalStore()
 	const [copied, setCopied] = useState(false)
+	const {
+		data: subscriptionsData,
+		isLoading,
+		error,
+	} = useGetUserSubscriptions()
 
 	const refferalRegisterLink = user
 		? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
@@ -38,24 +45,24 @@ const InnerWhiteHeader = () => {
 			<div className='w-full h-[73px] border-b border-gray-500 md:h-[120px] bg-[#171723] z-40 fixed top-0 left-0 p-3 sm:p-[34px]'>
 				<div className='max-w-8xl mx-auto flex items-center justify-between'>
 					{/* ✅ Left - Logo */}
-					<div>
+					<div className=''>
 						<Link href={'/'}>
-							<div className='hidden md:block'>
+							<div className='hidden md:block relative'>
 								<Image
 									src='/Header/LogoColored.svg'
 									alt='Pantheon Logo'
-									width={184}
-									height={58}
-									className='object-contain w-[130px] h-[48px] xl:w-[184px] md:h-[58px]'
+									fill={true}
+									priority={true}
+									className='object-contain w-[130px] h-[48px] xl:w-[184px] md:h-[58px] !relative'
 								/>
 							</div>
-							<div className='md:hidden'>
+							<div className='md:hidden relative'>
 								<Image
 									src='/Header/LogoColoredSmall.svg'
 									alt='Pantheon Logo'
-									width={41}
-									height={41}
-									className='object-contain'
+									fill={true}
+									priority={true}
+									className='object-contain w-auto !relative'
 								/>
 							</div>
 						</Link>
@@ -75,12 +82,14 @@ const InnerWhiteHeader = () => {
 						>
 							Блог
 						</Link>
-						<Link
-							href='/paywall'
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Підписки
-						</Link>
+						{!subscriptionsData?.has_active_subscription && (
+							<Link
+								href='/paywall'
+								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+							>
+								Підписки
+							</Link>
+						)}
 						{user && (
 							<button
 								type='button'

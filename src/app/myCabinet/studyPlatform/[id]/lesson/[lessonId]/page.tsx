@@ -29,7 +29,7 @@ const LessonDetail = () => {
   const id = Array.isArray(idParam) ? idParam[0] : idParam
 
   const { data, isLoading, error } = useGetLessonDetail(id || '')
-  console.log(data)
+  //console.log(data)
 
   return (
     <>
@@ -140,40 +140,40 @@ const LessonDetail = () => {
                       </a>
                     </VitalisGreenButton>
                   </div>
-                  <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .DOC/.DOCX</div>
-                  <div className='max-lg:mt-5'>
-                    <VitalisGreenButton>
-                      <a
-                        href={data?.doc_task}
-                        download
-                        target='_black'
-                        className="flex"
-                      >
-                        <div className='mr-[10px]'>Завантажити</div>
-                        <LuArrowBigDown
-                          className="w-6 h-6 text-white"
-                          style={{ fill: 'currentColor', stroke: 'none' }}
-                        />
-                      </a>
-                    </VitalisGreenButton>
-                  </div>
-                  <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .XLSX</div>
-                  <div className='max-lg:mt-5'>
-                    <VitalisGreenButton>
-                      <a
-                        href={data?.xlsx_task}
-                        download
-                        target='_black'
-                        className="flex"
-                      >
-                        <div className='mr-[10px]'>Завантажити</div>
-                        <LuArrowBigDown
-                          className="w-6 h-6 text-white"
-                          style={{ fill: 'currentColor', stroke: 'none' }}
-                        />
-                      </a>
-                    </VitalisGreenButton>
-                  </div>
+                </div>
+                <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .DOC/.DOCX</div>
+                <div className='max-lg:mt-5'>
+                  <VitalisGreenButton>
+                    <a
+                      href={data?.doc_task}
+                      download
+                      target='_black'
+                      className="flex"
+                    >
+                      <div className='mr-[10px]'>Завантажити</div>
+                      <LuArrowBigDown
+                        className="w-6 h-6 text-white"
+                        style={{ fill: 'currentColor', stroke: 'none' }}
+                      />
+                    </a>
+                  </VitalisGreenButton>
+                </div>
+                <div className='text-lg lg:text-1.2xl font-semibold'>Матеріал уроку у форматі .XLSX</div>
+                <div className='max-lg:mt-5'>
+                  <VitalisGreenButton>
+                    <a
+                      href={data?.xlsx_task}
+                      download
+                      target='_black'
+                      className="flex"
+                    >
+                      <div className='mr-[10px]'>Завантажити</div>
+                      <LuArrowBigDown
+                        className="w-6 h-6 text-white"
+                        style={{ fill: 'currentColor', stroke: 'none' }}
+                      />
+                    </a>
+                  </VitalisGreenButton>
                 </div>
                 <div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 mb-10 lg:mb-[100px] text-white flex flex-col lg:flex-row justify-between items-center px-5 max-lg:py-5 max-lg:text-center lg:px-6'>
                   <div className='text-lg lg:text-2xl font-semibold lg:w-8/12'>Для завершення уроку виконайте задання з тесту</div>
@@ -187,17 +187,14 @@ const LessonDetail = () => {
                 {data?.video_url === null && (
                   <div className='w-full my-10'></div>
                 )}
-
               </div>
-              <div className="hidden lg:flex mt-7">
+              <div className='hidden lg:flex mt-7'>
                 {data?.nava_data && data.nava_data.length > 0 && (
                   <NavAccordion modules={data.nava_data} />
                 )}
               </div>
             </div>
-
           </div>
-
         </div>
       </ProtectedRoute>
     </>

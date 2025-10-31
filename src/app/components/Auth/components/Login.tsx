@@ -29,7 +29,7 @@ const LoginModalFormComponent = () => {
 			const profileData = await getProfile()
 			setUser(profileData)
 			closeModal()
-			router.push('/paywall')
+			router.push('/myCabinet/studyPlatform')
 		},
 		onError: (error: any) => {
 			console.error('Login error details:', error)

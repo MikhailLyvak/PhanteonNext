@@ -1,9 +1,9 @@
 'use client'
 
-import MyCabinetBreadCrump from './components/BreadCrump';
-import CourseList from './components/CourseList';
-import Sidebar from '../components/Sidebar';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import MyCabinetBreadCrump from './components/BreadCrump'
+import CourseList from './components/CourseList'
+import Sidebar from '../components/Sidebar'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useState } from 'react'
 
 const StudyPlatformPage = () => {

@@ -5,21 +5,9 @@ import { motion } from 'framer-motion'
 import LoginModalFormComponent from '../components/Auth/components/Login'
 import Register from '../components/Auth/components/Register'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
-import { useRouter } from 'next/navigation'
-import { useUserStore } from '@/store/UserData/useUserStore'
-import { useEffect } from 'react'
 
 export default function LoginPage() {
 	const { activeTab, setActiveTab } = useAuthModalStore()
-	const router = useRouter()
-	const { user } = useUserStore()
-
-	useEffect(() => {
-		if (user) {
-			// router.push("/myCabinet/studyPlatform");
-			router.push('/paywall')
-		}
-	}, [user, router])
 
 	return (
 		<div className='min-h-screen flex items-center justify-center bg-[#171723]'>
