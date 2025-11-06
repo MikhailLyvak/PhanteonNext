@@ -17,10 +17,42 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
 	title: 'PantheonX',
 	description: 'PantheonX crypto dashboard',
+	applicationName: 'PantheonX',
 	icons: {
 		icon: '/favicon.ico',
 		shortcut: '/favicon.ico',
 		apple: '/favicon.png',
+	},
+	formatDetection: {
+		email: true,
+	},
+	openGraph: {
+		title: 'PantheonX',
+		description: 'PantheonX crypto dashboard',
+		url: 'https://www.pantheonx.club',
+		siteName: 'PantheonX',
+		images: [
+			{
+				url: 'https://www.pantheonx.club/Header/LogoColored.svg',
+				width: 300,
+				height: 50,
+			},
+		],
+		locale: 'uk-UA',
+		type: 'website',
+	},
+	robots: {
+		index: true,
+		follow: true,
+		nocache: false,
+		googleBot: {
+			index: true,
+			follow: true,
+			noimageindex: false,
+			'max-video-preview': -1,
+			'max-image-preview': 'large',
+			'max-snippet': -1,
+		},
 	},
 }
 
