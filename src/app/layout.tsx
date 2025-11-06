@@ -8,6 +8,7 @@ import Drawer from './components/HeaderComps/Drawer'
 import MainDrawer from './components/HeaderComps/Drawers/MainDrawer'
 import InnerWhiteHeader from './components/LayoutItems/components/Header/InnerWhiteHeader'
 import Script from 'next/script'
+import { MetaPixel } from './MetaPixel/MetaPixel'
 
 const montserrat = Montserrat({
 	subsets: ['latin'],
@@ -96,6 +97,7 @@ export default function RootLayout({
 				</>
 			</head>
 			<body className={`bg-[#171723] antialiased min-h-screen flex flex-col`}>
+				<MetaPixel />
 				<QueryProvider>
 					<InnerWhiteHeader />
 					<LoginModal />
