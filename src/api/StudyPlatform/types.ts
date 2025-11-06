@@ -32,6 +32,9 @@ export interface Lesson {
 	is_passed: boolean
 	is_free: boolean
 	is_comming_soon: boolean
+	is_have_video: boolean
+	is_have_presentation: boolean
+	is_have_test: boolean
 }
 
 export interface ModuleDetail {
@@ -88,18 +91,18 @@ export interface NavModule {
 }
 
 export interface LessonDetail {
-  id: number;
-  name: string;
-  description: string;
-  text_home_task: string;
-  is_free: boolean;
-  quize: number;
-  nava_data: NavModule[];
-  pdf_task: string;
-  doc_task: string;
-  xlsx_task: string;
-  is_comming_soon: boolean;
-  video_url: string;
+	id: number
+	name: string
+	description: string
+	text_home_task: string
+	is_free: boolean
+	quize: number
+	nava_data: NavModule[]
+	pdf_task: string
+	doc_task: string
+	xlsx_task: string
+	is_comming_soon: boolean
+	video_url: string
 }
 
 interface Answer {
@@ -155,24 +158,22 @@ export interface QuizSubmissionResponse {
 }
 
 export interface PaymentResponse {
-  payment: {
-    id: number;
-    order_reference: string;
-    status: 'PENDING' | 'SUCCESS' | 'DECLINED';
-    created_at: string;
-    user: number;
-    course: number;
-  };
-  payment_url: string | null;
-  free_course?: boolean;
-  message?: string;
+	payment: {
+		id: number
+		order_reference: string
+		status: 'PENDING' | 'SUCCESS' | 'DECLINED'
+		created_at: string
+		user: number
+		course: number
+	}
+	payment_url: string | null
+	free_course?: boolean
+	message?: string
 }
 
 export interface PaymentStatusCheckResponse {
 	status: string
 }
-
-
 
 export interface QuizAnswerResult {
 	id: number

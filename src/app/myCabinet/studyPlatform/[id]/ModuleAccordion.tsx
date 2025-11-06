@@ -115,18 +115,24 @@ const ModuleAccordion: React.FC<Props> = ({
 											</div>
 										</div>
 										<div className='flex gap-1 lg:gap-[10px] ml-2 lg:ml-7'>
-											<IconWithToolTip
-												imgPath='/CourseDetail/MiniIcons/VideoIcon.svg'
-												title='Відео'
-											/>
-											<IconWithToolTip
-												imgPath='/CourseDetail/MiniIcons/PresentationIcon.svg'
-												title='Презентація'
-											/>
-											<IconWithToolTip
-												imgPath='/CourseDetail/MiniIcons/QuizeIcon.svg'
-												title='Тест'
-											/>
+											{lesson.is_have_video && (
+												<IconWithToolTip
+													imgPath='/CourseDetail/MiniIcons/VideoIcon.svg'
+													title='Відео'
+												/>
+											)}
+											{lesson.is_have_presentation && (
+												<IconWithToolTip
+													imgPath='/CourseDetail/MiniIcons/PresentationIcon.svg'
+													title='Презентація'
+												/>
+											)}
+											{lesson.is_have_test && (
+												<IconWithToolTip
+													imgPath='/CourseDetail/MiniIcons/QuizeIcon.svg'
+													title='Тест'
+												/>
+											)}
 										</div>
 									</div>
 								</div>
