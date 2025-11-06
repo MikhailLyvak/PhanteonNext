@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 			{
 				url: 'https://www.pantheonx.club/Header/LogoColored.png',
 				width: 300,
-				height: 50,
+				height: 200,
 			},
 		],
 		locale: 'uk-UA',
