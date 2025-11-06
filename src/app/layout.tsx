@@ -7,6 +7,7 @@ import QueryProvider from '@/providers/QueryProvider'
 import Drawer from './components/HeaderComps/Drawer'
 import MainDrawer from './components/HeaderComps/Drawers/MainDrawer'
 import InnerWhiteHeader from './components/LayoutItems/components/Header/InnerWhiteHeader'
+import Script from 'next/script'
 
 const montserrat = Montserrat({
 	subsets: ['latin'],
@@ -64,14 +65,36 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en' className={montserrat.variable}>
-			{/* <head>
-				<link
-					rel='icon'
-					type='image/svg+xml'
-					href='/Header/LogoColoredSmall.svg'
-					style={{ width: 'auto', height: 'auto' }}
-				/>
-			</head> */}
+			<head>
+				<>
+					<Script
+						id='fb-pixel-script'
+						strategy='afterInteractive'
+						dangerouslySetInnerHTML={{
+							__html: `
+								!function(f,b,e,v,n,t,s)
+								{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+								n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+								if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+								n.queue=[];t=b.createElement(e);t.async=!0;
+								t.src=v;s=b.getElementsByTagName(e)[0];
+								s.parentNode.insertBefore(t,s)}(window, document,'script',
+								'https://connect.facebook.net/en_US/fbevents.js');
+								fbq('init', '1464612674823977');
+								fbq('track', 'PageView');
+								`,
+						}}
+					/>
+					<noscript>
+						<img
+							height='1'
+							width='1'
+							style={{ display: 'none' }}
+							src={`https://www.facebook.com/tr?id=1464612674823977&ev=PageView&noscript=1`}
+						/>
+					</noscript>
+				</>
+			</head>
 			<body className={`bg-[#171723] antialiased min-h-screen flex flex-col`}>
 				<QueryProvider>
 					<InnerWhiteHeader />
