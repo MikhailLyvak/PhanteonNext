@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		siteName: 'PantheonX',
 		images: [
 			{
-				url: 'https://www.pantheonx.club/Header/LogoColored.svg',
+				url: 'https://www.pantheonx.club/Header/LogoColored.png',
 				width: 300,
 				height: 50,
 			},
