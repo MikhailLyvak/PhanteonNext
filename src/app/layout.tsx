@@ -67,7 +67,7 @@ export default function RootLayout({
 	return (
 		<html lang='en' className={montserrat.variable}>
 			<head>
-				<>
+				{/* <>
 					<Script
 						id='fb-pixel-script'
 						strategy='afterInteractive'
@@ -94,10 +94,10 @@ export default function RootLayout({
 							src={`https://www.facebook.com/tr?id=1464612674823977&ev=PageView&noscript=1`}
 						/>
 					</noscript>
-				</>
+				</> */}
 			</head>
 			<body className={`bg-[#171723] antialiased min-h-screen flex flex-col`}>
-				<MetaPixel />
+				{/* <MetaPixel /> */}
 				<QueryProvider>
 					<InnerWhiteHeader />
 					<LoginModal />
