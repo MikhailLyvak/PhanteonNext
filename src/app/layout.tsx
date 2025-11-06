@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 	title: 'PantheonX',
 	description: 'PantheonX crypto dashboard',
 	applicationName: 'PantheonX',
+	category: 'cryptology',
 	icons: {
 		icon: '/favicon.ico',
 		shortcut: '/favicon.ico',
