@@ -67,6 +67,10 @@ export default function RootLayout({
 	return (
 		<html lang='en' className={montserrat.variable}>
 			<head>
+				<meta
+					name='facebook-domain-verification'
+					content='mu6ps5yr9yq5ds3w8i7yezpzb21far'
+				/>
 				<>
 					<Script
 						id='fb-pixel-script'
