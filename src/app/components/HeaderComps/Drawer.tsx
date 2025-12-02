@@ -108,7 +108,7 @@ const Drawer = () => {
 				/>
 				<NavItem
 					icon={<LuChartLine size={20} />}
-					text='Графіки'
+					text='Screener'
 					closeDrawer={closeDrawer}
 					link='/dashboard'
 				/>

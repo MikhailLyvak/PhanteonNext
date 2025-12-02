@@ -5,14 +5,12 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 import AdaptiveButtons from './AdaptiveButtons'
 import CryptoTicker from './CryptoTicker' // ✅ Import it
-import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 
 const InnerWhiteHeader = () => {
-	const { data: lastVebinar, isEnabled } = useGetLastVebinar()
 	const user = useUserStore(state => state.user)
 	const { toggleModal } = useAuthModalStore()
 	const [copied, setCopied] = useState(false)
@@ -151,7 +149,7 @@ const InnerWhiteHeader = () => {
 							href='/dashboard'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
-							Графіки
+							Screener
 						</Link>
 					</div>
 

@@ -94,7 +94,7 @@ const Footer = () => {
 								href='/dashboard'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
-								Графіки
+								Screener
 							</Link>
 						</div>
 
