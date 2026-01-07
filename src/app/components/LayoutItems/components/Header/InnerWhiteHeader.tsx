@@ -17,11 +17,10 @@ const InnerWhiteHeader = () => {
 	const [copied, setCopied] = useState(false)
 	const [isOpen, setIsOpen] = useState(false)
 	const pathname = usePathname()
-	const searchParams = useSearchParams()
 
 	useEffect(() => {
 		setIsOpen(false)
-	}, [pathname, searchParams])
+	}, [pathname])
 
 	const {
 		data: subscriptionsData,
