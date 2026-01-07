@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function About() {
 	return (
@@ -139,6 +140,26 @@ export default function About() {
 							</ul>
 						</div>
 					</div>
+				</div>
+
+				<div className='px-4 my-20'>
+					<Link
+						href='https://pantheonx.club/interview'
+						className='block w-full max-w-[1320px] mx-auto bg-[#1D1D2A] hover:bg-[#242437] transition rounded-2xl p-6 md:p-8 border border-[#2A2A39]'
+					>
+						<div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+							<p className='text-white text-base md:text-xl font-semibold'>
+								Не знаєш, з чого почати?{' '}
+								<span className='text-[#D2D2FF] font-bold'>
+									Наш AI допоможе обрати курс за кілька хвилин
+								</span>
+							</p>
+
+							<span className='inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#D2D2FF] text-[#171723] font-bold text-sm md:text-base'>
+								Перейти до AI-інтервʼю →
+							</span>
+						</div>
+					</Link>
 				</div>
 
 				{/* Eduard Tiasko Section */}

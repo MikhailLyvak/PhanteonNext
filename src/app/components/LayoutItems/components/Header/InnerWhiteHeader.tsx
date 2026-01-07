@@ -1,8 +1,9 @@
 'use client'
 
+import { usePathname, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AdaptiveButtons from './AdaptiveButtons'
 import CryptoTicker from './CryptoTicker' // ✅ Import it
 import { useUserStore } from '@/store/UserData/useUserStore'
@@ -14,6 +15,14 @@ const InnerWhiteHeader = () => {
 	const user = useUserStore(state => state.user)
 	const { toggleModal } = useAuthModalStore()
 	const [copied, setCopied] = useState(false)
+	const [isOpen, setIsOpen] = useState(false)
+	const pathname = usePathname()
+	const searchParams = useSearchParams()
+
+	useEffect(() => {
+		setIsOpen(false)
+	}, [pathname, searchParams])
+
 	const {
 		data: subscriptionsData,
 		isLoading,
@@ -102,7 +111,63 @@ const InnerWhiteHeader = () => {
 								{copied ? 'Скопійовано!' : 'Реферали'}
 							</button>
 						)}
-						{user ? (
+						<div className='relative'>
+							<button
+								type='button'
+								onClick={() => setIsOpen(prev => !prev)}
+								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base flex items-center gap-1'
+							>
+								AI
+							</button>
+							{isOpen && (
+								<div className='absolute top-full left-0 mt-2 w-40 bg-[#242433] rounded-md shadow-lg z-50 drop-shadow-md'>
+									{user ? (
+										<>
+											<Link
+												href='/AI-Agent'
+												className='block px-4 py-2 text-sm text-[#D2D2FFAB] hover:bg-[#222]'
+												onClick={() => setIsOpen(false)}
+											>
+												АІ-агенти
+											</Link>
+
+											<Link
+												href='https://pantheonx.club/interview'
+												className='block px-4 py-2 text-sm text-[#D2D2FFAB] hover:bg-[#222]'
+												onClick={() => setIsOpen(false)}
+											>
+												АІ Інтерв'ю
+											</Link>
+										</>
+									) : (
+										<>
+											<button
+												type='button'
+												onClick={() => {
+													handleAcademyClick()
+													setIsOpen(false)
+												}}
+												className='w-full text-left px-4 py-2 text-sm text-[#D2D2FFAB] hover:bg-[#222]'
+											>
+												АІ-агенти
+											</button>
+
+											<button
+												type='button'
+												onClick={() => {
+													handleAcademyClick()
+													setIsOpen(false)
+												}}
+												className='w-full text-left px-4 py-2 text-sm text-[#D2D2FFAB] hover:bg-[#222]'
+											>
+												АІ Інтерв'ю
+											</button>
+										</>
+									)}
+								</div>
+							)}
+						</div>
+						{/* {user ? (
 							<Link
 								href='/AI-Agent'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
@@ -118,6 +183,22 @@ const InnerWhiteHeader = () => {
 								АІ-агенти
 							</button>
 						)}
+						{user ? (
+							<Link
+								href='https://pantheonx.club/interview'
+								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+							>
+								АІ Інтерв'ю
+							</Link>
+						) : (
+							<button
+								type='button'
+								onClick={handleAcademyClick}
+								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+							>
+								АІ Інтерв'ю
+							</button>
+						)} */}
 						{user ? (
 							<Link
 								href='/myCabinet/studyPlatform'

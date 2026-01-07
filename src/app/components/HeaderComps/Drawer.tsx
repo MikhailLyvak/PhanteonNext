@@ -12,6 +12,7 @@ import {
 	CheckCircle,
 	Video,
 	Award,
+	Bot,
 } from 'lucide-react'
 import { MdArrowBackIosNew } from 'react-icons/md'
 import { useDrawerStore } from '@/store/Nav/useDrawerStore'
@@ -93,6 +94,12 @@ const Drawer = () => {
 					text='Академія'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/studyPlatform'
+				/>
+				<NavItem
+					icon={<Bot size={20} />}
+					text="АІ Інтерв'ю"
+					closeDrawer={closeDrawer}
+					link='https://pantheonx.club/interview'
 				/>
 				<NavItem
 					icon={<Award size={20} />}

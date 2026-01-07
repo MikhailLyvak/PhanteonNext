@@ -5,6 +5,7 @@ import CourseList from './components/CourseList'
 import Sidebar from '../components/Sidebar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useState } from 'react'
+import Link from 'next/link'
 
 const StudyPlatformPage = () => {
 	const [selectedPage, setSelectedPage] = useState<string>('all')
@@ -57,10 +58,19 @@ const StudyPlatformPage = () => {
 
 							{/* ✅ Course List */}
 							<CourseList filter={selectedPage ?? 'all'} />
+							<CourseList filter={selectedPage ?? 'all'} />
+							<CourseList filter={selectedPage ?? 'all'} />
+							<CourseList filter={selectedPage ?? 'all'} />
 						</div>
 					</div>
 				</div>
 			</div>
+			<Link
+				href={'https://pantheonx.club/interview'}
+				className='fixed top-[90%] right-10 py-4 px-6 bg-[#242433] drop-shadow-lg rounded-full border border-[#ffffff36]  shadow hover:scale-105 hover:bg-[#D2D2FF] hover:text-[#242433] transition-all duration-300 font-semibold z-10'
+			>
+				Підібрати курс з AI
+			</Link>
 		</ProtectedRoute>
 	)
 }
