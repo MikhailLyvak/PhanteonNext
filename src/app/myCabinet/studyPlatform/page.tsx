@@ -58,9 +58,6 @@ const StudyPlatformPage = () => {
 
 							{/* ✅ Course List */}
 							<CourseList filter={selectedPage ?? 'all'} />
-							<CourseList filter={selectedPage ?? 'all'} />
-							<CourseList filter={selectedPage ?? 'all'} />
-							<CourseList filter={selectedPage ?? 'all'} />
 						</div>
 					</div>
 				</div>
