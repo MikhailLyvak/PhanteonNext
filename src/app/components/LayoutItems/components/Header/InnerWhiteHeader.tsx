@@ -226,7 +226,7 @@ const InnerWhiteHeader = () => {
 							Вебінари
 						</Link>
 						<Link
-							href='/dashboard'
+							href='https://screener.pantheonx.club/'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Screener

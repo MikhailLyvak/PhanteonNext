@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
 import { LuInstagram } from 'react-icons/lu'
-import { PiTelegramLogo } from 'react-icons/pi'
+import { PiTelegramLogo, PiYoutubeLogo } from 'react-icons/pi'
 import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 
@@ -91,7 +91,7 @@ const Footer = () => {
 								</button>
 							)}
 							<Link
-								href='/dashboard'
+								href='https://screener.pantheonx.club/'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Screener
@@ -99,6 +99,16 @@ const Footer = () => {
 						</div>
 
 						<div className='flex items-center gap-4'>
+							<Link
+								href='https://www.youtube.com/@igorporokh'
+								target='_blank'
+								rel='noopener noreferrer'
+							>
+								<PiYoutubeLogo
+									size={38}
+									className='text-[#D2D2FF] hover:text-white transition-colors'
+								/>
+							</Link>
 							<Link
 								href='https://www.instagram.com/igor_porokh/'
 								target='_blank'
@@ -109,7 +119,7 @@ const Footer = () => {
 									className='text-[#D2D2FF] hover:text-white transition-colors'
 								/>
 							</Link>
-							<a
+							<Link
 								href='https://t.me/roadfromatoz'
 								target='_blank'
 								rel='noopener noreferrer'
@@ -118,7 +128,7 @@ const Footer = () => {
 									size={32}
 									className='text-[#D2D2FF] hover:text-white transition-colors'
 								/>
-							</a>
+							</Link>
 						</div>
 					</div>
 				</div>
@@ -128,7 +138,7 @@ const Footer = () => {
 			<div className='bg-[#13131B]'>
 				<div className='max-w-8xl mx-auto px-4 py-4'>
 					<div className='flex max-md:flex-col justify-between items-center text-sm text-[#58587B]'>
-						<div>Copyright © 2025 PantheonX. Всі права захищено.</div>
+						<div>Copyright © 2026 PantheonX. Всі права захищено.</div>
 						<div>
 							<Link
 								href='/privacy'
