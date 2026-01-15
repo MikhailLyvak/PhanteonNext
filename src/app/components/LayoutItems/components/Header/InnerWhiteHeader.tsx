@@ -82,13 +82,13 @@ const InnerWhiteHeader = () => {
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Про нас
-						</Link>
+						</Link> */}
 						<Link
 							href='/Blog'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Блог
-						</Link> */}
+						</Link>
 						{/* {!subscriptionsData?.has_active_subscription && (
 							<Link
 								href='/paywall'

@@ -48,13 +48,13 @@ const Footer = () => {
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Про нас
-							</Link>
+							</Link> */}
 							<Link
 								href='/Blog'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Блог
-							</Link> */}
+							</Link>
 							{/* <Link
 								href='/AI-Agent'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
