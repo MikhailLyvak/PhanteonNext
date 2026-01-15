@@ -15,7 +15,7 @@ export default function BlogListPage() {
 				{data?.map(post => (
 					<Link
 						key={post.id}
-						href={!user ? `/Blog/${post.slug}` : '/login'}
+						href={user ? `/Blog/${post.slug}` : '/login'}
 						className='bg-[#242433] rounded-lg overflow-hidden hover:ring-2 ring-[#58587B] transition'
 					>
 						{post.cover && (
