@@ -12,10 +12,10 @@ import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 
 const Footer = () => {
-	const { data: lastVebinar, isLoading } = useGetLastVebinar()
+	// const { data: lastVebinar, isLoading } = useGetLastVebinar()
 	const user = useUserStore(state => state.user)
 	const { toggleModal } = useAuthModalStore()
-	const { data: subscriptionsData } = useGetUserSubscriptions()
+	//const { data: subscriptionsData } = useGetUserSubscriptions()
 
 	const handleAcademyClick = (e: React.MouseEvent) => {
 		if (!user) {
@@ -43,7 +43,7 @@ const Footer = () => {
 						</div>
 
 						<div className='flex max-md:flex-col max-md:my-10 items-center gap-3 md:gap-8'>
-							<Link
+							{/* <Link
 								href='/About'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
@@ -54,40 +54,40 @@ const Footer = () => {
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Блог
-							</Link>
-							<Link
+							</Link> */}
+							{/* <Link
 								href='/AI-Agent'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								АІ-агенти
-							</Link>
-							<Link
+							</Link> */}
+							{/* <Link
 								href='/vebinars'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Вебінари
-							</Link>
-							{!subscriptionsData?.has_active_subscription && (
+							</Link> */}
+							{/* {!subscriptionsData?.has_active_subscription && (
 								<Link
 									href='/paywall'
 									className='text-[#D2D2FF] hover:text-white transition-colors'
 								>
 									Підписки
 								</Link>
-							)}
+							)} */}
 							{user ? (
 								<Link
 									href='/myCabinet/studyPlatform'
 									className='text-[#D2D2FF] hover:text-white transition-colors'
 								>
-									Академія
+									Навчання
 								</Link>
 							) : (
 								<button
 									onClick={handleAcademyClick}
 									className='text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer'
 								>
-									Академія
+									Навчання
 								</button>
 							)}
 							<Link

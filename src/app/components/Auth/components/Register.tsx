@@ -41,7 +41,7 @@ const RegisterModalFormComponent = () => {
 		onSuccess: data => {
 			setUser(data.user)
 			closeModal() // Close modal on successful registration
-			router.push('/myCabinet/studyPlatform')
+			router.push('https://screener.pantheonx.club/')
 		},
 		onError: (error: any) => {
 			console.error('Registration error details:', error)
@@ -233,6 +233,10 @@ const RegisterModalFormComponent = () => {
 
 			<p className='mt-4 text-xs text-gray-500 text-center'>
 				Натискаючи «Реєстрація», ви погоджуєтесь з обробкою персональних даних.
+			</p>
+			<p className='mt-4 text-xs text-gray-500 text-center'>
+				Скрінер - інструмент для системного аналізу ринку та відбору активів за
+				заданими параметрами. Доступний після реєстрації!
 			</p>
 		</form>
 	)

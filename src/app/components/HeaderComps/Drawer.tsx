@@ -91,28 +91,28 @@ const Drawer = () => {
 				/>
 				<NavItem
 					icon={<GraduationCap size={20} />}
-					text='Академія'
+					text='Навчання'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/studyPlatform'
 				/>
-				<NavItem
+				{/* <NavItem
 					icon={<Bot size={20} />}
 					text="АІ Інтерв'ю"
 					closeDrawer={closeDrawer}
 					link='https://pantheonx.club/interview'
-				/>
-				<NavItem
+				/> */}
+				{/* <NavItem
 					icon={<Award size={20} />}
 					text='Сертифікати'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/certificates'
-				/>
-				<NavItem
+				/> */}
+				{/* <NavItem
 					icon={<Video size={20} />}
 					text='Вебінари'
 					closeDrawer={closeDrawer}
 					link='/vebinars'
-				/>
+				/> */}
 				<NavItem
 					icon={<LuChartLine size={20} />}
 					text='Screener'

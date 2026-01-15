@@ -29,7 +29,7 @@ const LoginModalFormComponent = () => {
 			const profileData = await getProfile()
 			setUser(profileData)
 			closeModal()
-			router.push('/myCabinet/studyPlatform')
+			router.push('https://screener.pantheonx.club/')
 		},
 		onError: (error: any) => {
 			console.error('Login error details:', error)
@@ -136,6 +136,10 @@ const LoginModalFormComponent = () => {
 				<p className='mt-4 text-xs text-gray-500 text-center'>
 					Продовжуючи, ви підтверджуєте, що згодні увійти до облікового запису
 					PantheonX та надаєте згоду на обробку персональних даних
+				</p>
+				<p className='mt-4 text-xs text-gray-500 text-center'>
+					Скрінер - інструмент для системного аналізу ринку та відбору активів
+					за заданими параметрами. Доступний після реєстрації!
 				</p>
 				<button
 					type='submit'

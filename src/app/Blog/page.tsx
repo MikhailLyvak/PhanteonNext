@@ -1,9 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { useGetBlogs } from '@/hooks/Blog/useGetBlogs'
+import { useUserStore } from '@/store/UserData/useUserStore'
 
 export default function BlogListPage() {
 	const { data, isLoading } = useGetBlogs()
+	const user = useUserStore(state => state.user)
 
 	return (
 		<div className='max-w-6xl mx-auto px-4 py-10 text-white'>
@@ -13,7 +15,7 @@ export default function BlogListPage() {
 				{data?.map(post => (
 					<Link
 						key={post.id}
-						href={`/Blog/${post.slug}`}
+						href={!user ? `/Blog/${post.slug}` : '/login'}
 						className='bg-[#242433] rounded-lg overflow-hidden hover:ring-2 ring-[#58587B] transition'
 					>
 						{post.cover && (

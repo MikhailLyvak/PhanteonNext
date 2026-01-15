@@ -22,11 +22,11 @@ const InnerWhiteHeader = () => {
 		setIsOpen(false)
 	}, [pathname])
 
-	const {
-		data: subscriptionsData,
-		isLoading,
-		error,
-	} = useGetUserSubscriptions()
+	// const {
+	// 	data: subscriptionsData,
+	// 	isLoading,
+	// 	error,
+	// } = useGetUserSubscriptions()
 
 	const refferalRegisterLink = user
 		? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
@@ -44,6 +44,7 @@ const InnerWhiteHeader = () => {
 			toggleModal() // Open login modal if not authenticated
 		}
 	}
+	console.log(user)
 
 	return (
 		<>
@@ -76,7 +77,7 @@ const InnerWhiteHeader = () => {
 
 					{/* ✅ Center - Navigation */}
 					<div className='2xl:gap-10 gap-5 hidden lg:flex'>
-						<Link
+						{/* <Link
 							href='/About'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
@@ -87,15 +88,15 @@ const InnerWhiteHeader = () => {
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Блог
-						</Link>
-						{!subscriptionsData?.has_active_subscription && (
+						</Link> */}
+						{/* {!subscriptionsData?.has_active_subscription && (
 							<Link
 								href='/paywall'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 							>
 								Підписки
 							</Link>
-						)}
+						)} */}
 						{user && (
 							<button
 								type='button'
@@ -110,7 +111,7 @@ const InnerWhiteHeader = () => {
 								{copied ? 'Скопійовано!' : 'Реферали'}
 							</button>
 						)}
-						<div className='relative'>
+						{/* <div className='relative'>
 							<button
 								type='button'
 								onClick={() => setIsOpen(prev => !prev)}
@@ -165,7 +166,7 @@ const InnerWhiteHeader = () => {
 									)}
 								</div>
 							)}
-						</div>
+						</div> */}
 						{/* {user ? (
 							<Link
 								href='/AI-Agent'
@@ -203,7 +204,7 @@ const InnerWhiteHeader = () => {
 								href='/myCabinet/studyPlatform'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 							>
-								Академія
+								Навчання
 							</Link>
 						) : (
 							<button
@@ -216,17 +217,17 @@ const InnerWhiteHeader = () => {
 									cursor: 'pointer',
 								}}
 							>
-								Академія
+								Навчання
 							</button>
 						)}
-						<Link
+						{/* <Link
 							href='/vebinars'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Вебінари
-						</Link>
+						</Link> */}
 						<Link
-							href='https://screener.pantheonx.club/'
+							href={!user ? 'https://screener.pantheonx.club/' : '/login'}
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Screener

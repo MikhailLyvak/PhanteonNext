@@ -15,7 +15,7 @@ const StudyPlatformPage = () => {
 				<div className='max-w-8xl mx-auto px-4 md:px-6'>
 					{/* ✅ First Row: Breadcrumbs */}
 					<div className='mt-6'>
-						<MyCabinetBreadCrump currentPageTitle='Академія' />
+						<MyCabinetBreadCrump currentPageTitle='Навчання' />
 					</div>
 
 					{/* ✅ Second Row: Page Title */}
