@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   sassOptions: {
     includePaths: ['./src'],
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   images: {
     remotePatterns: [
       {
