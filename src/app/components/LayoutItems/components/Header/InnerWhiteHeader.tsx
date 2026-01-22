@@ -83,12 +83,7 @@ const InnerWhiteHeader = () => {
 						>
 							Про нас
 						</Link> */}
-						<Link
-							href='/Blog'
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Блог
-						</Link>
+
 						{/* {!subscriptionsData?.has_active_subscription && (
 							<Link
 								href='/paywall'
@@ -97,7 +92,7 @@ const InnerWhiteHeader = () => {
 								Підписки
 							</Link>
 						)} */}
-						{user && (
+						{/* {user && (
 							<button
 								type='button'
 								onClick={handleCopy}
@@ -110,7 +105,7 @@ const InnerWhiteHeader = () => {
 							>
 								{copied ? 'Скопійовано!' : 'Реферали'}
 							</button>
-						)}
+						)} */}
 						{/* <div className='relative'>
 							<button
 								type='button'
@@ -199,9 +194,26 @@ const InnerWhiteHeader = () => {
 								АІ Інтерв'ю
 							</button>
 						)} */}
+						{user ? (<Link
+							href='https://screener.pantheonx.club/'
+							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+						>
+							Скрінер
+						</Link>) : (<button
+							onClick={handleAcademyClick}
+							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+						>
+							Скрінер
+						</button>)}
+						<Link
+							href='/Blog'
+							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
+						>
+							Блог
+						</Link>
 						{user ? (
 							<Link
-								href='/myCabinet/studyPlatform'
+								href='http://pantheonx.club/interview'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 							>
 								Навчання
@@ -226,12 +238,7 @@ const InnerWhiteHeader = () => {
 						>
 							Вебінари
 						</Link> */}
-						<Link
-							href={!user ? 'https://screener.pantheonx.club/' : '/login'}
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Screener
-						</Link>
+
 					</div>
 
 					{/* ✅ Right - Buttons */}

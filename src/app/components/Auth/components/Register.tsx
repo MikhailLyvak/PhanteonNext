@@ -134,112 +134,112 @@ const RegisterModalFormComponent = () => {
 	}
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
-			<Controller
-				control={control}
-				name='email'
-				render={({ field, fieldState }) => (
-					<>
-						<input
-							{...field}
-							type='text'
-							inputMode='email'
-							placeholder='Email'
-							className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
-						/>
-						{fieldState.error && (
-							<p className='text-red-500 text-sm'>{fieldState.error.message}</p>
-						)}
-					</>
-				)}
-			/>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <h3 className="mt-6 text-sm text-gray-500 font-medium text-center">
+        Скрінер - інструмент для системного аналізу ринку та відбору активів за
+        заданими параметрами. Доступний після реєстрації!
+      </h3>
+      <Controller
+        control={control}
+        name="email"
+        render={({ field, fieldState }) => (
+          <>
+            <input
+              {...field}
+              type="text"
+              inputMode="email"
+              placeholder="Email"
+              className="w-full mt-6 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
+            />
+            {fieldState.error && (
+              <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+            )}
+          </>
+        )}
+      />
 
-			<Controller
-				control={control}
-				name='password'
-				render={({ field, fieldState }) => (
-					<>
-						<div className='relative'>
-							<input
-								{...field}
-								type={isVisible ? 'text' : 'password'}
-								placeholder='Пароль'
-								className='w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
-							/>
-							<button
-								type='button'
-								onClick={() => setIsVisible(!isVisible)}
-								className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
-							>
-								{isVisible ? '👁️' : '👁️‍🗨️'}
-							</button>
-						</div>
-						{fieldState.error && (
-							<p className='text-red-500 text-sm'>{fieldState.error.message}</p>
-						)}
-					</>
-				)}
-			/>
+      <Controller
+        control={control}
+        name="password"
+        render={({ field, fieldState }) => (
+          <>
+            <div className="relative">
+              <input
+                {...field}
+                type={isVisible ? 'text' : 'password'}
+                placeholder="Пароль"
+                className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsVisible(!isVisible)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {isVisible ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            {fieldState.error && (
+              <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+            )}
+          </>
+        )}
+      />
 
-			<Controller
-				control={control}
-				name='confirm_password'
-				render={({ field, fieldState }) => (
-					<>
-						<div className='relative'>
-							<input
-								{...field}
-								type={isVisible ? 'text' : 'password'}
-								placeholder='Повторіть пароль'
-								className='w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
-							/>
-							<button
-								type='button'
-								onClick={() => setIsVisible(!isVisible)}
-								className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
-							>
-								{isVisible ? '👁️' : '👁️‍🗨️'}
-							</button>
-						</div>
-						{fieldState.error && (
-							<p className='text-red-500 text-sm'>{fieldState.error.message}</p>
-						)}
-					</>
-				)}
-			/>
+      <Controller
+        control={control}
+        name="confirm_password"
+        render={({ field, fieldState }) => (
+          <>
+            <div className="relative">
+              <input
+                {...field}
+                type={isVisible ? 'text' : 'password'}
+                placeholder="Повторіть пароль"
+                className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsVisible(!isVisible)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {isVisible ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            {fieldState.error && (
+              <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+            )}
+          </>
+        )}
+      />
 
-			<button
-				type='submit'
-				disabled={isPending}
-				className='w-full mt-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:shadow-xl flex items-center justify-center gap-2'
-			>
-				{isPending && (
-					<Triangle
-						visible={true}
-						height={16}
-						width={16}
-						color='#fff'
-						ariaLabel='triangle-loading'
-					/>
-				)}
-				<span>Реєстрація</span>
-			</button>
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full mt-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:shadow-xl flex items-center justify-center gap-2"
+      >
+        {isPending && (
+          <Triangle
+            visible={true}
+            height={16}
+            width={16}
+            color="#fff"
+            ariaLabel="triangle-loading"
+          />
+        )}
+        <span>Реєстрація</span>
+      </button>
 
-			{errorMessage && (
-				<div className='alert border-0 alert-danger mt-2 text-center text-sm text-red-500'>
-					{errorMessage}
-				</div>
-			)}
+      {errorMessage && (
+        <div className="alert border-0 alert-danger mt-2 text-center text-sm text-red-500">
+          {errorMessage}
+        </div>
+      )}
 
-			<p className='mt-4 text-xs text-gray-500 text-center'>
-				Натискаючи «Реєстрація», ви погоджуєтесь з обробкою персональних даних.
-			</p>
-			<p className='mt-4 text-xs text-gray-500 text-center'>
-				Скрінер - інструмент для системного аналізу ринку та відбору активів за
-				заданими параметрами. Доступний після реєстрації!
-			</p>
-		</form>
-	)
+      <p className="mt-4 text-xs text-gray-500 text-center">
+        Натискаючи «Реєстрація», ви погоджуєтесь з обробкою персональних даних.
+      </p>
+    </form>
+  );
 }
 
 export default RegisterModalFormComponent
