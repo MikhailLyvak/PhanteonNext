@@ -1,90 +1,90 @@
-'use client'
+"use client";
 
-import { usePathname, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import AdaptiveButtons from './AdaptiveButtons'
-import CryptoTicker from './CryptoTicker' // ✅ Import it
-import { useUserStore } from '@/store/UserData/useUserStore'
-import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
+import { usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import AdaptiveButtons from "./AdaptiveButtons";
+import CryptoTicker from "./CryptoTicker"; // ✅ Import it
+import { useUserStore } from "@/store/UserData/useUserStore";
+import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 
-import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
+import { useGetUserSubscriptions } from "@/hooks/Subscriptions/useGetUserSubscriptions";
 
 const InnerWhiteHeader = () => {
-	const user = useUserStore(state => state.user)
-	const { toggleModal } = useAuthModalStore()
-	const [copied, setCopied] = useState(false)
-	const [isOpen, setIsOpen] = useState(false)
-	const pathname = usePathname()
+  const user = useUserStore((state) => state.user);
+  const { toggleModal } = useAuthModalStore();
+  const [copied, setCopied] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-	useEffect(() => {
-		setIsOpen(false)
-	}, [pathname])
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
-	// const {
-	// 	data: subscriptionsData,
-	// 	isLoading,
-	// 	error,
-	// } = useGetUserSubscriptions()
+  // const {
+  // 	data: subscriptionsData,
+  // 	isLoading,
+  // 	error,
+  // } = useGetUserSubscriptions()
 
-	const refferalRegisterLink = user
-		? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
-		: ''
+  const refferalRegisterLink = user
+    ? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
+    : "";
 
-	const handleCopy = async () => {
-		if (!refferalRegisterLink) return
-		await navigator.clipboard.writeText(refferalRegisterLink)
-		setCopied(true)
-		setTimeout(() => setCopied(false), 1500)
-	}
+  const handleCopy = async () => {
+    if (!refferalRegisterLink) return;
+    await navigator.clipboard.writeText(refferalRegisterLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
-	const handleAcademyClick = () => {
-		if (!user) {
-			toggleModal() // Open login modal if not authenticated
-		}
-	}
-	console.log(user)
+  const handleAcademyClick = () => {
+    if (!user) {
+      toggleModal(); // Open login modal if not authenticated
+    }
+  };
+  console.log(user);
 
-	return (
-		<>
-			{/* 🔼 Header */}
-			<div className='w-full h-[73px] border-b border-gray-500 md:h-[120px] bg-[#171723] z-40 fixed top-0 left-0 p-3 sm:p-[34px]'>
-				<div className='max-w-8xl mx-auto flex items-center justify-between'>
-					{/* ✅ Left - Logo */}
-					<div className=''>
-						<Link href={'/'}>
-							<div className='hidden md:block relative'>
-								<Image
-									src='/Header/LogoColored.svg'
-									alt='Pantheon Logo'
-									fill={true}
-									priority={true}
-									className='object-contain w-[130px] h-[48px] xl:w-[184px] md:h-[58px] !relative'
-								/>
-							</div>
-							<div className='md:hidden relative'>
-								<Image
-									src='/Header/LogoColoredSmall.svg'
-									alt='Pantheon Logo'
-									fill={true}
-									priority={true}
-									className='object-contain w-auto !relative'
-								/>
-							</div>
-						</Link>
-					</div>
+  return (
+    <>
+      {/* 🔼 Header */}
+      <div className="w-full h-[73px] border-b border-gray-500 md:h-[120px] bg-[#171723] z-40 fixed top-0 left-0 p-3 sm:p-[34px]">
+        <div className="max-w-8xl mx-auto flex items-center justify-between">
+          {/* ✅ Left - Logo */}
+          <div className="">
+            <Link href={"/"}>
+              <div className="hidden md:block relative">
+                <Image
+                  src="/Header/LogoColored.svg"
+                  alt="Pantheon Logo"
+                  fill={true}
+                  priority={true}
+                  className="object-contain w-[130px] h-[48px] xl:w-[184px] md:h-[58px] !relative"
+                />
+              </div>
+              <div className="md:hidden relative">
+                <Image
+                  src="/Header/LogoColoredSmall.svg"
+                  alt="Pantheon Logo"
+                  fill={true}
+                  priority={true}
+                  className="object-contain w-auto !relative"
+                />
+              </div>
+            </Link>
+          </div>
 
-					{/* ✅ Center - Navigation */}
-					<div className='2xl:gap-10 gap-5 hidden lg:flex'>
-						{/* <Link
+          {/* ✅ Center - Navigation */}
+          <div className="2xl:gap-10 gap-5 hidden lg:flex">
+            {/* <Link
 							href='/About'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Про нас
 						</Link> */}
 
-						{/* {!subscriptionsData?.has_active_subscription && (
+            {/* {!subscriptionsData?.has_active_subscription && (
 							<Link
 								href='/paywall'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
@@ -92,7 +92,7 @@ const InnerWhiteHeader = () => {
 								Підписки
 							</Link>
 						)} */}
-						{/* {user && (
+            {/* {user && (
 							<button
 								type='button'
 								onClick={handleCopy}
@@ -106,7 +106,7 @@ const InnerWhiteHeader = () => {
 								{copied ? 'Скопійовано!' : 'Реферали'}
 							</button>
 						)} */}
-						{/* <div className='relative'>
+            {/* <div className='relative'>
 							<button
 								type='button'
 								onClick={() => setIsOpen(prev => !prev)}
@@ -162,7 +162,7 @@ const InnerWhiteHeader = () => {
 								</div>
 							)}
 						</div> */}
-						{/* {user ? (
+            {/* {user ? (
 							<Link
 								href='/AI-Agent'
 								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
@@ -194,63 +194,72 @@ const InnerWhiteHeader = () => {
 								АІ Інтерв'ю
 							</button>
 						)} */}
-						{user ? (<Link
-							href='https://screener.pantheonx.club/'
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Скрінер
-						</Link>) : (<button
-							onClick={handleAcademyClick}
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Скрінер
-						</button>)}
-						<Link
-							href='/Blog'
-							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-						>
-							Блог
-						</Link>
-						{user ? (
-							<Link
-								href='http://pantheonx.club/interview'
-								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-							>
-								Навчання
-							</Link>
-						) : (
-							<button
-								type='button'
-								onClick={handleAcademyClick}
-								className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
-								style={{
-									background: 'none',
-									border: 'none',
-									cursor: 'pointer',
-								}}
-							>
-								Навчання
-							</button>
-						)}
-						{/* <Link
+            {user ? (
+              <Link
+                href="https://screener.pantheonx.club/"
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Скрінер
+              </Link>
+            ) : (
+              <button
+                onClick={handleAcademyClick}
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Скрінер
+              </button>
+            )}
+            <Link
+              href="/Blog"
+              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+            >
+              Блог
+            </Link>
+            {user ? (
+              <Link
+                href="http://pantheonx.club/interview"
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Навчання
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAcademyClick}
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Навчання
+              </button>
+            )}
+            {/* <Link
 							href='/vebinars'
 							className='font-bold text-sm text-[#D2D2FFAB] xl:text-base'
 						>
 							Вебінари
 						</Link> */}
+            <Link
+              href="/Trading-Chat"
+              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+            >
+              Трейдинг-чат
+            </Link>
+          </div>
 
-					</div>
+          {/* ✅ Right - Buttons */}
+          <AdaptiveButtons textColor="text-[#D2D2FF]" />
+        </div>
+      </div>
 
-					{/* ✅ Right - Buttons */}
-					<AdaptiveButtons textColor='text-[#D2D2FF]' />
-				</div>
-			</div>
+      <div className="pt-[73px] md:pt-[120px]">
+        <CryptoTicker />
+      </div>
+    </>
+  );
+};
 
-			<div className='pt-[73px] md:pt-[120px]'>
-				<CryptoTicker />
-			</div>
-		</>
-	)
-}
-
-export default InnerWhiteHeader
+export default InnerWhiteHeader;
