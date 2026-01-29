@@ -89,12 +89,7 @@ const Drawer = () => {
 					closeDrawer={closeDrawer}
 					link='/myCabinet/personalData'
 				/>
-				<NavItem
-					icon={<GraduationCap size={20} />}
-					text='Навчання'
-					closeDrawer={closeDrawer}
-					link='/myCabinet/studyPlatform'
-				/>
+				
 				{/* <NavItem
 					icon={<Bot size={20} />}
 					text="АІ Інтерв'ю"
@@ -118,6 +113,24 @@ const Drawer = () => {
 					text='Screener'
 					closeDrawer={closeDrawer}
 					link='/dashboard'
+				/>
+				<NavItem
+					icon={<LuChartLine size={20} />}
+					text='Трейдинг-чат'
+					closeDrawer={closeDrawer}
+					link='/trading-chat'
+				/>
+				<NavItem
+					icon={<LuChartLine size={20} />}
+					text='Блог'
+					closeDrawer={closeDrawer}
+					link='/Blog'
+				/>
+				<NavItem
+					icon={<GraduationCap size={20} />}
+					text='Навчання'
+					closeDrawer={closeDrawer}
+					link='/myCabinet/studyPlatform'
 				/>
 				<NavItem
 					icon={<Settings size={20} />}
