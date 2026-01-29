@@ -90,7 +90,7 @@ const Footer = () => {
               )}
               {user ? (
                 <Link
-                href="/trading-chat"
+                href="/Trading-Chat"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
                 Трейдинг-чат

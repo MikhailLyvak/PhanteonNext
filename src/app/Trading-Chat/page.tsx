@@ -1,20 +1,9 @@
 "use client";
 
-import { useUserStore } from "@/store/UserData/useUserStore";
-import { useRouter } from 'next/navigation'
-
 import { CircleCheck } from "lucide-react";
 import Image from "next/image";
 
 export default function TradingChats() {
-  const router = useRouter()
-
-  const {user} = useUserStore();
-
-  if(user === null){
-    router.push('/login')
-  }
-
   const features = [
     {
       id: 1,

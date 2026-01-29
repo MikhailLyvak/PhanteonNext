@@ -118,7 +118,7 @@ const Drawer = () => {
 					icon={<LuChartLine size={20} />}
 					text='Трейдинг-чат'
 					closeDrawer={closeDrawer}
-					link='/trading-chat'
+					link='/Trading-Chat'
 				/>
 				<NavItem
 					icon={<LuChartLine size={20} />}
