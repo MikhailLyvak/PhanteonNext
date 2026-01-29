@@ -13,6 +13,7 @@ import {
 	Video,
 	Award,
 	Bot,
+	MessageCircleMore,
 } from 'lucide-react'
 import { MdArrowBackIosNew } from 'react-icons/md'
 import { useDrawerStore } from '@/store/Nav/useDrawerStore'
@@ -115,7 +116,7 @@ const Drawer = () => {
 					link='/dashboard'
 				/>
 				<NavItem
-					icon={<LuChartLine size={20} />}
+					icon={<MessageCircleMore size={20}/>}
 					text='Трейдинг-чат'
 					closeDrawer={closeDrawer}
 					link='/Trading-Chat'

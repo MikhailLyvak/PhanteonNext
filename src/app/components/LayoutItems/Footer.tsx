@@ -83,7 +83,7 @@ const Footer = () => {
               ) : (
                 <button
                   onClick={handleAcademyClick}
-                  className="text-[#D2D2FF] hover:text-white transition-colors"
+                  className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
                 >
                   Скрінер
                 </button>
@@ -91,14 +91,14 @@ const Footer = () => {
               {user ? (
                 <Link
                 href="/Trading-Chat"
-                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+                className="text-[#D2D2FF] hover:text-white transition-colors"
               >
                 Трейдинг-чат
               </Link>
               ) : (
                 <button
                 onClick={handleAcademyClick}
-                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+                className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
               >
                 Трейдинг-чат
               </button>
