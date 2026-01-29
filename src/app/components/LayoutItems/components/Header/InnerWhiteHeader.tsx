@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { usePathname, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import AdaptiveButtons from './AdaptiveButtons'
-import CryptoTicker from './CryptoTicker' // ✅ Import it
-import { useUserStore } from '@/store/UserData/useUserStore'
-import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
+import { usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import AdaptiveButtons from "./AdaptiveButtons";
+import CryptoTicker from "./CryptoTicker"; // ✅ Import it
+import { useUserStore } from "@/store/UserData/useUserStore";
+import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 
-import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
+import { useGetUserSubscriptions } from "@/hooks/Subscriptions/useGetUserSubscriptions";
 
 const InnerWhiteHeader = () => {
   const user = useUserStore((state) => state.user);
@@ -208,6 +208,21 @@ const InnerWhiteHeader = () => {
                 Скрінер
               </button>
             )}
+            {user ? (
+              <Link
+              href="/trading-chat"
+              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+            >
+              Трейдинг-чат
+            </Link>
+            ) : (
+              <button
+              onClick={handleAcademyClick}
+              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+            >
+              Трейдинг-чат
+            </button>
+            )}
             <Link
               href="/Blog"
               className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
@@ -227,9 +242,9 @@ const InnerWhiteHeader = () => {
                 onClick={handleAcademyClick}
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
                 }}
               >
                 Навчання
@@ -253,6 +268,6 @@ const InnerWhiteHeader = () => {
       </div>
     </>
   );
-}
+};
 
-export default InnerWhiteHeader
+export default InnerWhiteHeader;
