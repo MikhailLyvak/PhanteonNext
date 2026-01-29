@@ -25,7 +25,11 @@ const LoginModal = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+    <div className="fixed inset-0 flex flex-col gap-6 items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+      <p className="mt-6 text-xl text-[#fff] font-medium text-center md:max-w-[400px] max-w-full">
+        Скрінер - інструмент для системного аналізу ринку та відбору активів за
+        заданими параметрами. Доступний після реєстрації
+      </p>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -41,30 +45,28 @@ const LoginModal = () => {
 
         <div className="flex justify-center space-x-6 border-b pb-2">
           <button
-            className={`text-lg pb-1 ${activeTab === "login"
-              ? "font-semibold  text-black"
-              : "text-gray-500 hover:text-black"
-              }`}
-            onClick={() => setActiveTab("login")}
+            className={`text-lg pb-1 ${
+              activeTab === 'login'
+                ? 'font-semibold  text-black'
+                : 'text-gray-500 hover:text-black'
+            }`}
+            onClick={() => setActiveTab('login')}
           >
             Вхід
           </button>
           <button
-            className={`text-lg pb-1 ${activeTab === "register"
-              ? "font-semibold  text-black"
-              : "text-gray-500 hover:text-black"
-              }`}
-            onClick={() => setActiveTab("register")}
+            className={`text-lg pb-1 ${
+              activeTab === 'register'
+                ? 'font-semibold  text-black'
+                : 'text-gray-500 hover:text-black'
+            }`}
+            onClick={() => setActiveTab('register')}
           >
             Реєстрація
           </button>
         </div>
 
-        {activeTab === "login" ? (
-          <LoginModalFormComponent />
-        ) : (
-          <Register />
-        )}
+        {activeTab === 'login' ? <LoginModalFormComponent /> : <Register />}
       </motion.div>
     </div>
   );

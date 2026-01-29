@@ -75,10 +75,6 @@ const LoginModalFormComponent = () => {
 	return (
     <div>
       <form method="post">
-        <p className="mt-6 text-sm text-gray-500 font-medium text-center">
-          Скрінер - інструмент для системного аналізу ринку та відбору активів
-          за заданими параметрами. Доступний після реєстрації!
-        </p>
         <Controller
           control={control}
           name="email"

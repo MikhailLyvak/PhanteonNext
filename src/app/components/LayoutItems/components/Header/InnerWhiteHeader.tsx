@@ -30,7 +30,7 @@ const InnerWhiteHeader = () => {
 
   const refferalRegisterLink = user
     ? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
-    : "";
+    : '';
 
   const handleCopy = async () => {
     if (!refferalRegisterLink) return;
@@ -52,7 +52,7 @@ const InnerWhiteHeader = () => {
         <div className="max-w-8xl mx-auto flex items-center justify-between">
           {/* ✅ Left - Logo */}
           <div className="">
-            <Link href={"/"}>
+            <Link href={'/'}>
               <div className="hidden md:block relative">
                 <Image
                   src="/Header/LogoColored.svg"
@@ -256,7 +256,6 @@ const InnerWhiteHeader = () => {
 						>
 							Вебінари
 						</Link> */}
-            
           </div>
 
           {/* ✅ Right - Buttons */}
