@@ -71,7 +71,7 @@ export default function TradingChats() {
         </div>
 
         <div className="text-3xl md:text-7xl font-black text-[#D2D2FF] font-sans leading-tight">
-          {`«Закритий трейдинг-чат»`}
+          {`«Трейдинг-чат»`}
         </div>
 
         <div className="pt-6 w-full md:w-[80%] text-lg  md:text-3xl leading-snug">
@@ -79,7 +79,7 @@ export default function TradingChats() {
           рішення, а не на емоціях і новинах.
         </div>
 
-        <div className="mt-8 mb-4 flex flex-wrap gap-6 text-xl font-bold text-[#EAB308]">
+        <div className="mt-8 mb-4 flex flex-wrap gap-6 text-xl font-bold text-[#C9A24D]">
           <div className="bg-white/5 px-4 py-2 rounded-md border border-white/10 text-sm md:text-md">
             Перший місяць — безкоштовний
           </div>
@@ -121,7 +121,12 @@ export default function TradingChats() {
         <div className="h-[1px] w-[50%] bg-white/10 mt-6"></div>
 
         <div className="flex flex-row gap-6 items-stretch w-full pt-10">
-          <button className="flex-1 bg-[#EAB308] hover:bg-[#CA8A04] text-black px-4 py-6 rounded-md font-bold text-xs md:text-lg uppercase tracking-wide transition-colors">
+          <button
+            className="flex-1 bg-[#C9A24D] text-black px-4 py-6 rounded-md font-bold text-lg uppercase tracking-wide 
+    transition-all duration-150 ease-in-out
+    hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
+    active:border-b-0 active:translate-y-[6px] active:shadow-none"
+          >
             ПОДАТИ ЗАЯВКУ
           </button>
 
@@ -143,7 +148,7 @@ export default function TradingChats() {
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full">
               {features.map((item) => (
                 <li key={item.id} className="flex flex-row items-start gap-4">
-                  <div className="flex-shrink-0 bg-[#EAB308] text-black rounded-full w-10 h-10 md:w-16 md:h-16 flex items-center justify-center font-bold text-2xl shadow-lg">
+                  <div className="flex-shrink-0 bg-[#C9A24D] text-black rounded-full w-10 h-10 md:w-16 md:h-16 flex items-center justify-center font-bold text-2xl shadow-lg">
                     {item.id}
                   </div>
 
@@ -187,6 +192,17 @@ export default function TradingChats() {
             ))}
           </ul>
         </div>
+      </div>
+      <div className="h-[1px] w-full bg-white/10 my-6"></div>
+      <div className="flex justify-center items-center">
+        <button
+          className="flex-1 bg-[#C9A24D] text-black px-4 py-6 rounded-md font-bold text-lg uppercase tracking-wide 
+    transition-all duration-150 ease-in-out
+    hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
+    active:border-b-0 active:translate-y-[6px] active:shadow-none"
+        >
+          ПОДАТИ ЗАЯВКУ
+        </button>
       </div>
     </div>
   );
