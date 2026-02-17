@@ -2,6 +2,7 @@
 
 import { CircleCheck } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function TradingChats() {
   const features = [
@@ -121,14 +122,21 @@ export default function TradingChats() {
         <div className="h-[1px] w-[50%] bg-white/10 mt-6"></div>
 
         <div className="flex flex-row gap-6 items-stretch w-full pt-10">
-          <button
-            className="flex-1 bg-[#C9A24D] text-black px-4 py-6 rounded-md font-bold text-lg uppercase tracking-wide 
-    transition-all duration-150 ease-in-out
-    hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
-    active:border-b-0 active:translate-y-[6px] active:shadow-none"
+          <Link
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfpPazPoy1M5icDOYym52WFZJfkX1rbJb2X7kPBGLZZPJnYJQ/viewform?pli=1"
+            className="
+              flex items-center justify-center text-center flex-1 
+              bg-[#C9A24D] text-black px-4 py-6 rounded-md 
+              font-bold text-lg uppercase tracking-wide 
+              transition-all duration-150 ease-in-out
+              hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
+              active:border-b-0 active:translate-y-[6px] active:shadow-none
+            "
           >
             ПОДАТИ ЗАЯВКУ
-          </button>
+          </Link>
 
           <div className="self-start flex-[1.5] py-6 bg-gradient-to-r from-[#6b6f8a] to-[#554e8f] rounded-lg flex items-center justify-center">
             <p className="text-white text-md md:text-2xl italic font-medium text-center leading-tight px-6">
@@ -195,14 +203,18 @@ export default function TradingChats() {
       </div>
       <div className="h-[1px] w-full bg-white/10 my-6"></div>
       <div className="flex justify-center items-center">
-        <button
+        <Link
+          rel="noopener noreferrer"
+          target="_blank"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfpPazPoy1M5icDOYym52WFZJfkX1rbJb2X7kPBGLZZPJnYJQ/viewform?pli=1"
           className="flex-1 bg-[#C9A24D] text-black px-4 py-6 rounded-md font-bold text-lg uppercase tracking-wide 
-    transition-all duration-150 ease-in-out
-    hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
-    active:border-b-0 active:translate-y-[6px] active:shadow-none"
+          text-center
+          transition-all duration-150 ease-in-out
+          hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
+          active:border-b-0 active:translate-y-[6px] active:shadow-none"
         >
           ПОДАТИ ЗАЯВКУ
-        </button>
+        </Link>
       </div>
     </div>
   );
