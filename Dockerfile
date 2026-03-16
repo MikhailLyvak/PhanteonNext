@@ -1,21 +1,21 @@
-# FROM node:20-alpine
+FROM node:20-alpine
 
-# WORKDIR /app-frontend
+WORKDIR /app-frontend
 
-# COPY package.json yarn.lock ./
+COPY package.json yarn.lock ./
 
-# ENV NEXT_PUBLIC_API_URL=https://app-api-3ajijyz4inxm6.azurewebsites.net
+ENV NEXT_PUBLIC_API_URL=https://app-api-3ajijyz4inxm6.azurewebsites.net
 
-# RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
-# COPY . ./
+COPY . ./
 
-# RUN yarn build
+RUN yarn build
 
-# EXPOSE 3000
+EXPOSE 3000
 
-# ENV PORT=3000
+ENV PORT=3000
 
-# USER node
+USER node
 
-# CMD ["yarn", "start"]
+CMD ["yarn", "start"]
