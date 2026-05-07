@@ -41,7 +41,7 @@ const RegisterModalFormComponent = () => {
     onSuccess: (data) => {
       setUser(data.user);
       closeModal(); // Close modal on successful registration
-      router.push("/trading-chat");
+      router.push("/Trading-Chat");
     },
     onError: (error: any) => {
       console.error("Registration error details:", error);
