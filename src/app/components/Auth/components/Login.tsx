@@ -1,78 +1,78 @@
-import { login } from '@/api/Auth/PostAuth'
-import React, { useCallback, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { useUserStore } from '@/store/UserData/useUserStore'
-import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
-import { getProfile } from '@/api/Auth/getProfile'
-import { Triangle } from 'react-loader-spinner'
-import { useRouter } from 'next/navigation'
+import { login } from "@/api/Auth/PostAuth";
+import React, { useCallback, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useUserStore } from "@/store/UserData/useUserStore";
+import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
+import { getProfile } from "@/api/Auth/getProfile";
+import { Triangle } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
-	email: z.string().min(1, 'required field'),
-	password: z.string().min(1, 'required field'),
-})
-type LoginFormData = z.infer<typeof schema>
+  email: z.string().min(1, "required field"),
+  password: z.string().min(1, "required field"),
+});
+type LoginFormData = z.infer<typeof schema>;
 
 const LoginModalFormComponent = () => {
-	const { setUser } = useUserStore()
-	const { closeModal } = useAuthModalStore()
-	const [isVisible, setIsVisible] = useState(false)
-	const [errorMessage, setErrorMessage] = useState<string | null>(null)
-	const router = useRouter()
+  const { setUser } = useUserStore();
+  const { closeModal } = useAuthModalStore();
+  const [isVisible, setIsVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
 
-	const { mutate: handleLogin, isPending } = useMutation({
-		mutationFn: login,
-		onSuccess: async () => {
-			const profileData = await getProfile()
-			setUser(profileData)
-			closeModal()
-			router.push('https://screener.pantheonx.club/')
-		},
-		onError: (error: any) => {
-			console.error('Login error details:', error)
+  const { mutate: handleLogin, isPending } = useMutation({
+    mutationFn: login,
+    onSuccess: async () => {
+      const profileData = await getProfile();
+      setUser(profileData);
+      closeModal();
+      router.push("/trading-chat");
+    },
+    onError: (error: any) => {
+      console.error("Login error details:", error);
 
-			let errorMessage = 'Невірні облікові дані'
+      let errorMessage = "Невірні облікові дані";
 
-			if (error?.response?.data) {
-				const responseData = error.response.data
+      if (error?.response?.data) {
+        const responseData = error.response.data;
 
-				// Handle specific error messages
-				if (responseData.error) {
-					errorMessage = responseData.error
-				} else if (responseData.message) {
-					errorMessage = responseData.message
-				} else if (responseData.detail) {
-					errorMessage = responseData.detail
-				}
-			}
+        // Handle specific error messages
+        if (responseData.error) {
+          errorMessage = responseData.error;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (responseData.detail) {
+          errorMessage = responseData.detail;
+        }
+      }
 
-			// Translate common error messages to Ukrainian
-			if (errorMessage.includes('Invalid credentials')) {
-				errorMessage = 'Невірні облікові дані'
-			} else if (errorMessage.includes('User is not active')) {
-				errorMessage = 'Обліковий запис не активний'
-			}
+      // Translate common error messages to Ukrainian
+      if (errorMessage.includes("Invalid credentials")) {
+        errorMessage = "Невірні облікові дані";
+      } else if (errorMessage.includes("User is not active")) {
+        errorMessage = "Обліковий запис не активний";
+      }
 
-			setErrorMessage(errorMessage)
-		},
-	})
+      setErrorMessage(errorMessage);
+    },
+  });
 
-	const { control, handleSubmit } = useForm<LoginFormData>({
-		resolver: zodResolver(schema),
-		defaultValues: {
-			email: '',
-			password: '',
-		},
-	})
+  const { control, handleSubmit } = useForm<LoginFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-	const onSubmit = (data: LoginFormData) => {
-		handleLogin(data)
-	}
+  const onSubmit = (data: LoginFormData) => {
+    handleLogin(data);
+  };
 
-	return (
+  return (
     <div>
       <form method="post">
         <Controller
@@ -112,7 +112,7 @@ const LoginModalFormComponent = () => {
                     field.onChange(e);
                     setErrorMessage(null);
                   }}
-                  type={isVisible ? 'text' : 'password'}
+                  type={isVisible ? "text" : "password"}
                   placeholder="Пароль"
                   autoComplete="current-password"
                   className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
@@ -122,7 +122,7 @@ const LoginModalFormComponent = () => {
                   onClick={() => setIsVisible(!isVisible)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {isVisible ? '👁️' : '👁️‍🗨️'}
+                  {isVisible ? "👁️" : "👁️‍🗨️"}
                 </button>
               </div>
               {fieldState.error && (
@@ -171,6 +171,6 @@ const LoginModalFormComponent = () => {
       </p>
     </div>
   );
-}
+};
 
-export default LoginModalFormComponent
+export default LoginModalFormComponent;
