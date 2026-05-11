@@ -2,10 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard } from "lucide-react";
+import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot } from "lucide-react";
 import { usePathname, useRouter } from 'next/navigation';
 import { LuChartLine } from 'react-icons/lu';
 import { useUserStore } from "@/store/UserData/useUserStore";
+import { useAlgonixSessionStore } from "@/store/TradingBots/useAlgonixSessionStore";
 import { Cookies } from "react-cookie";
 
 const Sidebar = () => {
@@ -18,6 +19,7 @@ const Sidebar = () => {
     const cookies = new Cookies();
     cookies.remove("local_access_token", { path: "/" });
     clearUser();
+    useAlgonixSessionStore.getState().clearSession();
     router.push("/");
   };
 
@@ -46,6 +48,12 @@ const Sidebar = () => {
         text="Керування підписками"
         href="/myCabinet/subscriptions"
         active={pathname === '/myCabinet/subscriptions'}
+      />
+      <NavItem
+        icon={<Bot size={20} />}
+        text="Торгові боти"
+        href="/myCabinet/tradingBots"
+        active={pathname === '/myCabinet/tradingBots'}
       />
       <NavItem
         icon={<Video size={20} />}

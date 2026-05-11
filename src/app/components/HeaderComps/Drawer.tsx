@@ -18,6 +18,7 @@ import {
 import { MdArrowBackIosNew } from 'react-icons/md'
 import { useDrawerStore } from '@/store/Nav/useDrawerStore'
 import { useUserStore } from '@/store/UserData/useUserStore'
+import { useAlgonixSessionStore } from '@/store/TradingBots/useAlgonixSessionStore'
 import { Cookies } from 'react-cookie'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -41,6 +42,7 @@ const Drawer = () => {
 		const cookies = new Cookies()
 		cookies.remove('local_access_token', { path: '/' })
 		clearUser()
+		useAlgonixSessionStore.getState().clearSession()
 		closeDrawer()
 		router.push('/login')
 	}
@@ -90,7 +92,13 @@ const Drawer = () => {
 					closeDrawer={closeDrawer}
 					link='/myCabinet/personalData'
 				/>
-				
+				<NavItem
+					icon={<Bot size={20} />}
+					text='Торгові боти'
+					closeDrawer={closeDrawer}
+					link='/myCabinet/tradingBots'
+				/>
+
 				{/* <NavItem
 					icon={<Bot size={20} />}
 					text="АІ Інтерв'ю"
