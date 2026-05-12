@@ -6,6 +6,7 @@
  * robot. Local tab state — no URL coupling.
  */
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
 import RobotsList from './RobotsList'
@@ -14,6 +15,7 @@ import AllApisList from './AllApisList'
 type Tab = 'robots' | 'apis'
 
 export default function LandingTabs() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('robots')
   const { data: robots } = useUserRobots()
   const { data: apis } = useUserApis()
@@ -43,23 +45,34 @@ export default function LandingTabs() {
 
   return (
     <div className="w-full">
-      <div className="inline-flex items-center gap-1 p-1 bg-[#1D1D2A] rounded-xl ring-1 ring-white/5">
-        <button
-          type="button"
-          onClick={() => setActiveTab('robots')}
-          className={tabClasses('robots')}
-        >
-          Роботи
-          {countBadge(robotsCount, activeTab === 'robots')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('apis')}
-          className={tabClasses('apis')}
-        >
-          API
-          {countBadge(apisCount, activeTab === 'apis')}
-        </button>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="inline-flex items-center gap-1 p-1 bg-[#1D1D2A] rounded-xl ring-1 ring-white/5">
+          <button
+            type="button"
+            onClick={() => setActiveTab('robots')}
+            className={tabClasses('robots')}
+          >
+            Роботи
+            {countBadge(robotsCount, activeTab === 'robots')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('apis')}
+            className={tabClasses('apis')}
+          >
+            API
+            {countBadge(apisCount, activeTab === 'apis')}
+          </button>
+        </div>
+        {activeTab === 'robots' && (
+          <button
+            type="button"
+            onClick={() => router.replace('/myCabinet/tradingBots?step=robot')}
+            className="bg-[#6A56E4] text-white px-4 py-2 rounded-2xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors text-sm font-medium"
+          >
+            + Створити новий
+          </button>
+        )}
       </div>
 
       {activeTab === 'robots' && <RobotsList />}

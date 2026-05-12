@@ -99,7 +99,7 @@ export default function RobotsList() {
       <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
         <p className="text-[#8c8ca0] text-sm mt-2">
-          Поки що немає створених ботів.
+          Поки що немає створених роботів.
         </p>
         <button
           type="button"
@@ -114,7 +114,7 @@ export default function RobotsList() {
 
   return (
     <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
         <span className="text-[10px] uppercase tracking-[0.18em] text-[#8c8ca0]">
           {activeCount} активних · {list.length} всього
@@ -196,14 +196,6 @@ export default function RobotsList() {
           )
         })}
       </ul>
-
-      <button
-        type="button"
-        onClick={goToCreateRobot}
-        className="w-full mt-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors flex items-center justify-center gap-2"
-      >
-        + Створити новий
-      </button>
     </div>
   )
 }

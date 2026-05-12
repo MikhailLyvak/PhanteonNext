@@ -40,7 +40,10 @@ export default function RobotCreationFormWithSelector() {
   return (
     <div className="w-full">
       {hasRobots && <BackButton />}
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
+        Створення робота
+      </h6>
+      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <label className="text-[#D2D2FF] text-sm font-medium block">
           Виберіть API
         </label>
@@ -53,18 +56,18 @@ export default function RobotCreationFormWithSelector() {
             const label = api.title?.trim() ? api.title : truncate(api.key)
             return (
               <option key={api.id} value={api.id}>
-                {label} · {api.exchange} · Баланс: {api.balance}
+                {label} · {api.exchange}
               </option>
             )
           })}
         </select>
-      </div>
 
-      <RobotCreationForm
-        key={selectedApiId}
-        apiId={selectedApi.id}
-        exchange={selectedApi.exchange}
-      />
+        <RobotCreationForm
+          key={selectedApiId}
+          apiId={selectedApi.id}
+          exchange={selectedApi.exchange}
+        />
+      </div>
     </div>
   )
 }

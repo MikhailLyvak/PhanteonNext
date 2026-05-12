@@ -10,30 +10,38 @@
  */
 import { z } from "zod";
 
-/** §4.1 — `UserInfoDto` (the portion the trading-bots flow consumes). */
+/**
+ * §4.1 — `UserInfoDto` (the portion the trading-bots flow consumes).
+ *
+ * Only `id`, `email`, `balance` are guaranteed by the live backend; the rest
+ * are optional because the wire payload has drifted from the spec (some
+ * fields renamed, some removed, some only present for certain account
+ * states). Keeping them optional prevents `parse` failures that would
+ * otherwise null out `data` for every consumer.
+ */
 export const userInfoSchema = z.object({
   id: z.string(),
-  paid: z.boolean(),
   email: z.string(),
   balance: z.number(),
-  referral_code: z.string(),
-  referral_bonus: z.number(),
-  role: z.string(),
-  subscription_level: z.string(),
-  telegram_username: z.string(),
-  onboarding: z.boolean(),
-  backtests_passed: z.number(),
-  backtests_limit: z.number(),
-  tunes_passed: z.number(),
-  tunes_limit: z.number(),
-  tunes_passed0: z.number(),
-  tunes_passed1: z.number(),
-  tunes_passed2: z.number(),
-  tunes_limit0: z.number(),
-  tunes_limit1: z.number(),
-  tunes_limit2: z.number(),
-  robots_active: z.number(),
-  robots_limit: z.number(),
+  paid: z.boolean().optional(),
+  referral_code: z.string().optional(),
+  referral_bonus: z.number().optional(),
+  role: z.string().optional(),
+  subscription_level: z.string().optional(),
+  telegram_username: z.string().optional(),
+  onboarding: z.boolean().optional(),
+  backtests_passed: z.number().optional(),
+  backtests_limit: z.number().optional(),
+  tunes_passed: z.number().optional(),
+  tunes_limit: z.number().optional(),
+  tunes_passed0: z.number().optional(),
+  tunes_passed1: z.number().optional(),
+  tunes_passed2: z.number().optional(),
+  tunes_limit0: z.number().optional(),
+  tunes_limit1: z.number().optional(),
+  tunes_limit2: z.number().optional(),
+  robots_active: z.number().optional(),
+  robots_limit: z.number().optional(),
 });
 
 /**

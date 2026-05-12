@@ -23,16 +23,6 @@ const formatRoi = (roi: number | null | undefined): string => {
   return `${(roi * 100).toFixed(2)}%`
 }
 
-const formatTime = (ms: number): string => {
-  try {
-    const d = new Date(ms)
-    if (Number.isNaN(d.getTime())) return String(ms)
-    return d.toLocaleString()
-  } catch {
-    return String(ms)
-  }
-}
-
 export default function RobotDetailCard() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -72,6 +62,8 @@ export default function RobotDetailCard() {
     if (
       checkLimit &&
       userInfo &&
+      userInfo.robots_active !== undefined &&
+      userInfo.robots_limit !== undefined &&
       userInfo.robots_active >= userInfo.robots_limit
     ) {
       setLimitModalOpen(true)
@@ -118,7 +110,7 @@ export default function RobotDetailCard() {
     )
   }
 
-  const { robot, trades } = entry
+  const { robot } = entry
   const rowClass = 'flex justify-between items-center mt-3 text-[#D2D2FF]'
   const labelMutedClass = 'text-[#8c8ca0] text-sm'
   const pnlPositive = (robot.pnl ?? 0) > 0
@@ -206,12 +198,6 @@ export default function RobotDetailCard() {
             <span>{robot.settings.symbol}</span>
           </div>
         )}
-        {robot.settings?.trend && (
-          <div className={rowClass}>
-            <span className={labelMutedClass}>Тренд</span>
-            <span>{robot.settings.trend}</span>
-          </div>
-        )}
         <div className={rowClass}>
           <span className={labelMutedClass}>Депозит</span>
           <span>{formatNumber(robot.deposit)}</span>
@@ -224,50 +210,7 @@ export default function RobotDetailCard() {
           <span className={labelMutedClass}>ROI</span>
           <span className={pnlColor}>{formatRoi(robot.roi)}</span>
         </div>
-        {robot.drawdown_max !== undefined && (
-          <div className={rowClass}>
-            <span className={labelMutedClass}>Макс. просадка</span>
-            <span>{formatRoi(robot.drawdown_max)}</span>
-          </div>
-        )}
       </div>
-
-      {trades.length > 0 && (
-        <div className="mt-6">
-          <h6 className="text-[#D2D2FF] text-base font-semibold">
-            Останні угоди
-          </h6>
-          <ul className="mt-3 space-y-2">
-            {trades
-              .slice()
-              .sort((a, b) => b.time - a.time)
-              .slice(0, 10)
-              .map((t, i) => {
-                const tradePositive = (t.pnl ?? 0) > 0
-                const tradeNegative = (t.pnl ?? 0) < 0
-                const tradeColor = tradePositive
-                  ? 'text-[#3DD68C]'
-                  : tradeNegative
-                  ? 'text-[#FF6B6B]'
-                  : 'text-[#D2D2FF]'
-                return (
-                  <li
-                    key={`${t.time}-${i}`}
-                    className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 p-3 bg-[#1D1D2A] rounded-lg text-sm"
-                  >
-                    <span className="text-[#8c8ca0]">{formatTime(t.time)}</span>
-                    <span className="text-[#D2D2FF]">
-                      {t.symbol} • {t.trend} • {t.condition_type}
-                    </span>
-                    <span className={tradeColor}>
-                      {formatNumber(t.pnl)}
-                    </span>
-                  </li>
-                )
-              })}
-          </ul>
-        </div>
-      )}
 
       {actionError && (
         <p className="text-red-500 text-sm mt-4">

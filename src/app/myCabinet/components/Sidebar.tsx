@@ -51,7 +51,7 @@ const Sidebar = () => {
       />
       <NavItem
         icon={<Bot size={20} />}
-        text="Торгові боти"
+        text="Торгові роботи"
         href="/myCabinet/tradingBots"
         active={pathname === '/myCabinet/tradingBots'}
       />

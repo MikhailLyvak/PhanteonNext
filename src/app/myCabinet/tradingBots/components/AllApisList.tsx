@@ -93,9 +93,6 @@ export default function AllApisList() {
                         >
                           {api.exchange}
                         </span>
-                        <span className="text-[10px] uppercase tracking-wider text-[#8c8ca0]">
-                          Баланс: {api.balance}
-                        </span>
                       </div>
                     </div>
 

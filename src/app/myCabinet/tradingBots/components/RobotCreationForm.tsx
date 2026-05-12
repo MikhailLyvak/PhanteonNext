@@ -10,6 +10,7 @@ import { Triangle } from 'react-loader-spinner'
 import useValidateApi from '@/hooks/TradingBots/useValidateApi'
 import usePresets from '@/hooks/TradingBots/usePresets'
 import useCreateRobot from '@/hooks/TradingBots/useCreateRobot'
+import useUserInfo from '@/hooks/TradingBots/useUserInfo'
 import { selectPreset } from '@/api/TradingBots/selectPreset'
 
 const formSchema = z.object({
@@ -30,7 +31,7 @@ type FormValues = z.infer<typeof formSchema>
 const DEFAULT_VALUES: FormValues = {
   title: '',
   deposit: null,
-  reinvest: true,
+  reinvest: false,
   notifTrades: true,
   notifBalance: true,
   notifApi: true,
@@ -50,6 +51,13 @@ export default function RobotCreationForm({
   const validateMutation = useValidateApi()
   const presetsQuery = usePresets()
   const createRobotMutation = useCreateRobot()
+  const userInfoQuery = useUserInfo()
+
+  const telegramUsername = userInfoQuery.data?.telegram_username?.trim() ?? ''
+  const isTelegramConnected = telegramUsername.length > 0
+  const telegramDeeplink = userInfoQuery.data?.id
+    ? `https://t.me/artrader_help_bot?start=${userInfoQuery.data.id}`
+    : null
 
   const balance: number | null = validateMutation.data?.balance ?? null
 
@@ -137,9 +145,9 @@ export default function RobotCreationForm({
         deposit: values.deposit,
         reinvest: values.reinvest,
         depositStop: 0,
-        notifications_trades: values.notifTrades,
-        notifications_balance: values.notifBalance,
-        notifications_api: values.notifApi,
+        notifications_trades: isTelegramConnected ? values.notifTrades : false,
+        notifications_balance: isTelegramConnected ? values.notifBalance : false,
+        notifications_api: isTelegramConnected ? values.notifApi : false,
         api: { id: apiId, balance: 0 },
         settings: {
           id: chosenPreset.id,
@@ -157,20 +165,9 @@ export default function RobotCreationForm({
     }
   }
 
-  const refreshBalance = () => {
-    if (!apiId) return
-    validateMutation.mutate({ id: apiId })
-  }
-
   return (
-    <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
-      <h6 className="text-[#D2D2FF] text-xl font-semibold">Створення робота</h6>
-      <p className="text-[#8c8ca0] text-sm mt-1">
-        Біржа: <span className="text-[#D2D2FF]">{exchange || '—'}</span>
-      </p>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Назва робота</label>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Назва робота</label>
         <Controller
           control={control}
           name="title"
@@ -189,26 +186,6 @@ export default function RobotCreationForm({
             </>
           )}
         />
-
-        <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Баланс</label>
-        <div className="flex items-center gap-3">
-          <span className="text-[#D2D2FF]">
-            {balance === null
-              ? validateMutation.isPending
-                ? 'Завантаження…'
-                : 'Не вдалося отримати'
-              : balance}
-          </span>
-          {balance === null && !validateMutation.isPending && (
-            <button
-              type="button"
-              className="px-3 py-1 bg-[#1D1D2A] text-[#D2D2FF] text-sm rounded-lg hover:shadow-xl"
-              onClick={refreshBalance}
-            >
-              Оновити баланс
-            </button>
-          )}
-        </div>
 
         <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Депозит</label>
         <Controller
@@ -273,51 +250,103 @@ export default function RobotCreationForm({
           )}
         />
 
-        <h6 className="text-[#D2D2FF] text-base font-semibold mt-6">
-          Сповіщення
-        </h6>
-        <Controller
-          control={control}
-          name="notifTrades"
-          render={({ field }) => (
-            <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-              />
-              <span>Сповіщення про торги</span>
-            </label>
+        <div className="mt-6 flex items-center gap-2 flex-wrap">
+          <h6 className="text-[#D2D2FF] text-base font-semibold">
+            Сповіщення
+          </h6>
+          {isTelegramConnected && (
+            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#242433] text-[#8c8ca0]">
+              Підключено: @{telegramUsername}
+            </span>
           )}
-        />
-        <Controller
-          control={control}
-          name="notifBalance"
-          render={({ field }) => (
-            <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-              />
-              <span>Сповіщення про баланс</span>
-            </label>
-          )}
-        />
-        <Controller
-          control={control}
-          name="notifApi"
-          render={({ field }) => (
-            <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-              />
-              <span>Сповіщення про API</span>
-            </label>
-          )}
-        />
+        </div>
+
+        {userInfoQuery.isLoading || userInfoQuery.isPending ? (
+          <div className="mt-2 flex items-center gap-2 text-[#8c8ca0] text-sm">
+            <Triangle
+              visible
+              height={16}
+              width={16}
+              color="#6A56E4"
+              ariaLabel="triangle-loading"
+            />
+            <span>Завантаження…</span>
+          </div>
+        ) : isTelegramConnected ? (
+          <>
+            <Controller
+              control={control}
+              name="notifTrades"
+              render={({ field }) => (
+                <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                  <span>Сповіщення про торги</span>
+                </label>
+              )}
+            />
+            <Controller
+              control={control}
+              name="notifBalance"
+              render={({ field }) => (
+                <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                  <span>Сповіщення про баланс</span>
+                </label>
+              )}
+            />
+            <Controller
+              control={control}
+              name="notifApi"
+              render={({ field }) => (
+                <label className="flex items-center gap-2 mt-2 text-[#D2D2FF] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                  <span>Сповіщення про API</span>
+                </label>
+              )}
+            />
+          </>
+        ) : (
+          <div className="mt-2 p-4 rounded-xl bg-[#1D1D2A] ring-1 ring-white/5">
+            <p className="text-[#D2D2FF] text-sm">
+              Щоб отримувати сповіщення про торги, баланс та API, підключіть Telegram-бот.
+            </p>
+            <div className="mt-3 flex items-center gap-3 flex-wrap">
+              <a
+                href={telegramDeeplink ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!telegramDeeplink}
+                className={`bg-[#6A56E4] text-white px-4 py-2 rounded-2xl text-sm font-medium transition-colors ${
+                  telegramDeeplink
+                    ? 'hover:bg-[#5A4BC4] hover:shadow-xl'
+                    : 'opacity-50 cursor-not-allowed pointer-events-none'
+                }`}
+              >
+                Підключити Telegram
+              </a>
+              <button
+                type="button"
+                onClick={() => userInfoQuery.refetch()}
+                disabled={userInfoQuery.isFetching}
+                className="text-[#8c8ca0] hover:text-[#D2D2FF] text-sm underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {userInfoQuery.isFetching ? 'Перевіряємо…' : 'Перевірити підключення'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {createRobotMutation.error && (
           <p className="text-red-500 text-sm mt-4">
@@ -340,9 +369,8 @@ export default function RobotCreationForm({
               ariaLabel="triangle-loading"
             />
           )}
-          Створити робота
-        </button>
-      </form>
-    </div>
+        Створити робота
+      </button>
+    </form>
   )
 }

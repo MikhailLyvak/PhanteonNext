@@ -46,3 +46,9 @@ package-lock.json
 
 nft-service/node_modules
 nft-service
+
+# playwright
+/.playwright-mcp/
+/playwright-report/
+/test-results/
+/playwright/.cache/

@@ -94,7 +94,7 @@ const Drawer = () => {
 				/>
 				<NavItem
 					icon={<Bot size={20} />}
-					text='Торгові боти'
+					text='Торгові роботи'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/tradingBots'
 				/>

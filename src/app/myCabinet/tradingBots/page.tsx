@@ -27,7 +27,7 @@ const TradingBotsPage = () => {
 			<div className='w-full pb-24'>
 				<div className='max-w-8xl mx-auto px-4 md:px-6'>
 					<div className='mt-6'>
-						<MyCabinetBreadCrump currentPageTitle='Торгові боти' />
+						<MyCabinetBreadCrump currentPageTitle='Торгові роботи' />
 					</div>
 
 					<div className='mt-6'>
@@ -45,7 +45,7 @@ const TradingBotsPage = () => {
 
 						<div className='flex flex-col w-full sm:ml-10'>
 							<h6 className='text-[#D2D2FF] text-xl md:text-3xl font-bold'>
-								Торгові боти
+								Торгові роботи
 							</h6>
 							<div className='mt-[30px]'>
 								<BalanceCard />

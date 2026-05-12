@@ -42,19 +42,12 @@ export default function ExchangePicker() {
                 } as React.CSSProperties
               }
               className="group relative overflow-hidden p-6 rounded-2xl text-left transition-all duration-300
-                         bg-gradient-to-br from-[#2B2B40] to-[#1E1E2C]
+                         bg-[#1D1D2A]
                          ring-1 ring-white/5
                          hover:ring-[var(--accent)] hover:-translate-y-1
                          hover:shadow-[0_18px_40px_-12px_var(--glow)]
                          focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-16 -right-16 w-44 h-44 rounded-full opacity-20
-                           blur-3xl transition-opacity duration-300 group-hover:opacity-60"
-                style={{ background: meta.accent }}
-              />
-
               <div className="relative flex items-center gap-4">
                 <div className="flex items-center justify-center w-16 h-16 transition-transform duration-300 group-hover:scale-105">
                   <Image
@@ -69,10 +62,6 @@ export default function ExchangePicker() {
                   <h6 className="text-[#F2F2FF] text-2xl font-bold leading-tight">
                     {meta.label}
                   </h6>
-                  <p className="text-[10px] uppercase tracking-[0.18em] mt-1 font-semibold"
-                     style={{ color: meta.accent }}>
-                    Біржа
-                  </p>
                 </div>
               </div>
 
