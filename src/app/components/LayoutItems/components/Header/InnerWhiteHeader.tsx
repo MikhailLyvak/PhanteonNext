@@ -30,7 +30,7 @@ const InnerWhiteHeader = () => {
 
   const refferalRegisterLink = user
     ? `${window.location.origin}/login?register=1&referal_id=${btoa(user.email)}`
-    : '';
+    : "";
 
   const handleCopy = async () => {
     if (!refferalRegisterLink) return;
@@ -52,7 +52,7 @@ const InnerWhiteHeader = () => {
         <div className="max-w-8xl mx-auto flex items-center justify-between">
           {/* ✅ Left - Logo */}
           <div className="">
-            <Link href={'/'}>
+            <Link href={"/"}>
               <div className="hidden md:block relative">
                 <Image
                   src="/Header/LogoColored.svg"
@@ -210,18 +210,18 @@ const InnerWhiteHeader = () => {
             )}
             {user ? (
               <Link
-              href="/Trading-Chat"
-              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
-            >
-              Трейдинг-чат
-            </Link>
+                href="/Trading-Chat"
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Трейдинг-чат
+              </Link>
             ) : (
               <button
-              onClick={handleAcademyClick}
-              className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
-            >
-              Трейдинг-чат
-            </button>
+                onClick={handleAcademyClick}
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Трейдинг-чат
+              </button>
             )}
             <Link
               href="/Blog"
@@ -234,7 +234,7 @@ const InnerWhiteHeader = () => {
                 href="http://pantheonx.club/interview"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Навчання
+                Підтримка
               </Link>
             ) : (
               <button
@@ -247,7 +247,28 @@ const InnerWhiteHeader = () => {
                   cursor: "pointer",
                 }}
               >
-                Навчання
+                Підтримка
+              </button>
+            )}
+            {user ? (
+              <Link
+                href=""
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Академія
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAcademyClick}
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Академія
               </button>
             )}
             {/* <Link
