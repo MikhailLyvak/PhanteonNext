@@ -14,10 +14,6 @@ export default function AllApisList() {
   const router = useRouter()
   const { data: apis, isLoading } = useUserApis()
 
-  const goToCreate = () => {
-    router.replace('/myCabinet/tradingBots?step=exchange')
-  }
-
   const goToRobot = (apiId: string) => {
     router.replace(`/myCabinet/tradingBots?step=robot&apiId=${apiId}`)
   }
@@ -26,7 +22,7 @@ export default function AllApisList() {
 
   return (
     <div className="w-full">
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <div className="flex items-end justify-between gap-3">
           <h6 className="text-[#D2D2FF] text-xl font-semibold">Збережені API</h6>
           {!isLoading && list.length > 0 && (
@@ -111,13 +107,6 @@ export default function AllApisList() {
           </ul>
         )}
 
-        <button
-          type="button"
-          onClick={goToCreate}
-          className="w-full mt-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors flex items-center justify-center gap-2"
-        >
-          + Створити новий API
-        </button>
       </div>
     </div>
   )

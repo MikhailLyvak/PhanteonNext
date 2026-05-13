@@ -66,7 +66,7 @@ export default function RobotsList() {
 
   if (isLoading) {
     return (
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <div className="flex items-center justify-center py-10">
           <Triangle
             visible
@@ -82,7 +82,7 @@ export default function RobotsList() {
 
   if (error) {
     return (
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
         <p className="text-red-500 text-sm mt-2">
           Не вдалося завантажити список роботів.
@@ -96,7 +96,7 @@ export default function RobotsList() {
 
   if (list.length === 0) {
     return (
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
         <p className="text-[#8c8ca0] text-sm mt-2">
           Поки що немає створених роботів.

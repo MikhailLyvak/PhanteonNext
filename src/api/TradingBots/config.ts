@@ -15,12 +15,18 @@ export const ALGONIX_BASE_URL = "https://api.algonix.org/api/v2";
 /**
  * Tron wallet service base URL.
  *
- * The wallet-generation / address-listing endpoints (GET/POST
- * `/blockchain/addresses/...`) live on a separate service from the main
- * Algonix backend. Same auth header format (`Bearer <token>pantheonX<email>`),
- * different host. Mirrors art-ui's `TRON_URL` split (see balance-system.md).
+ * Address creation (`POST /wallet/create`) lives on a separate service from
+ * the main Algonix backend. The host (`https://tron.algonix.org`) does not
+ * serve CORS for browser origins, so the browser can't call it directly —
+ * we route through a Next.js rewrite at `/tron-proxy/*` (see
+ * `next.config.ts`). Server-to-server inside Next has no CORS; the auth
+ * header (`Bearer <token>pantheonX<email>`) is passed through unchanged.
+ *
+ * The address-listing read (`GET /blockchain/addresses/user`) is served by
+ * the main Algonix backend, not the Tron service — see `listUserWallets`
+ * in `endpoints.ts`.
  */
-export const TRON_BASE_URL = "https://tron.artrader.org";
+export const TRON_BASE_URL = "/tron-proxy";
 
 /**
  * Compose the Algonix Authorization header value.

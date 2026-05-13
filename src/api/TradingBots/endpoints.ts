@@ -162,28 +162,25 @@ export const resumeRobot = async (robotId: string): Promise<true> => {
 /**
  * §4.11 GET /blockchain/addresses/user — list the user's deposit wallets.
  *
- * Routed through the Tron service (`tronClient`) because wallet provisioning
- * lives on that host, not on the main Algonix backend.
- *
- * Returns an empty array when the backend has not yet provisioned a wallet
- * for the user. The deposit modal treats `[]` as a signal to fire
- * `createUserWallet` once.
+ * Served by the main Algonix backend (mirrors the production flow in
+ * art-ui's `api.user.walletInfo`, which proxies through NEW_BACKEND_URL,
+ * not the Tron service). Returns `[]` until provisioning runs.
  */
 export const listUserWallets = async (): Promise<WalletAddressDto[]> => {
-  const { data } = await tronClient.get("/blockchain/addresses/user");
+  const { data } = await algonixClient.get("/blockchain/addresses/user");
   return walletAddressListSchema.parse(data);
 };
 
 /**
- * §4.10 POST /blockchain/addresses — request a new deposit wallet for the user.
+ * POST /wallet/create — provision a new deposit wallet for the user.
  *
- * Routed through the Tron service (`tronClient`). Body is empty; response
- * shape is permissive — backend may return the new `WalletAddressDto`, an
- * array, or an empty 2xx. We accept all three and rely on the follow-up GET
- * to settle state.
+ * Routed through the Tron service (`tronClient`) — wallet generation lives
+ * there. Body is empty; response shape is permissive — backend may return
+ * the new `WalletAddressDto`, an array, or an empty 2xx. We accept all
+ * three and rely on the follow-up GET to settle state.
  */
 export const createUserWallet = async (): Promise<WalletAddressDto | null> => {
-  const { data } = await tronClient.post("/blockchain/addresses", {});
+  const { data } = await tronClient.post("/wallet/create", {});
   const single = walletAddressSchema.safeParse(data);
   if (single.success) return single.data;
   const list = walletAddressListSchema.safeParse(data);

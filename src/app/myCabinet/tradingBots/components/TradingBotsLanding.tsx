@@ -9,7 +9,7 @@
  *                                          surface the error rather than
  *                                          downgrading to a creation form)
  *   ≥1 robot                            → <LandingTabs />
- *   apisCount === 0                     → <ExchangePicker />
+ *   apisCount === 0                     → <ApiCreationForm />
  *   ≥1 API && 0 robots                  → <RobotCreationFormWithSelector />
  *
  * Robots come from `GET /statistics/robots/users`; no local list.
@@ -24,7 +24,7 @@ import React from 'react'
 import { Triangle } from 'react-loader-spinner'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
-import ExchangePicker from './ExchangePicker'
+import ApiCreationForm from './ApiCreationForm'
 import RobotCreationFormWithSelector from './RobotCreationFormWithSelector'
 import LandingTabs from './LandingTabs'
 
@@ -66,5 +66,5 @@ export default function TradingBotsLanding() {
     return <RobotCreationFormWithSelector />
   }
 
-  return <ExchangePicker />
+  return <ApiCreationForm />
 }

@@ -1,16 +1,19 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { Triangle } from 'react-loader-spinner'
+import { SUPPORTED_EXCHANGES } from '@/api/TradingBots/constants'
 import useValidateApi from '@/hooks/TradingBots/useValidateApi'
 import useSaveApi from '@/hooks/TradingBots/useSaveApi'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import BackButton from './BackButton'
+import { EXCHANGE_META } from './exchangeMeta'
 
 const formSchema = z.object({
   title: z
@@ -27,8 +30,6 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function ApiCreationForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const exchange = searchParams.get('exchange') ?? ''
 
   const validateApi = useValidateApi()
   const saveApi = useSaveApi()
@@ -52,7 +53,7 @@ export default function ApiCreationForm() {
       await validateApi.mutateAsync({
         key: values.apiKey,
         secret: values.secretKey,
-        exchange,
+        exchange: '',
       })
     } catch {
       setSubmitError('З\u2019єднання не вдалося')
@@ -65,7 +66,7 @@ export default function ApiCreationForm() {
         title: values.title || undefined,
         key: values.apiKey,
         secret: values.secretKey,
-        exchange,
+        exchange: '',
       })
     } catch (err) {
       const errAny = err as {
@@ -78,19 +79,77 @@ export default function ApiCreationForm() {
       return
     }
 
-    router.replace(
-      `/myCabinet/tradingBots?step=robot&exchange=${exchange}&apiId=${apiId}`
-    )
+    router.replace(`/myCabinet/tradingBots?step=robot&apiId=${apiId}`)
   }
 
   return (
     <div className="w-full">
       {hasRobots && <BackButton />}
-      <h6 className="text-[#D2D2FF] text-xl md:text-3xl font-bold mt-2">
-        Під&apos;єднати API ({exchange})
+      <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
+        Під&apos;єднати API
       </h6>
 
-      <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
+      <div className="mt-[30px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {SUPPORTED_EXCHANGES.map((exchange) => {
+            const meta = EXCHANGE_META[exchange]
+            return (
+              <div
+                key={exchange}
+                style={
+                  {
+                    '--accent': meta.accent,
+                    '--glow': meta.glow,
+                  } as React.CSSProperties
+                }
+                className="group relative overflow-hidden p-5 rounded-xl bg-[#1D1D2A] ring-1 ring-white/5 transition-all duration-300 hover:-translate-y-0.5 hover:ring-[color:var(--accent)]/60"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-[2px] opacity-70 group-hover:opacity-100 transition-opacity"
+                  style={{ backgroundColor: 'var(--accent)' }}
+                />
+
+                <div className="relative flex items-center gap-4">
+                  <div className="flex items-center justify-center w-14 h-14 shrink-0">
+                    <Image
+                      src={meta.icon}
+                      alt={`${meta.label} logo`}
+                      width={52}
+                      height={52}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h6 className="text-[#F2F2FF] text-xl font-bold leading-tight">
+                      {meta.label}
+                    </h6>
+                    <span
+                      className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
+                      style={{ color: meta.accent }}
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                      Підтримується
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+      </div>
+
+      <div className="mt-[30px] py-6 bg-[#242433] rounded-2xl">
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Дані API</h6>
         <form
           onSubmit={handleSubmit(onSubmit)}

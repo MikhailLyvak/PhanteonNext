@@ -5,17 +5,16 @@ import { useSearchParams } from 'next/navigation'
 import MyCabinetBreadCrump from '../studyPlatform/components/BreadCrump'
 import Sidebar from '../components/Sidebar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import ExchangePicker from './components/ExchangePicker'
 import ApiCreationForm from './components/ApiCreationForm'
 import RobotCreationFormWithSelector from './components/RobotCreationFormWithSelector'
 import RobotDetailCard from './components/RobotDetailCard'
 import TradingBotsLanding from './components/TradingBotsLanding'
 import BalanceCard from './components/balance/BalanceCard'
 
-type Step = 'exchange' | 'api' | 'robot' | 'detail'
+type Step = 'api' | 'robot' | 'detail'
 
 const isStep = (value: string | null): value is Step =>
-	value === 'exchange' || value === 'api' || value === 'robot' || value === 'detail'
+	value === 'api' || value === 'robot' || value === 'detail'
 
 const TradingBotsPage = () => {
 	const searchParams = useSearchParams()
@@ -51,7 +50,6 @@ const TradingBotsPage = () => {
 								<BalanceCard />
 							</div>
 							<div className='p-6 bg-[#242433] rounded-2xl flex-1'>
-								{step === 'exchange' && <ExchangePicker />}
 								{step === 'api' && <ApiCreationForm />}
 								{step === 'robot' && <RobotCreationFormWithSelector />}
 								{step === 'detail' && <RobotDetailCard />}

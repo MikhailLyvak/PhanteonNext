@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/tron-proxy/:path*',
+        destination: 'https://tron.algonix.org/:path*',
+      },
+    ]
+  },
 };
 
 export default nextConfig;

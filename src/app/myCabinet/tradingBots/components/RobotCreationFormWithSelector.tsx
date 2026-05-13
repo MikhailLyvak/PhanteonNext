@@ -43,7 +43,7 @@ export default function RobotCreationFormWithSelector() {
       <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
         Створення робота
       </h6>
-      <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
+      <div className="py-6 bg-[#242433] rounded-2xl">
         <label className="text-[#D2D2FF] text-sm font-medium block">
           Виберіть API
         </label>

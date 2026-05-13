@@ -77,7 +77,7 @@ const DepositModal = ({ open, onClose }: Props) => {
 			aria-label='Депозит'
 		>
 			<div
-				className='relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[#242433] p-6 shadow-2xl'
+				className='relative w-full max-w-[38.4rem] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#242433] p-6 shadow-2xl'
 				onClick={e => e.stopPropagation()}
 			>
 				<DepositHeader onClose={onClose} />
