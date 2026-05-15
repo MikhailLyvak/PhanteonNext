@@ -195,6 +195,21 @@ const InnerWhiteHeader = () => {
 						)} */}
             {user ? (
               <Link
+                href="/myCabinet/tradingBots"
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Алготрейдинг
+              </Link>
+            ) : (
+              <button
+                onClick={handleAcademyClick}
+                className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
+              >
+                Алготрейдинг
+              </button>
+            )}
+            {user ? (
+              <Link
                 href="https://screener.pantheonx.club/"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >

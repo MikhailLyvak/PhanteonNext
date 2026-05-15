@@ -124,8 +124,7 @@ export default function ApiCreationForm() {
                       {meta.label}
                     </h6>
                     <span
-                      className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
-                      style={{ color: meta.accent }}
+                      className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white"
                     >
                       <svg
                         width="11"
