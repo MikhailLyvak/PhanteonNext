@@ -239,18 +239,32 @@ export default function TradingChats() {
         </div>
       </div>
       <div className="h-[1px] w-full bg-white/10 my-6"></div>
-      <div className="flex justify-center items-center">
+      <div className="flex flex-row gap-6 items-stretch w-full pt-10">
         <Link
           rel="noopener noreferrer"
           target="_blank"
-          href="https://docs.google.com/forms/d/e/1FAIpQLSfpPazPoy1M5icDOYym52WFZJfkX1rbJb2X7kPBGLZZPJnYJQ/viewform?pli=1"
-          className="flex-1 bg-[#C9A24D] text-black px-4 py-6 rounded-md font-bold text-lg uppercase tracking-wide 
-          text-center
-          transition-all duration-150 ease-in-out
-          hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
-          active:border-b-0 active:translate-y-[6px] active:shadow-none"
+          href="https://t.me/pantheonxtrade_bot?start=6a01e44f6883e6b05f0f40fb"
+          className="
+              flex items-center justify-center text-center flex-1 
+              bg-[#C9A24D] text-black px-4 py-6 rounded-md 
+              font-bold text-lg uppercase tracking-wide 
+              transition-all duration-150 ease-in-out
+              hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
+              active:border-b-0 active:translate-y-[6px] active:shadow-none
+            "
         >
           ПОДАТИ ЗАЯВКУ
+        </Link>
+
+        <Link
+          href="https://t.me/PNTHNX"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="self-start flex-[1.5] py-6 bg-gradient-to-r from-[#6b6f8a] to-[#554e8f] rounded-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300"
+        >
+          <p className="text-white text-md md:text-2xl italic font-medium text-center leading-tight px-6">
+            Чат підтримки
+          </p>
         </Link>
       </div>
     </div>
