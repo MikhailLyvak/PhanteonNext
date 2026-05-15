@@ -14,7 +14,7 @@ import tronClient from "./tronClient";
 import {
   userInfoSchema,
   userBalanceSchema,
-  validateApiKeyListSchema,
+  validateApiKeySchema,
   validateApiResponseSchema,
   settingsPresetListSchema,
   robotsSettingsCreateSchema,
@@ -54,10 +54,19 @@ export const getUserBalance = async (): Promise<{ balance: number }> => {
   return { balance: parsed.balance };
 };
 
-/** §4.2 GET /apis — saved API keys for the current user. */
+/**
+ * §4.2 GET /apis — saved API keys for the current user.
+ *
+ * Parses entries individually and drops malformed rows so a single bad record
+ * (e.g. legacy entry missing `exchange`) can't blank the entire list.
+ */
 export const listApis = async (): Promise<ValidateApiKey[]> => {
   const { data } = await algonixClient.get("/apis");
-  return validateApiKeyListSchema.parse(data);
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((entry) => {
+    const parsed = validateApiKeySchema.safeParse(entry);
+    return parsed.success ? [parsed.data] : [];
+  });
 };
 
 /**

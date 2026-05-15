@@ -65,7 +65,7 @@ export default function RobotCreationFormWithSelector() {
         <RobotCreationForm
           key={selectedApiId}
           apiId={selectedApi.id}
-          exchange={selectedApi.exchange}
+          exchange={selectedApi.exchange ?? ''}
         />
       </div>
     </div>

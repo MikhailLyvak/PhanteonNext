@@ -56,7 +56,7 @@ export const validateApiKeySchema = z
     id: z.string(),
     title: z.string().optional().default(""),
     balance: z.number(),
-    exchange: z.string(),
+    exchange: z.string().optional(),
     key: z.string(),
     secret: z.string().optional().default(""),
     status: z.string().optional(),
@@ -88,13 +88,12 @@ export const validateApiResponseSchema = z
   })
   .passthrough();
 
-/** §4.4 request body — supports either `{id}` or `{key, secret, exchange}`. */
+/** §4.4 request body — supports either `{id}` or `{key, secret}`. */
 export const validateApiInputSchema = z.union([
   z.object({ id: z.string() }),
   z.object({
     key: z.string(),
     secret: z.string(),
-    exchange: z.string(),
     other: z.string().optional(),
     market_type: z.string().optional(),
   }),
@@ -106,7 +105,6 @@ export const saveApiInputSchema = z.object({
   key: z.string(),
   secret: z.string(),
   other: z.string().optional(),
-  exchange: z.string(),
   market_type: z.string().optional(),
 });
 

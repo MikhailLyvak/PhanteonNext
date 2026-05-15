@@ -53,7 +53,6 @@ export default function ApiCreationForm() {
       await validateApi.mutateAsync({
         key: values.apiKey,
         secret: values.secretKey,
-        exchange: '',
       })
     } catch {
       setSubmitError('З\u2019єднання не вдалося')
@@ -66,7 +65,6 @@ export default function ApiCreationForm() {
         title: values.title || undefined,
         key: values.apiKey,
         secret: values.secretKey,
-        exchange: '',
       })
     } catch (err) {
       const errAny = err as {
@@ -98,7 +96,6 @@ export default function ApiCreationForm() {
                 style={
                   {
                     '--accent': meta.accent,
-                    '--glow': meta.glow,
                   } as React.CSSProperties
                 }
                 className="group relative overflow-hidden p-5 rounded-xl bg-[#1D1D2A] ring-1 ring-white/5 transition-all duration-300 hover:-translate-y-0.5 hover:ring-[color:var(--accent)]/60"
@@ -153,6 +150,7 @@ export default function ApiCreationForm() {
         <form
           onSubmit={handleSubmit(onSubmit)}
           method="post"
+          autoComplete="off"
         >
           <Controller
             control={control}
@@ -162,8 +160,10 @@ export default function ApiCreationForm() {
                 <label className="text-[#D2D2FF] text-sm font-medium">Назва (необов&apos;язково)</label>
                 <input
                   {...field}
+                  name="bot-api-title"
                   value={field.value ?? ''}
                   type="text"
+                  autoComplete="off"
                   placeholder="Назва API"
                   className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
                 />
@@ -182,9 +182,12 @@ export default function ApiCreationForm() {
                 <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">API ключ</label>
                 <input
                   {...field}
+                  name="bot-api-public-key"
                   value={field.value ?? ''}
                   type="text"
                   autoComplete="off"
+                  readOnly
+                  onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
                   placeholder="API key"
                   className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
                 />
@@ -204,10 +207,21 @@ export default function ApiCreationForm() {
                 <div className="relative">
                   <input
                     {...field}
+                    name="bot-api-private-key"
                     value={field.value ?? ''}
-                    type={showSecret ? 'text' : 'password'}
+                    type="text"
                     autoComplete="off"
+                    readOnly
+                    onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
                     placeholder="Secret key"
+                    style={
+                      showSecret
+                        ? undefined
+                        : ({
+                            WebkitTextSecurity: 'disc',
+                            textSecurity: 'disc',
+                          } as React.CSSProperties)
+                    }
                     className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none pr-10"
                   />
                   <button
