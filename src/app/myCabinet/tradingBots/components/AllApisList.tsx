@@ -1,10 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { Trash2 } from 'lucide-react'
 import { Triangle } from 'react-loader-spinner'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
+import useDeleteApi from '@/hooks/TradingBots/useDeleteApi'
 import { getExchangeMeta } from './exchangeMeta'
 
 const truncate = (s: string, max = 12) =>
@@ -13,9 +15,20 @@ const truncate = (s: string, max = 12) =>
 export default function AllApisList() {
   const router = useRouter()
   const { data: apis, isLoading } = useUserApis()
+  const deleteApi = useDeleteApi()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const goToRobot = (apiId: string) => {
     router.replace(`/myCabinet/tradingBots?step=robot&apiId=${apiId}`)
+  }
+
+  const handleDelete = (e: React.MouseEvent, apiId: string) => {
+    e.stopPropagation()
+    setDeletingId(apiId)
+  }
+
+  const confirmDelete = (apiId: string) => {
+    deleteApi.mutate(apiId, { onSettled: () => setDeletingId(null) })
   }
 
   const list = apis ?? []
@@ -57,10 +70,12 @@ export default function AllApisList() {
               const meta = getExchangeMeta(api.exchange)
               return (
                 <li key={api.id}>
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => goToRobot(api.id)}
-                    className="group relative w-full p-4 rounded-xl bg-[#1D1D2A] text-left ring-1 ring-white/5 hover:bg-[#2F2F40] hover:ring-[#6A56E4]/40 transition-colors flex items-center gap-4"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') goToRobot(api.id) }}
+                    className="group relative w-full p-4 rounded-xl bg-[#1D1D2A] text-left ring-1 ring-white/5 hover:bg-[#2F2F40] hover:ring-[#6A56E4]/40 transition-colors flex items-center gap-4 cursor-pointer"
                   >
                     {meta ? (
                       <div className="flex items-center justify-center w-10 h-10 shrink-0">
@@ -100,7 +115,44 @@ export default function AllApisList() {
                         <path d="M9 6l6 6-6 6" />
                       </svg>
                     </span>
-                  </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(e, api.id)}
+                      disabled={deleteApi.isPending}
+                      className="shrink-0 p-2 rounded-lg text-[#8c8ca0] hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                      aria-label="Видалити API"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  {deletingId === api.id && (
+                    <div className="mt-2 flex items-center gap-3 p-3 rounded-lg bg-[#2F2F40] ring-1 ring-red-400/20">
+                      <p className="text-sm text-[#D2D2FF] flex-1">
+                        Видалити цей API?
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => confirmDelete(api.id)}
+                        disabled={deleteApi.isPending}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center gap-1.5"
+                      >
+                        {deleteApi.isPending && (
+                          <Triangle visible height={12} width={12} color="#fff" ariaLabel="deleting" />
+                        )}
+                        Так
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingId(null)}
+                        disabled={deleteApi.isPending}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#1D1D2A] text-[#8c8ca0] hover:text-[#D2D2FF] transition-colors"
+                      >
+                        Ні
+                      </button>
+                    </div>
+                  )}
                 </li>
               )
             })}

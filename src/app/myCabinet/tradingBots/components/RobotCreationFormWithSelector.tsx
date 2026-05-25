@@ -24,11 +24,19 @@ export default function RobotCreationFormWithSelector() {
 
   useEffect(() => {
     if (apisList.length === 0) return
+
+    if (apiIdFromUrl) {
+      const fromUrl = apisList.find((a) => a.id === apiIdFromUrl)
+      if (fromUrl) {
+        if (selectedApiId !== fromUrl.id) setSelectedApiId(fromUrl.id)
+        return
+      }
+    }
+
     const stillExists = apisList.some((a) => a.id === selectedApiId)
     if (stillExists) return
 
-    const fromUrl = apiIdFromUrl && apisList.find((a) => a.id === apiIdFromUrl)
-    setSelectedApiId(fromUrl ? fromUrl.id : apisList[0].id)
+    setSelectedApiId(apisList[0].id)
   }, [apisList, selectedApiId, apiIdFromUrl])
 
   const selectedApi = apisList.find((a) => a.id === selectedApiId) ?? null

@@ -14,6 +14,106 @@ import useSaveApi from '@/hooks/TradingBots/useSaveApi'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import BackButton from './BackButton'
 import { EXCHANGE_META } from './exchangeMeta'
+import type { SupportedExchange } from '@/api/TradingBots/constants'
+
+const EXCHANGE_INSTRUCTIONS: Record<SupportedExchange, { title: string; description: string; image: string }[]> = {
+  BYBIT: [
+    {
+      title: 'Крок 1: Відкрийте меню акаунта',
+      description: 'Авторизуйтесь на біржі Bybit. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «API». Як показано на зображенні.',
+      image: '/wiki/Bybit/bybit-account-menu-api-ukr.jpg',
+    },
+    {
+      title: 'Крок 2: Відкрийте керування API',
+      description: 'Натисніть Створити новий ключ.',
+      image: '/wiki/Bybit/bybit-api-management-list-ukr.jpg',
+    },
+    {
+      title: 'Крок 3: Створіть новий ключ API',
+      description: 'Натисніть Згенеровані системою ключі API.',
+      image: '/wiki/Bybit/bybit-choose-key-type-ukr.jpg',
+    },
+    {
+      title: 'Крок 4: Обмежте права доступу',
+      description: 'Додайте назву ключа API. Оберіть: Читання/запис, Обмежень по IP немає, Єдиний торговий акаунт, Ордери, Позиції. Натисніть Надіслати.',
+      image: '/wiki/Bybit/bybit-create-key-permissions-ukr.jpg',
+    },
+    {
+      title: 'Крок 5: Збережіть ключі',
+      description: 'Скопіюйте Ключ API та Секретний ключ API у надійне місце. Далі натисніть Зрозуміло.',
+      image: '/wiki/Bybit/bybit-api-key-added-ukr.jpg',
+    },
+    {
+      title: 'Крок 6: Додайте ключі в застосунок',
+      description: 'Поверніться на платформу та внесіть назву, Ключ API та Секретний ключ API. Натисніть Зберегти API. Надалі, ви зможете використовувати їх по назві для створення різних роботів.',
+      image: '/wiki/save-api-keys.png',
+    },
+  ],
+  BINANCE: [
+    {
+      title: 'Крок 1: Відкрийте меню акаунта',
+      description: 'Авторизуйтесь на біржі Binance. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «Акаунт». Як показано на зображенні.',
+      image: '/wiki/Binance/binance-account-menu-ukr.jpg',
+    },
+    {
+      title: 'Крок 2: Відкрийте Управління API',
+      description: 'Натисніть Управління API.',
+      image: '/wiki/Binance/binance-api-management-list-ukr.jpg',
+    },
+    {
+      title: 'Крок 3: Створіть API',
+      description: 'Приберіть галочку та натисніть Створити API.',
+      image: '/wiki/Binance/binance-api-management-ukr.jpg',
+    },
+    {
+      title: 'Крок 4: Згенеруйте ключі',
+      description: 'Натисніть Згенеровані системою та Далі.',
+      image: '/wiki/Binance/binance-choose-api-key-type-ukr.jpg',
+    },
+    {
+      title: 'Крок 5: Відредагуйте ключі',
+      description: 'Скопіюйте Ключ API та Секретний ключ у надійне місце. Далі натисніть Редагувати обмеження.',
+      image: '/wiki/Binance/binance-api-key-details-ukr.jpg',
+    },
+    {
+      title: 'Крок 6: Налаштуйте доступи',
+      description: 'Поставте галочки на опціях Увімкнути фʼючерси та Необмежений доступ по IP. Далі натисніть Зберегти.',
+      image: '/wiki/Binance/binance-api-key-edit-save-ukr.jpg',
+    },
+    {
+      title: 'Крок 7: Додайте ключі в застосунок',
+      description: 'Поверніться на платформу та внесіть назву, Ключ API та Секретний ключ API. Натисніть Зберегти API. Надалі, ви зможете використовувати їх по назві для створення різних роботів.',
+      image: '/wiki/save-api-keys.png',
+    },
+  ],
+  BINGX: [
+    {
+      title: 'Крок 1: Відкрийте керування API',
+      description: 'Увійдіть на BingX. У правому верхньому куті натисніть на іконку профілю та у випадаючому меню оберіть «Керування API».',
+      image: '/wiki/Bingx/account-menu.png',
+    },
+    {
+      title: 'Крок 2: Створіть API',
+      description: 'Натисніть «Створити API».',
+      image: '/wiki/Bingx/api-access-keys-app.png',
+    },
+    {
+      title: 'Крок 3: Налаштуйте дозволи',
+      description: 'Вкажіть назву API-ключа. Оберіть опції «Спот торгівля» та «Безстрокова фʼючерсна торгівля». Натисніть «Підтвердити». Введіть коди верифікації.',
+      image: '/wiki/Bingx/api-key-edit-restrictions.png',
+    },
+    {
+      title: 'Крок 4: Збережіть ключі',
+      description: 'Скопіюйте API ключ та Секретний ключ у безпечне місце.',
+      image: '/wiki/Bingx/api-key-details.png',
+    },
+    {
+      title: 'Крок 5: Додайте ключі на платформу',
+      description: 'Поверніться на платформу, введіть назву, Публічний ключ та Секретний ключ. Натисніть «Зберегти API». Тепер ви зможете використовувати збережені ключі за назвою для створення нових роботів.',
+      image: '/wiki/save-api-keys.png',
+    },
+  ],
+}
 
 const formSchema = z.object({
   title: z
@@ -38,6 +138,8 @@ export default function ApiCreationForm() {
 
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showSecret, setShowSecret] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  const [instructionExchange, setInstructionExchange] = useState<SupportedExchange>(SUPPORTED_EXCHANGES[0])
 
   const { control, handleSubmit, formState } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -78,6 +180,63 @@ export default function ApiCreationForm() {
     }
 
     router.replace(`/myCabinet/tradingBots?step=robot&apiId=${apiId}`)
+  }
+
+  if (showInstructions) {
+    return (
+      <div className="w-full">
+        <button
+          type="button"
+          onClick={() => setShowInstructions(false)}
+          className="text-sm text-[#8c8ca0] hover:text-[#D2D2FF] focus:outline-none"
+        >
+          &larr; Назад
+        </button>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
+          Інструкції
+        </h6>
+
+        <div className="mt-[30px] inline-flex items-center gap-1 p-1 bg-[#1D1D2A] rounded-xl ring-1 ring-white/5">
+          {SUPPORTED_EXCHANGES.map((ex) => {
+            const meta = EXCHANGE_META[ex]
+            const active = ex === instructionExchange
+            return (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => setInstructionExchange(ex)}
+                className={`relative flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  active
+                    ? 'bg-[#6A56E4] text-white shadow-[0_4px_14px_-4px_rgba(106,86,228,0.55)]'
+                    : 'text-[#8c8ca0] hover:text-[#D2D2FF] hover:bg-[#242433]'
+                }`}
+              >
+                <Image src={meta.icon} alt={meta.label} width={20} height={20} className="object-contain" />
+                {meta.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="mt-4 py-6 bg-[#242433] rounded-2xl">
+          <div className="space-y-6">
+            {EXCHANGE_INSTRUCTIONS[instructionExchange].map((step, idx) => (
+              <div key={idx}>
+                <p className="text-[#D2D2FF] text-sm font-bold mb-1">{step.title}</p>
+                <p className="text-[#8c8ca0] text-sm mb-3">{step.description}</p>
+                <Image
+                  src={step.image}
+                  alt={step.title}
+                  width={600}
+                  height={400}
+                  className="w-full rounded-xl"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -146,6 +305,14 @@ export default function ApiCreationForm() {
       </div>
 
       <div className="mt-[30px] py-6 bg-[#242433] rounded-2xl">
+        <button
+          type="button"
+          onClick={() => setShowInstructions(true)}
+          className="w-full mb-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+        >
+          Інструкції
+        </button>
+
         <h6 className="text-[#D2D2FF] text-xl font-semibold">Дані API</h6>
         <form
           onSubmit={handleSubmit(onSubmit)}

@@ -13,7 +13,7 @@ import useUserInfo from '@/hooks/TradingBots/useUserInfo'
 import BackButton from './BackButton'
 import RobotLimitModal from './RobotLimitModal'
 
-const formatNumber = (n: number | null | undefined, digits = 4): string => {
+const formatNumber = (n: number | null | undefined, digits = 2): string => {
   if (n === null || n === undefined || !Number.isFinite(n)) return '—'
   return n.toFixed(digits)
 }
@@ -194,7 +194,7 @@ export default function RobotDetailCard() {
         </div>
         {robot.settings?.symbol && (
           <div className={rowClass}>
-            <span className={labelMutedClass}>Символ</span>
+            <span className={labelMutedClass}>Монета</span>
             <span>{robot.settings.symbol}</span>
           </div>
         )}
@@ -223,21 +223,21 @@ export default function RobotDetailCard() {
         <>
           <button
             type="button"
-            onClick={handlePause}
-            disabled={pauseMutation.isPending}
-            className={primaryClass}
-          >
-            {renderSpinner(pauseMutation.isPending)}
-            Пауза
-          </button>
-          <button
-            type="button"
             onClick={handleStop}
             disabled={stopMutation.isPending}
-            className={secondaryClass}
+            className={primaryClass}
           >
             {renderSpinner(stopMutation.isPending)}
             Зупинити робота
+          </button>
+          <button
+            type="button"
+            onClick={handlePause}
+            disabled={pauseMutation.isPending}
+            className={secondaryClass}
+          >
+            {renderSpinner(pauseMutation.isPending)}
+            Пауза
           </button>
         </>
       )}

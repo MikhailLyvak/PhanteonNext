@@ -172,16 +172,19 @@ export default function RobotsList() {
                       {symbol}
                     </span>
                   )}
-                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#242433] text-[#8c8ca0]">
-                    Депозит: {formatNumber(robot.deposit)}
-                  </span>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
+                <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">Депозит</p>
+                    <p className="mt-0.5 text-sm font-semibold text-[#D2D2FF]">
+                      {formatNumber(robot.deposit)}
+                    </p>
+                  </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wider text-[#58587B]">PnL</p>
                     <p className={`mt-0.5 text-sm font-semibold ${pnlColor}`}>
-                      {formatNumber(robot.pnl, 4)}
+                      {formatNumber(robot.pnl)}
                     </p>
                   </div>
                   <div>
