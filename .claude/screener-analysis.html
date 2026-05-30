@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PanScreen Frontend Analysis — for PhanteonNext port</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161a22;
+    --panel-2: #1d212c;
+    --border: #262b38;
+    --text: #e6e9f2;
+    --muted: #98a0b3;
+    --accent: #8aa6ff;
+    --accent-2: #d2d2ff;
+    --good: #4ade80;
+    --bad: #f87171;
+    --warn: #fbbf24;
+    --code-bg: #0b0d12;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 28px 80px; }
+  header.hero {
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(138,166,255,0.08), rgba(210,210,255,0.03));
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.01em; }
+  header.hero .sub { color: var(--muted); font-size: 14px; }
+  h2 {
+    margin: 40px 0 14px;
+    font-size: 20px;
+    color: var(--accent-2);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  h3 { margin: 22px 0 8px; font-size: 16px; color: var(--accent); }
+  p, li { font-size: 14px; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 12.5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: top;
+  }
+  th { background: var(--panel-2); color: var(--accent-2); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card h4 { margin: 0 0 6px; font-size: 14px; color: var(--accent); }
+  .card p { margin: 0; color: var(--muted); font-size: 13px; }
+  .tag {
+    display: inline-block;
+    background: rgba(138,166,255,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(138,166,255,0.25);
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    margin: 0 4px 4px 0;
+  }
+  .callout {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    color: #fde68a;
+    font-size: 13px;
+  }
+  .callout.good { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.35); color: #bbf7d0; }
+  .toc { columns: 2; column-gap: 28px; font-size: 13px; }
+  .toc a { color: var(--accent-2); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  ul { padding-left: 22px; }
+  .filemono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: var(--accent); }
+  footer { margin-top: 50px; color: var(--muted); font-size: 12px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>PanScreen Frontend — Analysis Report</h1>
+  <div class="sub">Source repo: <code>/Users/asilverrrr/WebstormProjects/panscreen</code> · Target: PhanteonNext cabinet port · Generated 2026-05-28</div>
+</header>
+
+<h2 id="summary">1. Executive summary</h2>
+<p>
+<strong>PanScreen</strong> is a real-time crypto futures screener for professional scalper traders. It tracks 16 Binance USDT-perp pairs and surfaces live OHLCV, CVD (cumulative volume delta), liquidations, funding rates, and open interest. The UI is split into two screens: a dense screener table and a deep-dive analysis terminal with a 6-pane synchronized chart plus real-time liquidations and large-trades feeds. The frontend is mostly thin glue — heavy lifting (footprint heatmap rendering, infinite scroll over 6000-candle pages, multi-stream WS multiplexing) lives in a few key components.
+</p>
+
+<div class="grid">
+  <div class="card"><h4>Framework</h4><p>Next.js 15 · React 19 · TypeScript 5</p></div>
+  <div class="card"><h4>Charts</h4><p>lightweight-charts 5.0.8 + custom HeatmapPlugin</p></div>
+  <div class="card"><h4>Styling</h4><p>Tailwind CSS 4 (no UI kit)</p></div>
+  <div class="card"><h4>State</h4><p>React hooks only — no Redux / Zustand</p></div>
+  <div class="card"><h4>Data</h4><p>REST (fetch) + native WebSocket</p></div>
+  <div class="card"><h4>Auth</h4><p>None — backend has no auth middleware</p></div>
+</div>
+
+<h2 id="routes">2. Routes &amp; pages</h2>
+<table>
+  <thead><tr><th>Route</th><th>File</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>/</code></td>
+      <td><span class="filemono">app/page.tsx</span></td>
+      <td><strong>Dashboard / Screener table.</strong> 16 rows of live assets. Columns: pair, price + change %, OI + change %, CVD, buy/sell liquidations, funding. Search filter, sort by any column, period selector (1h / 4h / 24h).</td>
+    </tr>
+    <tr>
+      <td><code>/terminal/[assetId]</code></td>
+      <td><span class="filemono">app/terminal/[assetId]/page.tsx</span></td>
+      <td><strong>Analysis terminal.</strong> 3-column layout. Left/center: <code>MasterChart</code> with 6 stacked synchronized panes and 6 timeframes (1m, 5m, 15m, 1h, 4h, 1d). Right: <code>LiquidationsFeed</code> + <code>TradesFeed</code> (large-trade alerts).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="features">3. Core features</h2>
+
+<h3>Screener (dashboard)</h3>
+<ul>
+  <li>Live table of 16 USDT-perp pairs, updated by WebSocket every ~60 s.</li>
+  <li>Sort by any column (asc/desc), default = OI desc.</li>
+  <li>Text filter + preset buttons (only "All" implemented today).</li>
+  <li>Period toggle (1h / 4h / 24h) changes which historical close is used for % change.</li>
+  <li>Row click → navigates to <code>/terminal/{pair}</code>.</li>
+</ul>
+
+<h3>Terminal (chart + feeds)</h3>
+<ul>
+  <li><strong>MasterChart</strong> — 6 stacked panes, shared time axis:
+    <ol>
+      <li>Candlesticks + volume bars</li>
+      <li>Footprint heatmap overlay (toggleable) — buy/sell volume per price level</li>
+      <li>CVD line</li>
+      <li>Liquidations histogram (buy green / sell red)</li>
+      <li>Funding rate histogram</li>
+      <li>Open Interest line</li>
+    </ol>
+  </li>
+  <li>6 timeframes: 1m, 5m, 15m, 1h, 4h, 1d.</li>
+  <li>Infinite backward scroll: pages of 6000 candles prepended on demand.</li>
+  <li>Forward edge tails live updates from the WebSocket.</li>
+  <li><strong>LiquidationsFeed</strong> — last 50 individual liquidation events (symbol, side, price, volume, ts).</li>
+  <li><strong>TradesFeed</strong> — last 50 "large" trades (filtered by EMA × 12 volume threshold).</li>
+</ul>
+
+<h2 id="apis">4. Data sources &amp; APIs</h2>
+
+<h3>REST</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Returns</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /dashboard</code></td><td>Snapshot for all pairs: <code>{ pair: { ohlcv, oi, liquidations, cvd, funding } }</code></td></tr>
+    <tr><td><code>GET /pair/{code}</code></td><td>Pair metadata: <code>{ id, code, coin, type, tick, precision }</code></td></tr>
+  </tbody>
+</table>
+
+<h3>WebSocket streams</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Events</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>/ws/all</code></td>
+      <td><code>ohlcv-1m-update</code>, <code>open-interest-update</code>, <code>liquidations</code>, <code>cvd</code>, <code>funding</code></td>
+      <td>Broadcast of all-pair analytics (every ~60 s) — drives the dashboard table.</td>
+    </tr>
+    <tr>
+      <td><code>/ws/chart/{pair}?tf={tf}</code></td>
+      <td>chart init + <code>ohlcv-update</code>, <code>footprint-update</code>, <code>cvd-update</code>, <code>liquidations-update</code>, …</td>
+      <td>Per-pair, per-timeframe stream — drives the 6-pane MasterChart.</td>
+    </tr>
+    <tr><td><code>/ws/liquidations-stream/{pair}</code></td><td><code>liquidations-stream-init</code>, <code>liquidations-stream</code></td><td>Individual liquidation events for the terminal feed.</td></tr>
+    <tr><td><code>/ws/trades-stream/{pair}</code></td><td><code>trades-stream-init</code>, <code>trades-stream</code></td><td>Large-trade alert events.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+Backend URLs are env-driven in panscreen: <code>NEXT_PUBLIC_API_BASE_URL</code> (REST) and <code>NEXT_PUBLIC_API_WS_BASE_URL</code> (WS). Defaults: <code>http://localhost:8000</code> / <code>ws://localhost:8000/ws</code>. PhanteonNext will need equivalent vars — proposed: <code>NEXT_PUBLIC_SCREENER_API_BASE_URL</code> / <code>NEXT_PUBLIC_SCREENER_WS_BASE_URL</code>.
+</div>
+
+<h2 id="model">5. Domain model</h2>
+
+<h3>AssetPair</h3>
+<pre>interface AssetPair {
+  id: number;
+  code: string;       // "BTCUSDT"
+  coin: string;       // "BTC"
+  type: string;       // "USDT"
+  tick: number;
+  precision: number;
+}</pre>
+
+<h3>DashboardAssetData (server payload per pair)</h3>
+<pre>type DashboardAssetData = {
+  ohlcv:    { close_latest, close_1h?, close_4h?, close_24h? };
+  oi:       { ointerest_latest, ointerest_1h?, ointerest_4h?, ointerest_24h? };
+  liquidations: {
+    buy_turnover_1h?,  sell_turnover_1h?,  total_turnover_1h?,
+    buy_turnover_4h?,  sell_turnover_4h?,  total_turnover_4h?,
+    buy_turnover_24h?, sell_turnover_24h?, total_turnover_24h?
+  };
+  cvd:      { cvd_1h?, cvd_4h?, cvd_24h? };
+  funding?: { close_latest };
+  tick: number;
+  precision: number;
+};</pre>
+
+<h3>Chart data</h3>
+<ul>
+  <li>OHLCV candle: <code>{ time, open, high, low, close, volume }</code></li>
+  <li>Footprint frame: <code>{ time, data: { [price_level]: { b: buy_vol, s: sell_vol } } }</code></li>
+  <li>CVD point: <code>{ time, value }</code></li>
+  <li>Liquidations bar: <code>{ time, buy_volume, sell_volume }</code></li>
+</ul>
+
+<h2 id="components">6. Component inventory</h2>
+
+<table>
+  <thead><tr><th>File</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">app/page.tsx</span></td><td>Dashboard layout shell (logo, filters, table).</td></tr>
+    <tr><td><span class="filemono">app/terminal/[assetId]/page.tsx</span></td><td>Terminal 3-column shell. Loads <code>/pair/{code}</code> for metadata.</td></tr>
+    <tr><td><span class="filemono">components/AssetsTable.tsx</span></td><td>Core screener table. Owns sort/filter/period state, WS subscription to <code>/ws/all</code>, merges <code>ohlcv</code>, <code>oi</code>, <code>liquidations</code>, <code>cvd</code>, <code>funding</code> events into rows. Row click → router push.</td></tr>
+    <tr><td><span class="filemono">components/TableRow.tsx</span></td><td>Visual row.</td></tr>
+    <tr><td><span class="filemono">components/Filters.tsx</span></td><td>Search input + preset buttons.</td></tr>
+    <tr><td><span class="filemono">components/charts/MasterChart.tsx</span></td><td>6-pane stacked lightweight-charts instance. Creates panes (candlestick, histogram, line), keeps shared legend, manages timeframe switching, infinite backward scroll fetching 6000-candle pages, real-time forward append.</td></tr>
+    <tr><td><span class="filemono">components/charts/HeatmapPlugin.ts</span></td><td>Custom lightweight-charts plugin — renders footprint price-level volume as heatmap cells overlaid on candles.</td></tr>
+    <tr><td><span class="filemono">components/charts/utils.ts</span></td><td>Data transforms (raw → candle, footprint reshape).</td></tr>
+    <tr><td><span class="filemono">components/feeds/LiquidationsFeed.tsx</span></td><td>Per-pair liquidations stream, 50-row FIFO.</td></tr>
+    <tr><td><span class="filemono">components/feeds/TradesFeed.tsx</span></td><td>Per-pair large-trade stream (uses <code>useWebSocketFeed</code>), 50-row FIFO.</td></tr>
+    <tr><td><span class="filemono">hooks/useWebSocketFeed.ts</span></td><td>Generic WS hook — URL + <code>transformMessage</code> + <code>maxItems</code> → ordered FIFO array.</td></tr>
+    <tr><td><span class="filemono">components/FadeIn.tsx</span></td><td>framer-motion fade wrapper.</td></tr>
+    <tr><td><span class="filemono">components/Footer.tsx</span></td><td>Logo + links.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="auth">7. Auth model</h2>
+<div class="callout">
+<strong>panscreen has no auth.</strong> All endpoints are public, frontend has no login. In PhanteonNext, the port must be gated behind: (a) <code>ProtectedRoute</code> (logged-in only) and (b) the <code>subscription.screener_access</code> boolean from <code>src/api/Subscriptions/getSubscriptions.ts</code>. Users without the flag should be redirected to <code>/paywall</code>.
+</div>
+
+<h2 id="realtime">8. Real-time architecture</h2>
+<ul>
+  <li>100 % WebSocket-driven after the initial REST snapshot. No polling.</li>
+  <li>Backend broadcasts <code>/ws/all</code> snapshots every 60 s — the dashboard merges incoming events into rows by pair.</li>
+  <li>Per-pair streams (<code>/ws/chart</code>, <code>/ws/liquidations-stream</code>, <code>/ws/trades-stream</code>) are subscribed only on the terminal page and torn down on unmount.</li>
+  <li>Event envelope is always <code>{ event: string, data: object }</code>.</li>
+  <li>The chart stream sends a large "init" payload (6000 candles + footprints + CVD + liquidations) and then incremental updates per bar close / per event.</li>
+</ul>
+
+<h2 id="sophisticated">9. Sophisticated / non-trivial pieces</h2>
+<div class="grid">
+  <div class="card"><h4>Footprint heatmap plugin</h4><p>Custom lightweight-charts plugin renders per-price-level buy/sell volume as colored cells inside each candle.</p></div>
+  <div class="card"><h4>Infinite backward scroll</h4><p>When the visible range hits the left edge of loaded data, fetch 6000 more candles, prepend without losing the user's pan/zoom.</p></div>
+  <div class="card"><h4>Multi-pane sync</h4><p>6 stacked panes share the time axis; legend updates on crosshair move across all panes.</p></div>
+  <div class="card"><h4>Period-aware % change</h4><p>Dashboard reads <code>close_1h</code>, <code>close_4h</code>, <code>close_24h</code> from the snapshot and computes the % delta client-side based on the selected period.</p></div>
+  <div class="card"><h4>Generic WS hook</h4><p><code>useWebSocketFeed</code> accepts a URL + <code>transformMessage</code> + <code>maxItems</code> — reused by trades feed and could replace ad-hoc subscriptions elsewhere.</p></div>
+</div>
+
+<h2 id="phanteon">10. PhanteonNext fit &amp; mismatches</h2>
+
+<table>
+  <thead><tr><th>Aspect</th><th>panscreen</th><th>PhanteonNext</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td>Next.js</td><td>15</td><td>16</td><td>Compatible — no action.</td></tr>
+    <tr><td>React</td><td>19.1</td><td>19.2</td><td>Compatible.</td></tr>
+    <tr><td>Tailwind</td><td>4</td><td>3.4 + SCSS</td><td><strong>Do not upgrade.</strong> Restyle in Tailwind 3 + SCSS using existing tokens (<code>#D2D2FF</code>, dark backgrounds).</td></tr>
+    <tr><td>State</td><td>React hooks</td><td>Zustand</td><td>Use a Zustand store for dashboard rows + period selector.</td></tr>
+    <tr><td>HTTP client</td><td>fetch</td><td>Axios</td><td>Wire REST through the existing Axios setup under <code>src/api/Screener/</code>.</td></tr>
+    <tr><td>Charts lib</td><td>lightweight-charts</td><td>react-ts-tradingview-widget</td><td>Add <code>lightweight-charts@^5.0.8</code> for the screener; keep TradingView where it's already used.</td></tr>
+    <tr><td>Icons</td><td>lucide-react</td><td>react-icons + lucide-react</td><td>Reuse what's there.</td></tr>
+    <tr><td>Auth</td><td>none</td><td>JWT + subscriptions</td><td>Wrap routes in <code>ProtectedRoute</code> + check <code>screener_access</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>Integration points in PhanteonNext (today)</h3>
+<ul>
+  <li><span class="filemono">src/app/dashboard/page.tsx</span> — placeholder TradingView widget. To be replaced or removed once the new routes land.</li>
+  <li><span class="filemono">src/app/components/HeaderComps/Drawer.tsx</span> (~line 122) — Screener <code>NavItem</code> link, currently <code>/dashboard</code>. Update to <code>/myCabinet/screener</code>.</li>
+  <li><span class="filemono">src/app/components/Footer.tsx</span> (~line 78) — external link to <code>https://screener.pantheonx.club/</code>. Remove or point internally.</li>
+  <li><span class="filemono">src/api/Subscriptions/getSubscriptions.ts</span> — source of <code>screener_access</code>.</li>
+  <li><span class="filemono">src/components/ProtectedRoute.tsx</span> — auth wrapper.</li>
+  <li><span class="filemono">src/app/myCabinet/layout.tsx</span> — cabinet shell where the new routes live.</li>
+</ul>
+
+<h2 id="key-files">11. Key source files (panscreen)</h2>
+<table>
+  <thead><tr><th>Path</th><th>What's there</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">panscreen/ARCHITECTURE.md</span></td><td>Full data pipeline (Binance → Kafka → Bytewax → TimescaleDB → Redis → FastAPI).</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/components/AssetsTable.tsx</span></td><td>Screener table logic — sort/filter/period/WS merge.</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/components/charts/MasterChart.tsx</span></td><td>6-pane chart + infinite scroll.</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/components/charts/HeatmapPlugin.ts</span></td><td>Footprint heatmap plugin.</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/hooks/useWebSocketFeed.ts</span></td><td>Generic WS hook.</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/config.ts</span></td><td>API URL config (env-driven).</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/src/types/index.ts</span></td><td>Type definitions.</td></tr>
+    <tr><td><span class="filemono">panscreen/frontend/public/media/</span></td><td>Coin icons (PNG) — copy into PhanteonNext public assets.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="next">12. What happens next</h2>
+<ol>
+  <li>A planning subagent reads this document + the PhanteonNext constraints and produces a concrete file-by-file implementation plan.</li>
+  <li>That plan is saved as <code>screener-implementation-plan.html</code> in this repo root.</li>
+  <li>The user reviews the plan and explicitly approves it.</li>
+  <li>Only then does an implementation subagent start touching code.</li>
+</ol>
+
+<footer>
+PanScreen frontend analysis · generated for the PhanteonNext port workflow · 2026-05-28
+</footer>
+
+</div>
+</body>
+</html>

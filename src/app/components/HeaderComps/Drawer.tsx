@@ -121,7 +121,7 @@ const Drawer = () => {
 					icon={<LuChartLine size={20} />}
 					text='Screener'
 					closeDrawer={closeDrawer}
-					link='/dashboard'
+					link='/myCabinet/screener'
 				/>
 				<NavItem
 					icon={<MessageCircleMore size={20}/>}

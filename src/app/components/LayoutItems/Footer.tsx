@@ -75,7 +75,7 @@ const Footer = () => {
 							)} */}
               {user ? (
                 <Link
-                  href="https://screener.pantheonx.club/"
+                  href="/myCabinet/screener"
                   className="text-[#D2D2FF] hover:text-white transition-colors"
                 >
                   Скрінер

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Screener — Frontend Gap Analysis</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #161a22;
+    --panel-2: #1d212c;
+    --border: #262b38;
+    --text: #D2D2FF;
+    --muted: #98A0B3;
+    --dim: #58587B;
+    --accent: #8AA6FF;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Inter", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 28px 80px; }
+  h1 {
+    font-size: 32px;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, #D2D2FF, #8AA6FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 17px; margin: 22px 0 10px; color: var(--accent); }
+  p, li { color: #c5c8e0; }
+  .lede { color: var(--muted); font-size: 15px; }
+  code {
+    background: #1A1A28;
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #C8D2FF;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    vertical-align: middle;
+  }
+  .b-ok    { background: rgba(74,222,128,.12); color: var(--ok);   border: 1px solid rgba(74,222,128,.35); }
+  .b-part  { background: rgba(251,191,36,.12); color: var(--warn); border: 1px solid rgba(251,191,36,.35); }
+  .b-miss  { background: rgba(248,113,113,.12); color: var(--bad); border: 1px solid rgba(248,113,113,.35); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px 0 24px;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--panel-2);
+    font-weight: 600;
+    color: var(--text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.requirement { width: 28%; font-weight: 600; color: var(--text); }
+  td.status { width: 12%; white-space: nowrap; }
+  td.notes { color: #b9bdd6; }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 14px 0 8px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card .num { font-size: 26px; font-weight: 800; }
+  .card .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+  .card.ok   .num { color: var(--ok); }
+  .card.part .num { color: var(--warn); }
+  .card.miss .num { color: var(--bad); }
+
+  ul.gap-list { padding-left: 18px; }
+  ul.gap-list li { margin: 4px 0; }
+
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap; margin: 6px 0 0;
+    font-size: 12px; color: var(--muted);
+  }
+  .priority {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 4px; margin-right: 6px;
+    vertical-align: middle;
+  }
+  .p-high { background: rgba(248,113,113,.15); color: var(--bad); }
+  .p-med  { background: rgba(251,191,36,.15);  color: var(--warn); }
+  .p-low  { background: rgba(138,166,255,.15); color: var(--accent); }
+
+  hr { border: 0; border-top: 1px solid var(--border); margin: 26px 0; }
+  .src { color: var(--dim); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Screener — Frontend Gap Analysis</h1>
+<p class="lede">
+  Comparison of the original Screener spec (<code>screener_desc.md</code>) against the current frontend
+  implementation under <code>src/app/components/Screener/</code>, <code>src/app/myCabinet/screener/</code>,
+  <code>src/lib/screener/</code> and <code>src/store/Screener/</code>.
+  Backend is mocked — this report covers <em>frontend completeness only</em>.
+</p>
+
+<div class="summary">
+  <div class="card ok">
+    <div class="num">8</div>
+    <div class="lbl">Implemented</div>
+  </div>
+  <div class="card part">
+    <div class="num">9</div>
+    <div class="lbl">Partial / needs rework</div>
+  </div>
+  <div class="card miss">
+    <div class="num">9</div>
+    <div class="lbl">Missing</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="badge b-ok">DONE</span> implemented end-to-end (UI level)</span>
+  <span><span class="badge b-part">PARTIAL</span> present but doesn't match spec</span>
+  <span><span class="badge b-miss">MISSING</span> not implemented in the frontend</span>
+</div>
+
+<hr/>
+
+<h2>Page 1 — Market Scanner Dashboard</h2>
+<p class="src">Route: <code>/myCabinet/screener</code> · Files: <code>page.tsx</code>, <code>Filters.tsx</code>, <code>AssetsTable.tsx</code>, <code>TableRow.tsx</code>.</p>
+
+<h3>Columns</h3>
+<table>
+  <thead>
+    <tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="requirement">Symbol (pair) with icon</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">Implemented in <code>TableRow.tsx</code> with image fallback.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Price + 24h % change</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Price renders fine, but the % change uses the global <em>Period</em> toggle (1h/4h/24h),
+        not a fixed 24h delta. Spec asks for a dedicated 24h % column.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">OI change % for 1h, 4h, 24h (three columns)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Only <em>one</em> OI column whose value flips with the Period toggle. Spec wants three
+        side-by-side columns (1h / 4h / 24h) so the trader can sort by any horizon.
+        Color coding for spikes is present.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Volume Spike (current vs recent average, e.g. “250% of 24h avg”)</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">No such column. <code>DashboardAssetData</code> doesn't even carry the field.</td>
+    </tr>
+    <tr>
+      <td class="requirement">VDelta 1h, 4h (buy/sell pressure)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">CVD column exists but is single-value, period-toggled. Spec wants 1h <em>and</em> 4h shown together.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Funding rate with extreme-value warning color</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Funding renders with red/green by sign; spec wants threshold-based warning highlighting
+        (e.g. yellow/red flash for extreme negative rates), not just sign.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Recent liquidations $ (last 1h total)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Implemented as two columns (Liq Buy, Liq Sell) tied to the Period toggle. Spec wants a
+        single rolling 1h $ total to flag unusual activity at a glance.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Pattern recognition icon ("Stretched growth", "Trend weakness", …)</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">No pattern column. No type field. Needs a pattern badge per row + tooltip.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Global filters / controls</h3>
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="requirement">Search by pair</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes"><code>Filters.tsx</code> + <code>useScreenerStore.searchTerm</code>.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Exchange filter (Binance, MEXC, …)</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">
+        Not implemented. The spec explicitly flags MEXC absence as a known pain point.
+        No exchange field on <code>AssetPair</code>.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Market-cap filter (low-cap focus)</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">No market-cap data on assets, no filter control.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Preset filters ("High OI Spike", "Negative Funding")</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Buttons "Сплески" and "Топ OI" exist but are <code>disabled</code> with title "Coming soon"
+        (<code>Filters.tsx:36-48</code>). Need real predicates wired to the table.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Period toggle (1h / 4h / 24h)</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">Present via <code>PeriodToggle</code>, but it forces the column rework above to make sense.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Sortable columns</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">Click on header sorts asc/desc via <code>setSort</code>.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Click row → open analytical terminal for that asset</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes"><code>router.push('/myCabinet/screener/terminal/&lt;code&gt;')</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Page 2 — Analysis Terminal</h2>
+<p class="src">Route: <code>/myCabinet/screener/terminal/[assetId]</code> · Files: <code>terminal/[assetId]/page.tsx</code>, <code>MasterChart.tsx</code>, <code>LiquidationsFeed.tsx</code>, <code>TradesFeed.tsx</code>, <code>HeatmapPlugin.ts</code>.</p>
+
+<h3>Main chart panel (top ~60%)</h3>
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="requirement">TradingView-style candlestick chart</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes"><code>lightweight-charts v5</code> with crosshair OHLC legend.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Vertical volume bars on the main chart</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">Histogram series overlaid on pane 0.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Mode switch: standard chart ⇄ Footprint / Cluster chart</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        A custom <code>HeatmapSeriesView</code> renders bid/ask cells over candles, toggled by the
+        "Heatmap" button. The spec calls out <em>Footprint ("Cluster") chart</em> specifically — that
+        means per-candle bid/ask numbers, dominant side coloring and delta totals, not a heatmap.
+        Treat as a stub for the real footprint mode.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Infinite backward scroll / "load older"</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Button exists but logs a TODO (<code>MasterChart.tsx:204-207</code>). Needs the historical
+        prepend flow once backend is in.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Synchronized sub-panels (bottom ~40%)</h3>
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="requirement">Panel 1: Open Interest (line) + Volume (bars)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        OI exists as its own pane and Volume is on the main pane — not combined in one
+        subpanel as the spec asks. Reorganize so OI line and volume bars share one synced pane.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Panel 2: Cumulative Delta (VDelta) histogram/line</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">CVD line in pane 1.</td>
+    </tr>
+    <tr>
+      <td class="requirement">Panel 3: Liquidations (bars) + Funding rate (line overlay)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        Liq buy/sell are histograms in pane 2 ✅, but funding is a separate histogram pane.
+        Spec wants funding overlaid as a <em>line</em> on the liquidations bar chart.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Time-axis synchronization across all panels</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">All series share the same <code>IChartApi</code> instance.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Right sidebar</h3>
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="requirement">L2 Order Book ("Стакан") — visualized depth</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">
+        Not implemented. No depth component, no <code>OrderBook</code> types in <code>types.ts</code>.
+        Needs a live bid/ask ladder with depth bars and price-grouping control.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Time &amp; Sales tape (recent prints)</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        <code>TradesFeed</code> exists but is titled "Великі угоди" and filters to
+        <code>isLarge: true</code> only. Spec wants the standard prints tape (all recent trades),
+        ideally with a "large only" toggle layered on top.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Liquidations feed</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes">
+        Not explicitly in the spec sidebar list but already implemented in
+        <code>LiquidationsFeed.tsx</code> — keep it; it's useful next to the tape.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">On-chain data flow (large exchange in/outflows for this asset)</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">No panel, no types. Needs an event feed and probably a small icon + tooltip per row.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Global UI / UX</h2>
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes / Gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="requirement">Global timeframe selector that drives all terminal charts</td>
+      <td class="status"><span class="badge b-part">PARTIAL</span></td>
+      <td class="notes">
+        <code>useTerminalStore.timeframe</code> exists and the master chart reacts to it, but the
+        <code>TimeframeToggle</code> control lives inside <code>MasterChart</code>. The order book,
+        tape and on-chain panels — once added — must also subscribe to it. Lift the control to the
+        terminal page header so it visually governs the entire screen.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Telegram alert configuration UI (e.g. right-click on OI chart → "Set alert &gt;50% in 1h")</td>
+      <td class="status"><span class="badge b-miss">MISSING</span></td>
+      <td class="notes">
+        Nothing implemented. Needs: (a) chart context menu (custom, lightweight-charts doesn't ship one),
+        (b) an alert-rule modal, (c) an alerts list / management view.
+      </td>
+    </tr>
+    <tr>
+      <td class="requirement">Access gate / protected route for the screener</td>
+      <td class="status"><span class="badge b-ok">DONE</span></td>
+      <td class="notes"><code>ProtectedRoute</code> wraps both pages, plus a <code>ScreenerAccessGate</code> component is in place.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h2>Frontend work that needs to happen, by priority</h2>
+
+<h3>High priority — directly blocks the spec's stated workflow</h3>
+<ul class="gap-list">
+  <li><span class="priority p-high">P0</span> <b>Dashboard column rework:</b> show OI 1h / 4h / 24h side-by-side instead of one period-toggled column; add Volume Spike % and 1h-Total Liquidation $.</li>
+  <li><span class="priority p-high">P0</span> <b>Exchange filter</b> (Binance, MEXC, …) — add <code>exchange</code> to <code>AssetPair</code> and a select control to <code>Filters.tsx</code>.</li>
+  <li><span class="priority p-high">P0</span> <b>Real preset filters:</b> wire "High OI Spike" and "Negative Funding" buttons to predicates instead of leaving them disabled.</li>
+  <li><span class="priority p-high">P0</span> <b>Order Book (L2 depth) panel</b> in the terminal sidebar — currently absent.</li>
+  <li><span class="priority p-high">P0</span> <b>Footprint (Cluster) chart mode</b> — replace/extend the heatmap stub with a true footprint that prints bid/ask per price level and per-candle delta.</li>
+</ul>
+
+<h3>Medium priority — improves the analysis loop</h3>
+<ul class="gap-list">
+  <li><span class="priority p-med">P1</span> <b>Pattern recognition column</b> with a badge per row + tooltip; needs a <code>patterns[]</code> field on the asset.</li>
+  <li><span class="priority p-med">P1</span> <b>VDelta 1h + 4h dual column</b>, dropping period-toggle dependency.</li>
+  <li><span class="priority p-med">P1</span> <b>Funding-extreme warning highlighting</b> with thresholds (e.g. |fr| &gt; 0.05% = yellow, &gt; 0.1% = red).</li>
+  <li><span class="priority p-med">P1</span> <b>Terminal sub-panel reorganization:</b> OI+Volume in one pane, Liquidations+Funding-line overlay in another, to match the spec's three-panel layout.</li>
+  <li><span class="priority p-med">P1</span> <b>Time &amp; Sales tape:</b> show all prints by default; add a "large only" toggle. Keep <code>LiquidationsFeed</code> alongside.</li>
+  <li><span class="priority p-med">P1</span> <b>Global timeframe control in the page header</b>, governing master chart + sidebar panels.</li>
+</ul>
+
+<h3>Lower priority — value-add, not workflow-critical</h3>
+<ul class="gap-list">
+  <li><span class="priority p-low">P2</span> <b>Telegram alert configuration UI</b> — chart context menu + alert-rule modal + management page.</li>
+  <li><span class="priority p-low">P2</span> <b>On-chain events panel</b> (large exchange inflows/outflows for the active asset).</li>
+  <li><span class="priority p-low">P2</span> <b>Market-cap filter</b> (low-cap focus) — needs a marketCap field per pair.</li>
+  <li><span class="priority p-low">P2</span> <b>Infinite-history loader</b> on the master chart (already stubbed).</li>
+  <li><span class="priority p-low">P2</span> <b>Fixed 24h % column</b> for price, decoupled from the period toggle.</li>
+</ul>
+
+<hr/>
+
+<p class="src">
+  Scope note: this report only inventories <em>frontend</em> gaps relative to the spec.
+  All current data flows through <code>src/lib/screener/mock/</code> with <code>TODO(real-data)</code> markers
+  pointing to the future REST and WebSocket endpoints; wiring those is a separate backlog.
+</p>
+
+</div>
+</body>
+</html>
