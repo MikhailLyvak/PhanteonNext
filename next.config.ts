@@ -20,10 +20,15 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const target = process.env.SCREENER_SERVICE_URL ?? 'http://localhost:4000'
     return [
       {
         source: '/tron-proxy/:path*',
         destination: 'https://tron.algonix.org/:path*',
+      },
+      {
+        source: '/api/screener/:path*',
+        destination: `${target}/:path*`,
       },
     ]
   },
