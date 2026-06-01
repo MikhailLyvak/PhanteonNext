@@ -102,7 +102,7 @@ GET https://fapi.binance.com/fapi/v1/fundingRate?symbol={code}&limit={…} [&sta
 
 1. **Rate limits.** Binance public API allows ~1 200 weight/min/IP. Today the dashboard alone is one `/ticker/24hr` every second (weight 40). With one open terminal we also poll `/klines` + `/ticker/24hr` + `/openInterest` continuously. Many concurrent users on the same NAT can be banned for several minutes (HTTP 418/429).
 2. **CORS / availability risk.** Binance public API currently sets permissive CORS, but any tightening — or geo-blocks (e.g. US users) — breaks the screener in production with no fallback.
-3. **No WebSockets.** Every "live" value uses `setInterval`. Higher latency and traffic than a single stream, and miss-prone (a slow tab can lag behind without us noticing).
+3. **No live streams of any kind.** Every "live" value uses `setInterval`. Higher latency and traffic than a single server-push stream, and miss-prone (a slow tab can lag behind without us noticing).
 4. **Stale mocked fields.** The 1 s dashboard poll updates `lastPrice / openPrice / quoteVolume` from Binance, but OI / CVD / liquidations / funding columns are seeded mocks that never change. Users see a "live" table where half the numbers are frozen.
 5. **Silent failures.** Every `fetch` is wrapped in `try / catch {}` with no retry or surfacing. A transient network blip silently empties the table on the next render.
 6. **No auth boundary.** Nothing on the screener is gated. Once we add per-user features (favorites, alerts, bot orders) we'll need auth on the backend before they make sense.
@@ -117,22 +117,23 @@ GET https://fapi.binance.com/fapi/v1/fundingRate?symbol={code}&limit={…} [&sta
 
 | FE env var | Purpose | Example | Status |
 | --- | --- | --- | --- |
-| `NEXT_PUBLIC_SCREENER_API_BASE_URL` | REST base for all `/api/screener/*` calls | `https://api.example.com` | declared here, **not yet read by code** |
-| `NEXT_PUBLIC_SCREENER_WS_BASE_URL` | WS base for all `/ws/*` connections | `wss://api.example.com` | same |
+| `SCREENER_SERVICE_URL` (server-side, in `next.config.ts`) | Target the Next.js rewrite `/api/screener/:path*` → screener-service. REST and SSE both ride on this single base URL. | `http://localhost:4000` (dev), service URL in prod | declared in `screener-service/README.md` §11, **not yet wired in code** |
 
 Auth: **TBD — see Open Questions**. Assume for now that the same `local_access_token` cookie used elsewhere in the cabinet is in scope for both REST and WS.
 
 ## II.1 Endpoints overview
 
+Transport: REST for request-response, **SSE (Server-Sent Events)** for one-way server push to the client. SSE was chosen over WebSocket because client → server has nothing to say on these channels, `EventSource` handles reconnect automatically, and SSE rides over plain HTTP through the Next.js rewrites without a custom server. See §II.9.2 for lifecycle.
+
 | # | Transport | Path | Replaces | FE caller (target) |
 | --- | --- | --- | --- | --- |
 | 1 | REST `GET` | `/api/screener/pairs` | Binance `/exchangeInfo` + `mock/pairs.ts` icons | bootstrap |
 | 2 | REST `GET` | `/api/screener/dashboard` | Binance `/ticker/24hr` + mocked OI/CVD/liq/funding | `AssetsTable.tsx` |
-| 3 | WS | `/ws/all` | dashboard polling | `AssetsTable.tsx` (new) |
-| 4 | WS | `/ws/chart/{pair}?tf={tf}` | Binance `/klines` + `openInterestHist` + `takerlongshortRatio` + `fundingRate` + `mock/chart.ts` footprints | `MasterChart.tsx` |
+| 3 | SSE `GET` | `/api/screener/stream/dashboard` | the 1 s dashboard poll | `AssetsTable.tsx` (new) |
+| 4 | SSE `GET` | `/api/screener/stream/chart/{pair}?tf={tf}` | Binance `/klines` + `openInterestHist` + `takerlongshortRatio` + `fundingRate` + `mock/chart.ts` footprints | `MasterChart.tsx` |
 | 5 | REST `GET` | `/api/screener/chart/{pair}/history` | Binance `/klines` backward pagination | `MasterChart.tsx` `loadOlderCandles` |
-| 6 | WS | `/ws/liquidations-stream/{pair}` | `mock/feeds.ts` `subscribeLiquidations` | `LiquidationsFeed.tsx` |
-| 7 | WS | `/ws/trades-stream/{pair}` | `mock/feeds.ts` `subscribeTrades` | `TradesFeed.tsx` |
+| 6 | SSE `GET` | `/api/screener/stream/liquidations/{pair}` | `mock/feeds.ts` `subscribeLiquidations` | `LiquidationsFeed.tsx` |
+| 7 | SSE `GET` | `/api/screener/stream/trades/{pair}` | `mock/feeds.ts` `subscribeTrades` | `TradesFeed.tsx` |
 
 ## II.2 `GET /api/screener/pairs`
 
@@ -168,7 +169,7 @@ Notes:
 
 ## II.3 `GET /api/screener/dashboard`
 
-One-shot snapshot of metrics for every pair. The FE then merges incremental updates from `/ws/all` (§II.4) on top.
+One-shot snapshot of metrics for every pair. The FE then merges incremental updates from `/api/screener/stream/dashboard` (§II.4) on top.
 
 **Response 200**
 ```ts
@@ -215,19 +216,24 @@ Notes:
 - Funding may be absent for non-perp pairs.
 - Replaces both `mock/dashboard.ts` mocks **and** the 1 s Binance `/ticker/24hr` poll.
 
-## II.4 WS `/ws/all` — dashboard incremental updates
+## II.4 SSE `GET /api/screener/stream/dashboard` — dashboard incremental updates
 
-Pushes deltas for any subset of pairs whenever the BE has new data. FE listens for the lifetime of the screener page.
+Pushes patches for any subset of pairs whenever the BE has new data. FE opens an `EventSource` immediately after `/api/screener/dashboard` resolves and keeps it open for the lifetime of the screener page.
 
-**Connection**
-- Open immediately after `/api/screener/dashboard` resolves.
-- No subscribe message — server pushes for all pairs.
-- Heartbeat: **TBD**.
+**Frame format**
 
-**Server → client message**
+Standard SSE: each frame is a sequence of `event:` / `data:` lines terminated by a blank line.
+
+```
+event: dashboard_update
+data: {"ts":1735689600000,"updates":[{"code":"BTCUSDT","patch":{"ohlcv":{"close_latest":63450.1}}}]}
+
+```
+
+**Payload**
+
 ```ts
 interface DashboardUpdateMessage {
-  type: 'dashboard_update'
   ts: number   // server epoch millis
   updates: Array<{
     code: string                                 // pair, e.g. "BTCUSDT"
@@ -237,25 +243,28 @@ interface DashboardUpdateMessage {
 ```
 
 Notes:
-- Sending the whole `DashboardAssetData` is also acceptable (FE merges shallowly per top-level key).
-- Batching multiple pairs into one message is encouraged; 5 Hz upper bound is fine.
+- Sending the whole `DashboardAssetData` per pair is also acceptable (FE merges shallowly per top-level key).
+- Batching multiple pairs into one frame is encouraged; 5 Hz upper bound is fine.
+- Heartbeat / reconnect / error semantics: see §II.9.2.
 
-## II.5 WS `/ws/chart/{pair}?tf={tf}` — chart stream
+## II.5 SSE `GET /api/screener/stream/chart/{pair}?tf={tf}` — chart stream
 
-Single WS per open terminal page. Replaces `getChartInitFromBinance` (`MasterChart.tsx:430`) and the indicator polling that currently fans out to four Binance endpoints.
+One SSE connection per open terminal page. Replaces `getChartInitFromBinance` (`MasterChart.tsx:430`) and the indicator polling that currently fans out to four Binance endpoints.
 
-**Path params**
+**Path / query**
 - `pair` — `AssetPair.code`, e.g. `BTCUSDT`
 - `tf` — one of the 12 timeframes in `Timeframe` (`types.ts`):
   `1m | 5m | 15m | 30m | 1h | 2h | 4h | 8h | 12h | 1d | 1w | 1M`
 
-**Server → client: first message (init)**
-```ts
-interface ChartInitMessage {
-  type: 'init'
-  payload: ChartInitPayload
-}
+**First frame: `init`**
 
+```
+event: init
+data: <JSON of ChartInitPayload>
+
+```
+
+```ts
 interface ChartInitPayload {
   candles:      Candle[]          // up to ~5000 most recent, ascending by time
   footprints:   FootprintFrame[]  // one per candle, same time index
@@ -266,13 +275,13 @@ interface ChartInitPayload {
 }
 
 interface Candle {
-  time:           number   // UNIX seconds, aligned to tf boundary
-  open:           number
-  high:           number
-  low:            number
-  close:          number
-  volume:         number   // in base asset units (NOT USD)
-  takerBuyVolume?: number  // optional; used to derive CVD client-side if BE omits cvd[]
+  time:            number   // UNIX seconds, aligned to tf boundary
+  open:            number
+  high:            number
+  low:             number
+  close:           number
+  volume:          number   // in base asset units (NOT USD)
+  takerBuyVolume?: number   // optional; lets FE derive CVD client-side if cvd[] is absent
 }
 
 interface FootprintFrame {
@@ -288,15 +297,21 @@ interface FundingBar      { time: number; value: number }   // fraction (0.0001 
 interface OIPoint         { time: number; value: number }   // USD notional
 ```
 
-**Server → client: subsequent messages (update)**
+**Subsequent frames: `tick` and `bar_close`**
 
-Two flavours are acceptable; FE will support both.
+Two flavours; FE will support both.
 
-(a) *Replace last bar* — most common, fired on every tick within the current bar:
+(a) `event: tick` — most common, fired on every tick within the current bar (updates the last bar in place if `candle.time` matches the last bar's time, otherwise appends).
+
+```
+event: tick
+data: <JSON of TickPayload>
+
+```
+
 ```ts
-{
-  type: 'tick'
-  candle?:       Candle           // updates last bar in-place if time matches; appends otherwise
+interface TickPayload {
+  candle?:       Candle
   footprint?:    FootprintFrame
   cvd?:          CvdPoint
   liquidations?: LiquidationBar
@@ -305,15 +320,12 @@ Two flavours are acceptable; FE will support both.
 }
 ```
 
-(b) *Bar close* — fired once when a bar closes and a new one opens:
-```ts
-{ type: 'bar_close' /* same shape as 'tick' */ }
-```
+(b) `event: bar_close` — fired once when a bar closes and a new one opens. Same payload shape as `tick`.
 
 Notes:
 - `time` is **UNIX seconds**, not millis. Lightweight-Charts requires seconds.
 - Footprint `data` keys are strings to preserve precision across JSON. Use `.toFixed(8)`.
-- FE never sends client → server messages on this socket. If you need subscriptions, prefer separate URLs.
+- On reconnect (network blip → `EventSource` auto-reconnect) the server re-sends `init` then resumes ticks. FE replaces its local chart state on every `init`. See §II.9.2.
 - `LiquidationBar` here is real liquidation USD volume — **not** the taker-ratio stand-in used today (I.1.4).
 
 ## II.6 `GET /api/screener/chart/{pair}/history` — Load older candles
@@ -335,25 +347,33 @@ Powers backward-scroll on the chart. Returns *only* candles + footprints; second
 
 Today's FE backward-paginates Binance `/klines` directly (`MasterChart.tsx:172`). When this endpoint ships, that code path is swapped over.
 
-## II.7 WS `/ws/liquidations-stream/{pair}` — liquidation feed
+## II.7 SSE `GET /api/screener/stream/liquidations/{pair}` — liquidation feed
 
 Per-pair live liquidation events. Replaces `subscribeLiquidations` in `mock/feeds.ts`.
 
-**On connect: seed**
+**First frame: `seed`**
+
+```
+event: seed
+data: {"events":[…up to 50 LiquidationEvent…]}
+
+```
+
 ```ts
-interface LiqSeedMessage {
-  type: 'seed'
+interface LiqSeedPayload {
   events: LiquidationEvent[]   // up to 50 most recent, descending by ts
 }
 ```
 
-**Per-event**
-```ts
-interface LiqEventMessage {
-  type: 'event'
-  event: LiquidationEvent
-}
+**Per-event frame**
 
+```
+event: event
+data: <JSON of LiquidationEvent>
+
+```
+
+```ts
 interface LiquidationEvent {
   ts:     number             // epoch millis
   symbol: string             // pair code, e.g. "BTCUSDT"
@@ -365,9 +385,11 @@ interface LiquidationEvent {
 
 FE keeps a sliding window of 50 events (newest first).
 
-## II.8 WS `/ws/trades-stream/{pair}` — large-trades feed
+On reconnect: server re-sends `seed`, then resumes live events.
 
-Same shape as §II.7 but for large prints only (BE-side threshold).
+## II.8 SSE `GET /api/screener/stream/trades/{pair}` — large-trades feed
+
+Same shape as §II.7 but for large prints only. Server-side threshold is an EMA-based detector (see `screener-service/README.md` §6.1) — `volume` and `notional` test against a rolling per-pair baseline so small-cap tokens aren't drowned out by BTC-scale prints.
 
 ```ts
 interface TradeEvent {
@@ -380,17 +402,26 @@ interface TradeEvent {
 }
 ```
 
-Messages: `{ type: 'seed', events: TradeEvent[] }` on connect, then `{ type: 'event', event: TradeEvent }` per print.
+Frames: `event: seed` (once, payload `{ events: TradeEvent[] }`), then `event: event` per print (payload is the `TradeEvent` itself).
 
 ## II.9 Cross-cutting concerns
 
 ### II.9.1 Auth — **TBD**
 Cookie? Bearer in `Authorization` header? Token in WS query string (e.g. `?token=…`)? Subprotocol? Decide before any endpoint is shipped.
 
-### II.9.2 WS lifecycle — **TBD**
-- Heartbeat: ping interval and direction (server-ping vs client-ping)?
-- Reconnect: FE strategy will be exponential backoff (1 s → 30 s cap). On reconnect, does the client need to send a `since=<ts>` cursor, or does the server replay automatically?
-- Close codes: define BE-side close codes (auth failure, unknown pair, rate-limited).
+### II.9.2 SSE lifecycle
+
+- **Heartbeat.** Server sends `:keepalive\n\n` (SSE comment frame) every 15 s on every open stream. `EventSource` ignores comment frames silently — their only purpose is to keep proxies and load balancers from closing the idle TCP connection.
+- **Reconnect.** `EventSource` reconnects automatically on any disconnect (default 2–3 s delay). Server may set the delay explicitly by sending a `retry: <ms>` line once at connection start; not required.
+- **Resume on reconnect.** No cursor, no `Last-Event-ID` replay. Each stream re-establishes its own initial state:
+  - `/stream/chart/{pair}` re-sends `event: init` then resumes ticks. FE replaces local state.
+  - `/stream/liquidations/{pair}` and `/stream/trades/{pair}` re-send `event: seed` then resume events.
+  - `/stream/dashboard` resumes mid-stream without re-seed; clients keep their last known `DashboardAssetData` until the first `dashboard_update` lands.
+- **Stopping reconnect.** If the server wants the client to give up (e.g. `pair` was delisted), it returns HTTP `204 No Content` on the next reconnect — `EventSource` treats `204` as terminal and stops.
+- **Connect-time errors.** Standard HTTP status codes:
+  - `404` — unknown pair.
+  - `400` — bad `tf` query parameter.
+  - `503` — upstream not connected (Coinank or Binance WS is down). Client should back off and retry.
 
 ### II.9.3 Errors
 REST errors should use:
@@ -415,11 +446,11 @@ USD turnover values can exceed `Number.MAX_SAFE_INTEGER` for BTC. Either keep th
 | --- | --- | --- |
 | `GET /api/screener/pairs` | `src/api/Screener/getBinanceFuturesPairs.ts` (call site) + `src/lib/screener/mock/pairs.ts` (icons) | Binance `/exchangeInfo` |
 | `GET /api/screener/dashboard` | `src/app/components/Screener/AssetsTable.tsx` initial load + `src/lib/screener/mock/dashboard.ts` (delete) + `src/app/components/Screener/LivePrice.tsx` (header price) | Binance `/ticker/24hr` (`AssetsTable`, `LivePrice`) |
-| WS `/ws/all` | `src/app/components/Screener/AssetsTable.tsx` (replace `setInterval`) | the 1 s dashboard poll |
-| WS `/ws/chart/{pair}` | `src/app/components/Screener/MasterChart.tsx` (replace `getChartInitFromBinance` + the 1 s/5 s polls) | Binance `/klines`, `/openInterest`, `/openInterestHist`, `/takerlongshortRatio`, `/fundingRate` |
+| SSE `/api/screener/stream/dashboard` | `src/app/components/Screener/AssetsTable.tsx` (replace `setInterval` with `EventSource`) | the 1 s dashboard poll |
+| SSE `/api/screener/stream/chart/{pair}` | `src/app/components/Screener/MasterChart.tsx` (replace `getChartInitFromBinance` + the 1 s/5 s polls) | Binance `/klines`, `/openInterest`, `/openInterestHist`, `/takerlongshortRatio`, `/fundingRate` |
 | `GET /api/screener/chart/{pair}/history` | `src/app/components/Screener/MasterChart.tsx` `loadOlderCandles` | Binance `/klines` backward pagination |
-| WS `/ws/liquidations-stream/{pair}` | `src/app/components/Screener/LiquidationsFeed.tsx` | `mock/feeds.ts` `subscribeLiquidations` |
-| WS `/ws/trades-stream/{pair}` | `src/app/components/Screener/TradesFeed.tsx` | `mock/feeds.ts` `subscribeTrades` |
+| SSE `/api/screener/stream/liquidations/{pair}` | `src/app/components/Screener/LiquidationsFeed.tsx` | `mock/feeds.ts` `subscribeLiquidations` |
+| SSE `/api/screener/stream/trades/{pair}` | `src/app/components/Screener/TradesFeed.tsx` | `mock/feeds.ts` `subscribeTrades` |
 
 ---
 
@@ -427,14 +458,14 @@ USD turnover values can exceed `Number.MAX_SAFE_INTEGER` for BTC. Either keep th
 
 These must be resolved before BE integration starts.
 
-- [ ] **Auth model** for REST and WS. Cookie / bearer / query token / subprotocol?
-- [ ] **WS heartbeat** — interval and direction. Native ping/pong frames or app-level `{type:'ping'}`?
-- [ ] **WS reconnect / resume** — does the client send `since=<ts>` or does the server replay automatically?
+- [ ] **Auth model** for REST and SSE. `EventSource` cannot set custom request headers, so any auth must travel as a **cookie** (preferred, matches the rest of the cabinet) or a **query-string token**. Bearer-in-`Authorization` is not an option for SSE.
 - [ ] **Numeric format** for large USD values — `number` everywhere vs. `string` for turnovers.
-- [ ] **`/ws/all` message granularity** — patch-per-pair (recommended) or full-snapshot replays.
+- [ ] **`/stream/dashboard` message granularity** — patch-per-pair (recommended) or full-snapshot replays.
 - [ ] **History pagination** — by `before=<ts>` (recommended) or by `page`/`offset`.
 - [ ] **Funding-rate semantics** — fraction (`0.0001 = 0.01 %`) or basis points? FE currently assumes fraction.
-- [ ] **Rate limits** — per-IP/per-token caps on both REST and WS.
-- [ ] **Close codes** for WS errors (auth failed, unknown pair, banned).
-- [ ] **Liquidations source** — backend must use real liquidation streams; the current taker-ratio stand-in (§I.1.4) must not be carried forward.
-- [ ] **Migration order** — which endpoint ships first? Recommended: §II.2 (pairs) and §II.3 (dashboard) together, then §II.4 WS, then chart, then feeds.
+- [ ] **Rate limits** — per-IP/per-token caps on both REST and SSE connections.
+- [ ] **Liquidations source** — backend must use real liquidation streams (Coinank `liqOrder@All@All@1m` per `screener-service/README.md` §5.2); the current taker-ratio stand-in (§I.1.4) must not be carried forward.
+- [ ] **Migration order** — sequenced in `screener-service/README.md` §14. Summary: §II.2 (pairs) + §II.3 (dashboard) first, then §II.4 SSE, then chart, then feeds.
+
+Resolved (kept here for trail):
+- ~~WS heartbeat / reconnect / resume / close codes~~ — replaced by SSE lifecycle, see §II.9.2.
