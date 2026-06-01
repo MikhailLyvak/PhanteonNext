@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { AssetPair, TradeEvent } from '@/lib/screener/types'
-import { subscribeTrades } from '@/lib/screener/mock/feeds'
+import { openTradesStream } from '@/api/Screener/streams'
 import { formatPrice, formatUsdShort } from '@/lib/screener/format'
 
 interface Props {
@@ -18,11 +18,15 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 	const [events, setEvents] = useState<TradeEvent[]>([])
 
 	useEffect(() => {
-		// TODO(real-data): swap mock for new WebSocket(WS_BASE + '/ws/trades-stream/' + pair.code).
-		const { seed, unsubscribe } = subscribeTrades(pair.code, evt => {
-			setEvents(prev => [evt, ...prev].slice(0, 50))
+		setEvents([])
+		const unsubscribe = openTradesStream(pair.code, {
+			onSeed: seed => {
+				setEvents(seed.slice(0, 50))
+			},
+			onEvent: evt => {
+				setEvents(prev => [evt, ...prev].slice(0, 50))
+			},
 		})
-		setEvents(seed)
 		return unsubscribe
 	}, [pair.code])
 
