@@ -9,7 +9,7 @@ import MasterChart from '@/app/components/Screener/MasterChart'
 import FeedTabs from '@/app/components/Screener/FeedTabs'
 import TimeframeToggle from '@/app/components/Screener/TimeframeToggle'
 import LivePrice from '@/app/components/Screener/LivePrice'
-import { getFuturesPairByCode } from '@/api/Screener/getBinanceFuturesPairs'
+import { getPairs } from '@/api/Screener/client'
 import { AssetPair } from '@/lib/screener/types'
 
 const TerminalPage = () => {
@@ -19,8 +19,8 @@ const TerminalPage = () => {
 	const [pair, setPair] = useState<AssetPair | null | undefined>(undefined)
 
 	useEffect(() => {
-		getFuturesPairByCode(assetId)
-			.then(p => setPair(p ?? null))
+		getPairs()
+			.then(pairs => setPair(pairs.find(p => p.code === assetId) ?? null))
 			.catch(() => setPair(null))
 	}, [assetId])
 

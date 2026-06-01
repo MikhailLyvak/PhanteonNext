@@ -1,6 +1,29 @@
 import { LiquidationEvent, TradeEvent } from '../types'
-import { getBasePrice } from './pairs'
 import { hashString, mulberry32 } from './rng'
+
+// Inlined from former mock/pairs.ts (scheduled for deletion in steps 4-8).
+const COIN_BASE_PRICE: Record<string, number> = {
+	BTC: 96500,
+	ETH: 3400,
+	SOL: 215,
+	XRP: 2.4,
+	BNB: 690,
+	DOGE: 0.38,
+	ADA: 1.05,
+	AVAX: 42,
+	TRX: 0.26,
+	LINK: 22.5,
+	DOT: 8.2,
+	MATIC: 0.58,
+	LTC: 115,
+	BCH: 525,
+	NEAR: 6.3,
+	ARB: 0.92,
+}
+
+function getBasePrice(coin: string): number {
+	return COIN_BASE_PRICE[coin] ?? 1
+}
 
 function seedEvents<T extends LiquidationEvent | TradeEvent>(
 	pairCode: string,

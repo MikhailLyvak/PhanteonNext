@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowDown, ArrowUp, Columns3 } from 'lucide-react'
 import { useScreenerStore, SortKey } from '@/store/Screener/useScreenerStore'
 import { getDashboardSnapshot } from '@/lib/screener/mock/dashboard'
-import { getBinanceFuturesPairs } from '@/api/Screener/getBinanceFuturesPairs'
+import { getPairs } from '@/api/Screener/client'
 import { AssetPair, DashboardAssetData } from '@/lib/screener/types'
 import TableRow from './TableRow'
 import Pagination from './Pagination'
@@ -69,7 +69,7 @@ const AssetsTable: React.FC = () => {
 		let cachedPairs: AssetPair[] = []
 		setLoading(true)
 
-		getBinanceFuturesPairs()
+		getPairs()
 			.then(async (fetchedPairs) => {
 				if (!active) return
 				cachedPairs = fetchedPairs
