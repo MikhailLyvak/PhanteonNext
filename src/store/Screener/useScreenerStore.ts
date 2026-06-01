@@ -1,7 +1,12 @@
 import { create } from 'zustand'
 import type { AssetPair, DashboardSnapshot, DashboardUpdateMessage, DeepPartial } from '@/lib/screener/types'
-import { getDashboard, getPairs } from '@/api/Screener/client'
+import { getDashboard, getHealth, getPairs } from '@/api/Screener/client'
 import { openDashboardStream } from '@/api/Screener/streams'
+
+const HEALTH_POLL_MS = 30_000
+const SILENCE_TICK_MS = 5_000
+const SILENCE_THRESHOLD_MS = 15_000
+const HEALTH_FAILURE_THRESHOLD = 2
 
 export type SortKey =
 	| 'pair'
@@ -83,8 +88,11 @@ export const useScreenerStore = create<ScreenerState>((set, get) => ({
 	subscribe: () => {
 		let cancelled = false
 		let close: (() => void) | null = null
+		let lastEventTs = Date.now()
+		let consecutiveFailures = 0
 
 		const handleEvent = (msg: DashboardUpdateMessage) => {
+			lastEventTs = Date.now()
 			const current = get().data
 			const next: DashboardSnapshot = { ...current }
 			for (const u of msg.updates) {
@@ -96,15 +104,54 @@ export const useScreenerStore = create<ScreenerState>((set, get) => ({
 			set({ data: next, healthStatus: 'live' })
 		}
 
+		const probeHealth = async () => {
+			try {
+				const h = await getHealth()
+				if (cancelled) return
+				if (h.status === 'degraded') {
+					consecutiveFailures = 0
+					set({ healthStatus: 'disconnected' })
+					return
+				}
+				consecutiveFailures = 0
+				// Only flip to 'live' if we are not currently 'stale' — the silence
+				// watchdog owns the stale->live transition (which happens on next event).
+				if (get().healthStatus !== 'stale') {
+					set({ healthStatus: 'live' })
+				}
+			} catch {
+				if (cancelled) return
+				consecutiveFailures += 1
+				if (consecutiveFailures >= HEALTH_FAILURE_THRESHOLD) {
+					set({ healthStatus: 'disconnected' })
+				}
+			}
+		}
+
+		const healthInterval: ReturnType<typeof setInterval> = setInterval(probeHealth, HEALTH_POLL_MS)
+		const silenceInterval: ReturnType<typeof setInterval> = setInterval(() => {
+			if (cancelled) return
+			const silentFor = Date.now() - lastEventTs
+			if (silentFor > SILENCE_THRESHOLD_MS && get().healthStatus === 'live') {
+				set({ healthStatus: 'stale' })
+			}
+		}, SILENCE_TICK_MS)
+
+		// Fire an immediate health probe so the badge has signal before the first poll tick.
+		void probeHealth()
+
 		;(async () => {
 			try {
 				const [pairs, snapshot] = await Promise.all([getPairs(), getDashboard()])
 				if (cancelled) return
 				set({ pairs, data: snapshot })
+				lastEventTs = Date.now()
 				close = openDashboardStream({
 					onEvent: handleEvent,
 					onError: () => {
-						// Reconnect/health logic deferred to Step 9.
+						// Chart and trades streams auto-reconnect; transient SSE errors
+						// for the dashboard stream are NOT surfaced as a status change.
+						// The /health poll + silence watchdog drive healthStatus.
 					},
 				})
 			} catch (err) {
@@ -117,6 +164,8 @@ export const useScreenerStore = create<ScreenerState>((set, get) => ({
 
 		return () => {
 			cancelled = true
+			clearInterval(healthInterval)
+			clearInterval(silenceInterval)
 			if (close) close()
 		}
 	},
