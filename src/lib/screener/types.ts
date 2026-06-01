@@ -107,3 +107,33 @@ export interface TradeEvent {
 	volume: number
 	isLarge: true
 }
+
+export type DashboardSnapshot = Record<string, DashboardAssetData>
+
+export type DeepPartial<T> = {
+	[K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
+
+export interface DashboardUpdateMessage {
+	ts: number
+	updates: Array<{ code: string; patch: DeepPartial<DashboardAssetData> }>
+}
+
+export interface TickPayload {
+	candle?: Candle
+	footprint?: FootprintFrame
+	cvd?: CvdPoint
+	liquidations?: LiquidationBar
+	funding?: FundingBar
+	oi?: OIPoint
+}
+
+export interface ChartHistoryResponse {
+	candles: Candle[]
+	footprints: FootprintFrame[]
+}
+
+export interface ScreenerHealth {
+	status: 'ok' | 'degraded'
+	upstream?: Record<string, { last_msg_ms_ago: number }>
+}
