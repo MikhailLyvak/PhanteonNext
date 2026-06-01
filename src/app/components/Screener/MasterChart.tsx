@@ -12,24 +12,12 @@ import {
 	LineStyle,
 	Time,
 } from 'lightweight-charts'
-import { AssetPair, Candle, ChartInitPayload } from '@/lib/screener/types'
+import { AssetPair } from '@/lib/screener/types'
 import {
 	useTerminalStore,
 	INDICATOR_ORDER,
 	INDICATOR_LABELS,
 } from '@/store/Screener/useTerminalStore'
-import { getChartInitFromBinance, fetchKlines } from '@/api/Screener/getBinanceKlines'
-import {
-	fetchOIHistory,
-	fetchCurrentOI,
-	fetchTakerHistory,
-	fetchFundingHistory,
-	computeCVDFromCandles,
-	TF_TO_INDICATOR_PERIOD,
-	aggregateOI,
-	aggregateLiquidations,
-	aggregateFunding,
-} from '@/api/Screener/getBinanceIndicators'
 import {
 	toCandlestickData,
 	toFundingLineData,
@@ -70,12 +58,8 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		funding: null,
 		oi: null,
 	})
-	const payloadRef = useRef<ChartInitPayload | null>(null)
 	const loadingOlderRef = useRef(false)
 	const allLoadedRef = useRef(false)
-	const oiAllLoadedRef = useRef(false)
-	const liqAllLoadedRef = useRef(false)
-	const fundingAllLoadedRef = useRef(false)
 
 	const timeframe = useTerminalStore(s => s.timeframe)
 	const heatmapVisible = useTerminalStore(s => s.heatmapVisible)
@@ -86,6 +70,57 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	const [livePrice, setLivePrice] = useState<number | null>(null)
 	const [priceDir, setPriceDir] = useState<'up' | 'down' | 'flat'>('flat')
 	const prevPriceRef = useRef<number>(0)
+
+	// Apply current store data to every existing series. Used after the chart is
+	// rebuilt (indicator toggle / pair precision change) and after init events.
+	const applyAllFromStore = (fitContent: boolean) => {
+		const s = useTerminalStore.getState()
+		candleRef.current?.setData(toCandlestickData(s.candles))
+		const refs = indicatorRefs.current
+		refs.volume?.setData(toVolumeData(s.candles))
+		refs.cvd?.setData(toLineData(s.cvd))
+		refs.liqBuy?.setData(toLiquidationBuy(s.liquidations))
+		refs.liqSell?.setData(toLiquidationSell(s.liquidations))
+		refs.funding?.setData(toFundingLineData(s.funding))
+		refs.oi?.setData(toLineData(s.oi))
+
+		if (heatmapRef.current) {
+			const heatmapData: HeatmapDatum[] = s.footprints.map(f => {
+				const cells = Object.entries(f.data).map(([priceStr, v]) => ({
+					price: Number(priceStr),
+					b: v.b,
+					s: v.s,
+				}))
+				const prices = cells.map(c => c.price)
+				return {
+					time: toTime(f.time),
+					cells,
+					minPrice: Math.min(...prices),
+					maxPrice: Math.max(...prices),
+				} as HeatmapDatum
+			})
+			heatmapRef.current.setData(heatmapData as unknown as { time: Time }[])
+			heatmapRef.current.applyOptions({ visible: heatmapVisible })
+		}
+
+		if (fitContent && s.candles.length > 0) {
+			const total = s.candles.length
+			const visible = Math.min(100, total)
+			requestAnimationFrame(() => {
+				chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
+			})
+		}
+
+		const lastCandle = s.candles[s.candles.length - 1]
+		if (lastCandle) {
+			const prev = prevPriceRef.current
+			if (prev && lastCandle.close !== prev) {
+				setPriceDir(lastCandle.close > prev ? 'up' : 'down')
+			}
+			prevPriceRef.current = lastCandle.close
+			setLivePrice(lastCandle.close)
+		}
+	}
 
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -170,44 +205,24 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	}, [pair.precision])
 
 	const loadOlderCandles = async () => {
-		const p = payloadRef.current
-		if (!p || p.candles.length === 0 || loadingOlderRef.current || allLoadedRef.current) return
+		const s = useTerminalStore.getState()
+		if (s.candles.length === 0 || loadingOlderRef.current || allLoadedRef.current) return
 		loadingOlderRef.current = true
 		try {
-			const earliestMs = p.candles[0].time * 1000 - 1
+			const earliestSec = s.candles[0].time
+			const beforeMs = earliestSec * 1000 - 1
 			const tf = useTerminalStore.getState().timeframe
-			const batch1 = await fetchKlines(pair.code, tf, 1500, { endTime: earliestMs })
-			if (batch1.length === 0) {
+			const before = s.candles.length
+			await useTerminalStore.getState().loadOlder(beforeMs, tf, 500)
+			const after = useTerminalStore.getState().candles.length
+			const prepended = after - before
+			if (prepended <= 0) {
 				allLoadedRef.current = true
 				return
 			}
-			const older = batch1
-			if (older.length === 0) {
-				allLoadedRef.current = true
-				return
-			}
-
-			// Fetch older Funding
-			if (!fundingAllLoadedRef.current && p.funding.length > 0) {
-				try {
-					const batch = await fetchFundingHistory(pair.code, 1000, undefined, p.funding[0].time * 1000 - 1)
-					if (batch.length > 0) {
-						const earliest = p.funding[0].time
-						const filtered = batch.filter(d => d.time < earliest)
-						if (filtered.length > 0) p.funding = [...filtered, ...p.funding]
-						else fundingAllLoadedRef.current = true
-					} else {
-						fundingAllLoadedRef.current = true
-					}
-				} catch { fundingAllLoadedRef.current = true }
-			}
-
 			const chart = chartRef.current
 			const range = chart?.timeScale().getVisibleLogicalRange()
-			const prepended = older.length
-			p.candles = [...older, ...p.candles]
-			p.cvd = computeCVDFromCandles(p.candles)
-			applySeriesData(false)
+			applyAllFromStore(false)
 			if (chart && range) {
 				chart.timeScale().setVisibleLogicalRange({
 					from: range.from + prepended,
@@ -221,311 +236,206 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		}
 	}
 
-	const applyIndicatorData = () => {
-		const p = payloadRef.current
-		if (!p) return
-		const tf = useTerminalStore.getState().timeframe
-		const refs = indicatorRefs.current
-		const aggLiq = aggregateLiquidations(p.liquidations, p.candles, tf)
-		refs.liqBuy?.setData(toLiquidationBuy(aggLiq))
-		refs.liqSell?.setData(toLiquidationSell(aggLiq))
-		refs.funding?.setData(toFundingLineData(aggregateFunding(p.funding, p.candles, tf)))
-		refs.oi?.setData(toLineData(aggregateOI(p.oi, p.candles, tf)))
-	}
-
-	const applySeriesData = (fitContent = true) => {
-		const p = payloadRef.current
-		if (!p) return
-		const tf = useTerminalStore.getState().timeframe
-		candleRef.current?.setData(toCandlestickData(p.candles))
-		const refs = indicatorRefs.current
-		refs.volume?.setData(toVolumeData(p.candles))
-		refs.cvd?.setData(toLineData(p.cvd))
-		const aggLiq = aggregateLiquidations(p.liquidations, p.candles, tf)
-		refs.liqBuy?.setData(toLiquidationBuy(aggLiq))
-		refs.liqSell?.setData(toLiquidationSell(aggLiq))
-		refs.funding?.setData(toFundingLineData(aggregateFunding(p.funding, p.candles, tf)))
-		refs.oi?.setData(toLineData(aggregateOI(p.oi, p.candles, tf)))
-
-		if (heatmapRef.current) {
-			const heatmapData: HeatmapDatum[] = p.footprints.map(f => {
-				const cells = Object.entries(f.data).map(([priceStr, v]) => ({
-					price: Number(priceStr),
-					b: v.b,
-					s: v.s,
-				}))
-				const prices = cells.map(c => c.price)
-				return {
-					time: toTime(f.time),
-					cells,
-					minPrice: Math.min(...prices),
-					maxPrice: Math.max(...prices),
-				} as HeatmapDatum
-			})
-			heatmapRef.current.setData(heatmapData as unknown as { time: Time }[])
-			heatmapRef.current.applyOptions({ visible: heatmapVisible })
-		}
-		if (fitContent && p.candles.length > 0) {
-			const total = p.candles.length
-			const visible = Math.min(100, total)
-			requestAnimationFrame(() => {
-				chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
-			})
-		}
-	}
-
+	// Subscribe to /stream/chart for this pair+tf, and drive the chart imperatively
+	// from store subscriptions so per-tick re-renders stay out of React.
 	useEffect(() => {
-		let cancelled = false
-		let pollTimer: ReturnType<typeof setInterval> | null = null
-		let indicatorPollTimer: ReturnType<typeof setInterval> | null = null
 		allLoadedRef.current = false
 		loadingOlderRef.current = false
-		oiAllLoadedRef.current = false
-		liqAllLoadedRef.current = false
-		fundingAllLoadedRef.current = false
 
-		const period = TF_TO_INDICATOR_PERIOD[timeframe]
+		// Track per-array length so we can decide between setData and update.
+		let lastCandlesLen = 0
+		let lastFootprintsLen = 0
+		let lastCvdLen = 0
+		let lastLiqLen = 0
+		let lastFundingLen = 0
+		let lastOiLen = 0
 
-		const pollLatestKline = async () => {
-			try {
-				const res = await fetch(
-					`https://fapi.binance.com/fapi/v1/klines?symbol=${pair.code}&interval=${timeframe}&limit=1`
-				)
-				if (!res.ok || cancelled) return
-				const raw: unknown[][] = await res.json()
-				if (raw.length === 0) return
-				const k = raw[0]
-				const candle: Candle = {
-					time: Math.floor((k[0] as number) / 1000),
-					open: parseFloat(k[1] as string),
-					high: parseFloat(k[2] as string),
-					low: parseFloat(k[3] as string),
-					close: parseFloat(k[4] as string),
-					volume: parseFloat(k[5] as string),
-					takerBuyVolume: parseFloat(k[9] as string),
-				}
-
+		const handleCandles = () => {
+			const s = useTerminalStore.getState()
+			const arr = s.candles
+			if (arr.length === 0) {
+				candleRef.current?.setData([])
+				indicatorRefs.current.volume?.setData([])
+				lastCandlesLen = 0
+				return
+			}
+			// Full replace when length jumps non-monotonically (init / prepend / clear).
+			if (arr.length < lastCandlesLen || arr.length - lastCandlesLen > 1) {
+				candleRef.current?.setData(toCandlestickData(arr))
+				indicatorRefs.current.volume?.setData(toVolumeData(arr))
+			} else {
+				// Update last only (tick or append-by-one).
+				const last = arr[arr.length - 1]
 				candleRef.current?.update({
-					time: toTime(candle.time),
-					open: candle.open,
-					high: candle.high,
-					low: candle.low,
-					close: candle.close,
+					time: toTime(last.time),
+					open: last.open,
+					high: last.high,
+					low: last.low,
+					close: last.close,
 				})
-
-				const prev = prevPriceRef.current
-				if (prev && candle.close !== prev) {
-					setPriceDir(candle.close > prev ? 'up' : 'down')
-				}
-				prevPriceRef.current = candle.close
-				setLivePrice(candle.close)
-
-				const refs = indicatorRefs.current
-				if (refs.volume) {
-					refs.volume.update({
-						time: toTime(candle.time),
-						value: candle.volume,
-						color: candle.close >= candle.open
+				indicatorRefs.current.volume?.update({
+					time: toTime(last.time),
+					value: last.volume,
+					color:
+						last.close >= last.open
 							? 'rgba(74,222,128,0.45)'
 							: 'rgba(248,113,113,0.45)',
-					})
-				}
-
-				const p = payloadRef.current
-				if (p) {
-					const last = p.candles[p.candles.length - 1]
-					if (last && last.time === candle.time) {
-						p.candles[p.candles.length - 1] = candle
-					} else {
-						p.candles.push(candle)
-					}
-
-					// Update CVD
-					if (refs.cvd) {
-						const delta = candle.takerBuyVolume - (candle.volume - candle.takerBuyVolume)
-						const prevCvd = p.cvd.length > 1 ? p.cvd[p.cvd.length - 2]?.value ?? 0 : 0
-						const isUpdate = p.cvd.length > 0 && p.cvd[p.cvd.length - 1].time === candle.time
-						const cvdValue = isUpdate ? prevCvd + delta : (p.cvd[p.cvd.length - 1]?.value ?? 0) + delta
-						const cvdPoint = { time: candle.time, value: cvdValue }
-						if (isUpdate) {
-							p.cvd[p.cvd.length - 1] = cvdPoint
-						} else {
-							p.cvd.push(cvdPoint)
-						}
-						refs.cvd.update({ time: toTime(cvdPoint.time), value: cvdPoint.value })
-					}
-				}
-			} catch {
-				// ignore poll errors
+				})
 			}
+			lastCandlesLen = arr.length
+
+			// Live-price chrome.
+			const prev = prevPriceRef.current
+			const close = arr[arr.length - 1].close
+			if (prev && close !== prev) {
+				setPriceDir(close > prev ? 'up' : 'down')
+			}
+			prevPriceRef.current = close
+			setLivePrice(close)
 		}
 
-		const pollIndicators = async () => {
-			try {
-				const p = payloadRef.current
-				if (!p || cancelled) return
-				const refs = indicatorRefs.current
-
-				const [oiResult, takerResult, fundingResult] = await Promise.allSettled([
-					fetchCurrentOI(pair.code),
-					fetchTakerHistory(pair.code, period, 1),
-					fetchFundingHistory(pair.code, 1),
-				])
-
-				if (cancelled) return
-
-				if (oiResult.status === 'fulfilled' && refs.oi) {
-					const { oi, time } = oiResult.value
-					const point = { time, value: oi }
-					const data = p.oi
-					if (data.length > 0 && data[data.length - 1].time === point.time) {
-						data[data.length - 1] = point
-					} else {
-						data.push(point)
-					}
-					refs.oi.update({ time: toTime(point.time), value: point.value })
-				}
-
-				if (takerResult.status === 'fulfilled' && takerResult.value.length > 0) {
-					const d = takerResult.value[0]
-					const data = p.liquidations
-					if (data.length > 0 && data[data.length - 1].time === d.time) {
-						data[data.length - 1] = d
-					} else {
-						data.push(d)
-					}
-					if (refs.liqBuy) {
-						refs.liqBuy.update({
-							time: toTime(d.time),
-							value: d.buy_volume,
-							color: 'rgba(74,222,128,0.7)',
-						})
-					}
-					if (refs.liqSell) {
-						refs.liqSell.update({
-							time: toTime(d.time),
-							value: -d.sell_volume,
-							color: 'rgba(248,113,113,0.7)',
-						})
-					}
-				}
-
-				if (fundingResult.status === 'fulfilled' && fundingResult.value.length > 0 && refs.funding) {
-					const f = fundingResult.value[fundingResult.value.length - 1]
-					const data = p.funding
-					if (data.length > 0 && data[data.length - 1].time === f.time) {
-						data[data.length - 1] = f
-					} else {
-						data.push(f)
-					}
-					refs.funding.update({ time: toTime(f.time), value: f.value })
-				}
-			} catch {
-				// ignore indicator poll errors
+		const handleFootprints = () => {
+			const s = useTerminalStore.getState()
+			const arr = s.footprints
+			// Heatmap series uses setData; cheap enough not to micro-optimise yet.
+			if (heatmapRef.current && (arr.length !== lastFootprintsLen || arr.length === 0)) {
+				const data: HeatmapDatum[] = arr.map(f => {
+					const cells = Object.entries(f.data).map(([priceStr, v]) => ({
+						price: Number(priceStr),
+						b: v.b,
+						s: v.s,
+					}))
+					const prices = cells.map(c => c.price)
+					return {
+						time: toTime(f.time),
+						cells,
+						minPrice: Math.min(...prices),
+						maxPrice: Math.max(...prices),
+					} as HeatmapDatum
+				})
+				heatmapRef.current.setData(data as unknown as { time: Time }[])
 			}
+			lastFootprintsLen = arr.length
 		}
 
-		const load = async () => {
-			try {
-				const payload = await getChartInitFromBinance(pair.code, timeframe)
-				if (cancelled) return
-				payloadRef.current = payload
-				const lastCandle = payload.candles[payload.candles.length - 1]
-				if (lastCandle) {
-					setLivePrice(lastCandle.close)
-					prevPriceRef.current = lastCandle.close
-				}
-
-				// Show candles + CVD immediately
-				payload.cvd = computeCVDFromCandles(payload.candles)
-				applySeriesData()
-				pollTimer = setInterval(pollLatestKline, 1000)
-
-				// Load indicators in background, start indicator poll after done
-				loadIndicators(payload)
-			} catch (err) {
-				console.error('[screener] Failed to fetch Binance klines:', err)
+		const handleCvd = () => {
+			const arr = useTerminalStore.getState().cvd
+			const ref = indicatorRefs.current.cvd
+			if (!ref) {
+				lastCvdLen = arr.length
+				return
 			}
+			if (arr.length === 0) {
+				ref.setData([])
+			} else if (arr.length < lastCvdLen || arr.length - lastCvdLen > 1) {
+				ref.setData(toLineData(arr))
+			} else {
+				const last = arr[arr.length - 1]
+				ref.update({ time: toTime(last.time), value: last.value })
+			}
+			lastCvdLen = arr.length
 		}
 
-		const loadIndicators = async (payload: ChartInitPayload) => {
-			const [currentOIResult, fundingResult] = await Promise.allSettled([
-				fetchCurrentOI(pair.code),
-				fetchFundingHistory(pair.code),
-			])
-			if (cancelled) return
-
-			if (fundingResult.status === 'fulfilled') {
-				payload.funding = fundingResult.value
-				applyIndicatorData()
+		const handleLiq = () => {
+			const arr = useTerminalStore.getState().liquidations
+			const buy = indicatorRefs.current.liqBuy
+			const sell = indicatorRefs.current.liqSell
+			if (!buy && !sell) {
+				lastLiqLen = arr.length
+				return
 			}
-
-			// Fetch all OI data using endTime backwards pagination
-			try {
-				const first = await fetchOIHistory(pair.code, period, 500)
-				if (first.length > 0) {
-					payload.oi = first
-					applyIndicatorData()
-					while (!cancelled) {
-						try {
-							const endMs = payload.oi[0].time * 1000 - 1
-							const batch = await fetchOIHistory(pair.code, period, 500, { endTime: endMs })
-							if (batch.length === 0) break
-							const filtered = batch.filter(d => d.time < payload.oi[0].time)
-							if (filtered.length === 0) break
-							payload.oi = [...filtered, ...payload.oi]
-							if (batch.length < 500) break
-						} catch { break }
-					}
-				}
-			} catch { /* no OI data available */ }
-			oiAllLoadedRef.current = true
-
-			if (currentOIResult.status === 'fulfilled') {
-				const { oi, time } = currentOIResult.value
-				const point = { time, value: oi }
-				const data = payload.oi
-				if (data.length > 0 && data[data.length - 1].time === point.time) {
-					data[data.length - 1] = point
-				} else if (data.length === 0 || point.time > data[data.length - 1].time) {
-					data.push(point)
-				}
+			if (arr.length === 0) {
+				buy?.setData([])
+				sell?.setData([])
+			} else if (arr.length < lastLiqLen || arr.length - lastLiqLen > 1) {
+				buy?.setData(toLiquidationBuy(arr))
+				sell?.setData(toLiquidationSell(arr))
+			} else {
+				const last = arr[arr.length - 1]
+				buy?.update({
+					time: toTime(last.time),
+					value: last.buy_volume,
+					color: 'rgba(74,222,128,0.7)',
+				})
+				sell?.update({
+					time: toTime(last.time),
+					value: -last.sell_volume,
+					color: 'rgba(248,113,113,0.7)',
+				})
 			}
-			applyIndicatorData()
-
-			// Fetch all Liquidation data using endTime backwards pagination
-			try {
-				const first = await fetchTakerHistory(pair.code, period, 500)
-				if (first.length > 0) {
-					payload.liquidations = first
-					applyIndicatorData()
-					while (!cancelled) {
-						try {
-							const endMs = payload.liquidations[0].time * 1000 - 1
-							const batch = await fetchTakerHistory(pair.code, period, 500, { endTime: endMs })
-							if (batch.length === 0) break
-							const filtered = batch.filter(d => d.time < payload.liquidations[0].time)
-							if (filtered.length === 0) break
-							payload.liquidations = [...filtered, ...payload.liquidations]
-							if (batch.length < 500) break
-						} catch { break }
-					}
-				}
-			} catch { /* no liquidation data available */ }
-			liqAllLoadedRef.current = true
-			applyIndicatorData()
-
-			// Start indicator poll only after all historical data is loaded
-			if (!cancelled) {
-				indicatorPollTimer = setInterval(pollIndicators, 5000)
-			}
+			lastLiqLen = arr.length
 		}
 
-		load()
+		const handleFunding = () => {
+			const arr = useTerminalStore.getState().funding
+			const ref = indicatorRefs.current.funding
+			if (!ref) {
+				lastFundingLen = arr.length
+				return
+			}
+			if (arr.length === 0) {
+				ref.setData([])
+			} else if (arr.length < lastFundingLen || arr.length - lastFundingLen > 1) {
+				ref.setData(toFundingLineData(arr))
+			} else {
+				const last = arr[arr.length - 1]
+				ref.update({ time: toTime(last.time), value: last.value })
+			}
+			lastFundingLen = arr.length
+		}
+
+		const handleOi = () => {
+			const arr = useTerminalStore.getState().oi
+			const ref = indicatorRefs.current.oi
+			if (!ref) {
+				lastOiLen = arr.length
+				return
+			}
+			if (arr.length === 0) {
+				ref.setData([])
+			} else if (arr.length < lastOiLen || arr.length - lastOiLen > 1) {
+				ref.setData(toLineData(arr))
+			} else {
+				const last = arr[arr.length - 1]
+				ref.update({ time: toTime(last.time), value: last.value })
+			}
+			lastOiLen = arr.length
+		}
+
+		// Wire imperative subscriptions for each series.
+		const unsubs = [
+			useTerminalStore.subscribe(s => s.candles, handleCandles),
+			useTerminalStore.subscribe(s => s.footprints, handleFootprints),
+			useTerminalStore.subscribe(s => s.cvd, handleCvd),
+			useTerminalStore.subscribe(s => s.liquidations, handleLiq),
+			useTerminalStore.subscribe(s => s.funding, handleFunding),
+			useTerminalStore.subscribe(s => s.oi, handleOi),
+		]
+
+		// Open the stream — this resets data then onInit fills it (triggers the
+		// subscribers above which will setData on the lightweight-charts series).
+		const unsubscribeStream = useTerminalStore.getState().subscribe(pair.code, timeframe)
+
+		// Apply current state once on mount in case data already exists for this pair.
+		applyAllFromStore(true)
+
+		// After init populates data we want fitContent — handle via a one-shot.
+		let didFit = false
+		const fitUnsub = useTerminalStore.subscribe(s => s.candles, candles => {
+			if (!didFit && candles.length > 0) {
+				didFit = true
+				const total = candles.length
+				const visible = Math.min(100, total)
+				requestAnimationFrame(() => {
+					chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
+				})
+			}
+		})
+
 		return () => {
-			cancelled = true
-			if (pollTimer) clearInterval(pollTimer)
-			if (indicatorPollTimer) clearInterval(indicatorPollTimer)
+			fitUnsub()
+			for (const u of unsubs) u()
+			unsubscribeStream()
 		}
 	}, [pair.code, timeframe])
 
@@ -642,7 +552,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		}
 
 		chart.panes()[0].setStretchFactor(MAIN_PANE_STRETCH)
-		applySeriesData()
+		applyAllFromStore(false)
 	}, [indicators])
 
 	useEffect(() => {
