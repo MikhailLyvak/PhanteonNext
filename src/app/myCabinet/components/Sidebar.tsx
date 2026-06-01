@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot } from "lucide-react";
+import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot, Radar } from "lucide-react";
 import { usePathname, useRouter } from 'next/navigation';
 import { LuChartLine } from 'react-icons/lu';
 import { useUserStore } from "@/store/UserData/useUserStore";
@@ -54,6 +54,12 @@ const Sidebar = () => {
         text="Алготрейдинг"
         href="/myCabinet/tradingBots"
         active={pathname === '/myCabinet/tradingBots'}
+      />
+      <NavItem
+        icon={<Radar size={20} />}
+        text="Скрінер"
+        href="/myCabinet/screener"
+        active={pathname.includes('/myCabinet/screener')}
       />
       <NavItem
         icon={<Video size={20} />}

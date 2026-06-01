@@ -15,9 +15,15 @@ const TF_SECONDS: Record<Timeframe, number> = {
 	'1m': 60,
 	'5m': 300,
 	'15m': 900,
+	'30m': 1800,
 	'1h': 3600,
+	'2h': 7200,
 	'4h': 14400,
+	'8h': 28800,
+	'12h': 43200,
 	'1d': 86400,
+	'1w': 604800,
+	'1M': 2592000,
 }
 
 const cache = new Map<string, ChartInitPayload>()
@@ -53,7 +59,8 @@ function buildPayload(pairCode: string, tf: Timeframe): ChartInitPayload {
 		const low = Math.min(open, close) - rand() * volatility
 		const volume = base * (200 + rand() * 1500)
 
-		candles.push({ time, open, high, low, close, volume })
+		const takerBuyVolume = volume * (0.4 + rand() * 0.2)
+		candles.push({ time, open, high, low, close, volume, takerBuyVolume })
 
 		const levels = 10 + Math.floor(rand() * 9)
 		const data: Record<string, { b: number; s: number }> = {}

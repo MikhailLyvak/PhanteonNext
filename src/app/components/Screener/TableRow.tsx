@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 import { AssetPair, DashboardAssetData } from '@/lib/screener/types'
 import { formatPercent, formatPrice, formatUsdShort } from '@/lib/screener/format'
+import { SortKey } from '@/store/Screener/useScreenerStore'
 
 interface Props {
 	pair: AssetPair
 	data: DashboardAssetData
+	hiddenColumns: Set<SortKey>
 }
 
 function pctChange(curr: number, prev: number | undefined): number {
@@ -41,9 +42,9 @@ function cvdCellClass(value: number): string {
 	return value >= 0 ? 'text-[#4ade80]' : 'text-[#f87171]'
 }
 
-const TableRow: React.FC<Props> = ({ pair, data }) => {
+const TableRow: React.FC<Props> = ({ pair, data, hiddenColumns }) => {
+	const show = (key: SortKey) => !hiddenColumns.has(key)
 	const router = useRouter()
-	const [imgError, setImgError] = useState(false)
 
 	const price = data.ohlcv.close_latest
 	const priceDelta24h = pctChange(price, data.ohlcv.close_24h)
@@ -68,70 +69,70 @@ const TableRow: React.FC<Props> = ({ pair, data }) => {
 			onClick={onClick}
 			className='group cursor-pointer hover:bg-[#2F2F40]/50 transition-colors'
 		>
-			<td className='px-3 py-3'>
-				<div className='flex items-center gap-2'>
-					{!imgError ? (
-						<Image
-							src={pair.iconUrl}
-							alt={pair.coin}
-							width={24}
-							height={24}
-							className='rounded-full'
-							onError={() => setImgError(true)}
-							unoptimized
-						/>
-					) : (
-						<span className='inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#1A1A28] text-[10px] text-[#D2D2FF] font-bold'>
-							{pair.coin.slice(0, 3)}
-						</span>
-					)}
-					<span className='text-sm font-semibold text-[#D2D2FF]'>{pair.coin}</span>
-					<span className='text-xs text-[#7A7AA0]'>USDT</span>
-				</div>
-			</td>
-			<td className='px-3 py-3 text-right'>
-				<div className='text-sm text-[#D2D2FF]'>
-					{formatPrice(price, pair.precision)}
-				</div>
-				<div
-					className={`text-xs ${
-						priceDeltaMuted
-							? 'text-[#7A7AA0]'
-							: priceDelta24h >= 0
-							? 'text-[#4ade80]'
-							: 'text-[#f87171]'
-					}`}
-				>
-					{formatPercent(priceDelta24h)}
-				</div>
-			</td>
-			<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi1h)}`}>
-				{formatPercent(oi1h)}
-			</td>
-			<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi4h)}`}>
-				{formatPercent(oi4h)}
-			</td>
-			<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi24h)}`}>
-				{formatPercent(oi24h)}
-			</td>
-			<td className='px-3 py-3 text-right'>
-				<span className={`text-sm ${cvdCellClass(cvd1h)}`}>
-					{formatUsdShort(cvd1h)}
-				</span>
-			</td>
-			<td className='px-3 py-3 text-right'>
-				<span className={`text-sm ${cvdCellClass(cvd4h)}`}>
-					{formatUsdShort(cvd4h)}
-				</span>
-			</td>
-			<td className='px-3 py-3 text-right text-sm text-[#D2D2FF]'>
-				{formatUsdShort(liqTotal1h)}
-			</td>
-			<td className='px-3 py-3 text-right'>
-				<span className={`text-sm ${fundingColor(funding)}`}>
-					{formatPercent(funding * 100, 4)}
-				</span>
-			</td>
+			{show('pair') && (
+				<td className='px-3 py-3 whitespace-nowrap'>
+					<span className='text-sm font-semibold text-[#D2D2FF]'>{pair.code}</span>
+				</td>
+			)}
+			{show('price') && (
+				<td className='px-3 py-3 text-right'>
+					<div className='text-sm text-[#D2D2FF]'>
+						{formatPrice(price, pair.precision)}
+					</div>
+					<div
+						className={`text-xs ${
+							priceDeltaMuted
+								? 'text-[#7A7AA0]'
+								: priceDelta24h >= 0
+								? 'text-[#4ade80]'
+								: 'text-[#f87171]'
+						}`}
+					>
+						{formatPercent(priceDelta24h)}
+					</div>
+				</td>
+			)}
+			{show('oi_1h') && (
+				<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi1h)}`}>
+					{formatPercent(oi1h)}
+				</td>
+			)}
+			{show('oi_4h') && (
+				<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi4h)}`}>
+					{formatPercent(oi4h)}
+				</td>
+			)}
+			{show('oi_24h') && (
+				<td className={`px-3 py-3 text-right text-sm ${oiCellClass(oi24h)}`}>
+					{formatPercent(oi24h)}
+				</td>
+			)}
+			{show('cvd_1h') && (
+				<td className='px-3 py-3 text-right'>
+					<span className={`text-sm ${cvdCellClass(cvd1h)}`}>
+						{formatUsdShort(cvd1h)}
+					</span>
+				</td>
+			)}
+			{show('cvd_4h') && (
+				<td className='px-3 py-3 text-right'>
+					<span className={`text-sm ${cvdCellClass(cvd4h)}`}>
+						{formatUsdShort(cvd4h)}
+					</span>
+				</td>
+			)}
+			{show('liq_total_1h') && (
+				<td className='px-3 py-3 text-right text-sm text-[#D2D2FF]'>
+					{formatUsdShort(liqTotal1h)}
+				</td>
+			)}
+			{show('funding') && (
+				<td className='px-3 py-3 text-right'>
+					<span className={`text-sm ${fundingColor(funding)}`}>
+						{formatPercent(funding * 100, 4)}
+					</span>
+				</td>
+			)}
 			<td className='pr-3 py-3 w-6 text-right'>
 				<ChevronRight
 					size={14}

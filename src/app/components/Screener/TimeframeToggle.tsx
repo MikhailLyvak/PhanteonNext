@@ -4,7 +4,7 @@ import React from 'react'
 import { useTerminalStore } from '@/store/Screener/useTerminalStore'
 import { Timeframe } from '@/lib/screener/types'
 
-const TFS: Timeframe[] = ['1m', '5m', '15m', '1h', '4h', '1d']
+const TFS: Timeframe[] = ['1m', '5m', '15m', '30m', '1h', '2h', '4h', '8h', '12h', '1d', '1w', '1M']
 
 const TimeframeToggle: React.FC = () => {
 	const timeframe = useTerminalStore(s => s.timeframe)

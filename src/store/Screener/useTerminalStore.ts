@@ -4,7 +4,7 @@ import { Timeframe } from '@/lib/screener/types'
 
 export type IndicatorKey = 'volume' | 'cvd' | 'liq' | 'funding' | 'oi'
 
-export const INDICATOR_ORDER: IndicatorKey[] = ['volume', 'cvd', 'liq', 'funding', 'oi']
+export const INDICATOR_ORDER: IndicatorKey[] = ['volume', 'cvd', 'funding', 'liq', 'oi']
 
 export const INDICATOR_LABELS: Record<IndicatorKey, string> = {
 	volume: 'Volume',

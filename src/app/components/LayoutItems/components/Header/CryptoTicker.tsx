@@ -55,7 +55,7 @@ export default function CryptoTicker() {
           }
         }, 30000) // Increased timeout to 30 seconds
         
-        const res = await fetch('https://api.binance.com/api/v3/ticker/price', {
+        const res = await fetch('https://fapi.binance.com/fapi/v1/ticker/price', {
           signal: abortController.signal
         })
         
