@@ -3,9 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowDown, ArrowUp, Columns3 } from 'lucide-react'
 import { useScreenerStore, SortKey } from '@/store/Screener/useScreenerStore'
-import { getDashboardSnapshot } from '@/lib/screener/mock/dashboard'
-import { getPairs } from '@/api/Screener/client'
-import { AssetPair, DashboardAssetData } from '@/lib/screener/types'
+import { DashboardAssetData } from '@/lib/screener/types'
 import TableRow from './TableRow'
 import Pagination from './Pagination'
 
@@ -59,49 +57,17 @@ const AssetsTable: React.FC = () => {
 		[hiddenColumns]
 	)
 
-	const [pairs, setPairs] = useState<AssetPair[]>([])
-	const [rows, setRows] = useState<Record<string, DashboardAssetData> | null>(null)
-	const [loading, setLoading] = useState(true)
+	const pairs = useScreenerStore(s => s.pairs)
+	const data = useScreenerStore(s => s.data)
 
-	useEffect(() => {
-		let active = true
-		let pollTimer: ReturnType<typeof setInterval> | null = null
-		let cachedPairs: AssetPair[] = []
-		setLoading(true)
+	useEffect(() => useScreenerStore.getState().subscribe(), [])
 
-		getPairs()
-			.then(async (fetchedPairs) => {
-				if (!active) return
-				cachedPairs = fetchedPairs
-				setPairs(fetchedPairs)
-				const snap = await getDashboardSnapshot(fetchedPairs)
-				if (!active) return
-				setRows(snap)
-				setLoading(false)
-
-				pollTimer = setInterval(async () => {
-					try {
-						const snap = await getDashboardSnapshot(cachedPairs)
-						if (!active) return
-						setRows(snap)
-					} catch {
-						// ignore poll errors
-					}
-				}, 1000)
-			})
-			.catch(err => {
-				console.error('[screener] Failed to fetch futures pairs:', err)
-				if (active) setLoading(false)
-			})
-
-		return () => {
-			active = false
-			if (pollTimer) clearInterval(pollTimer)
-		}
-	}, [])
+	const hasData = pairs.length > 0 && Object.keys(data).length > 0
+	const loading = !hasData
 
 	const display = useMemo(() => {
-		if (!rows) return { pageItems: [], totalCount: 0 }
+		if (!hasData) return { pageItems: [], totalCount: 0 }
+		const rows = data
 		const term = searchTerm.trim().toLowerCase()
 		const list = pairs.filter(p => {
 			if (!term) return true
@@ -165,7 +131,7 @@ const AssetsTable: React.FC = () => {
 		const start = (safePage - 1) * pageSize
 		const pageItems = list.slice(start, start + pageSize)
 		return { pageItems, totalCount }
-	}, [pairs, rows, searchTerm, sortKey, sortDir, preset, currentPage, pageSize])
+	}, [pairs, data, hasData, searchTerm, sortKey, sortDir, preset, currentPage, pageSize])
 
 	const pageCount = Math.max(1, Math.ceil(display.totalCount / pageSize))
 
