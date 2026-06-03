@@ -210,10 +210,10 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		loadingOlderRef.current = true
 		try {
 			const earliestSec = s.candles[0].time
-			const beforeMs = earliestSec * 1000 - 1
+			const beforeSec = earliestSec - 1
 			const tf = useTerminalStore.getState().timeframe
 			const before = s.candles.length
-			await useTerminalStore.getState().loadOlder(beforeMs, tf, 500)
+			await useTerminalStore.getState().loadOlder(beforeSec, tf, 500)
 			const after = useTerminalStore.getState().candles.length
 			const prepended = after - before
 			if (prepended <= 0) {
@@ -231,6 +231,36 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			}
 		} catch (err) {
 			console.error('[screener] Failed to load older candles:', err)
+		} finally {
+			loadingOlderRef.current = false
+		}
+	}
+
+	// On first SSE init, backend currently delivers only a handful of bars
+	// (sometimes just the live one). Eagerly fetch history so the chart has a
+	// reasonable initial window instead of zooming onto a single candle.
+	const loadInitialBackfill = async () => {
+		const s = useTerminalStore.getState()
+		if (s.candles.length === 0 || loadingOlderRef.current || allLoadedRef.current) return
+		loadingOlderRef.current = true
+		try {
+			const earliestSec = s.candles[0].time
+			const tf = useTerminalStore.getState().timeframe
+			const before = s.candles.length
+			await useTerminalStore.getState().loadOlder(earliestSec - 1, tf, 500)
+			const after = useTerminalStore.getState().candles.length
+			if (after === before) {
+				allLoadedRef.current = true
+				return
+			}
+			const chart = chartRef.current
+			if (!chart) return
+			const visible = Math.min(100, after)
+			requestAnimationFrame(() => {
+				chart.timeScale().setVisibleLogicalRange({ from: after - visible, to: after - 1 })
+			})
+		} catch (err) {
+			console.error('[screener] initial backfill failed:', err)
 		} finally {
 			loadingOlderRef.current = false
 		}
@@ -429,6 +459,11 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				requestAnimationFrame(() => {
 					chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
 				})
+				// If the SSE init delivered a thin slice (often only the current bar),
+				// fetch history once so the chart isn't stuck zoomed on a handful of bars.
+				if (total < 100) {
+					void loadInitialBackfill()
+				}
 			}
 		})
 

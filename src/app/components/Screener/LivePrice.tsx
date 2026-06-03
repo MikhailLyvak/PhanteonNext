@@ -22,11 +22,11 @@ const LivePrice: React.FC<Props> = ({ pair }) => {
 	const dashboardEntry = useScreenerStore(s => s.data[pair.code])
 
 	const price =
-		latestCandleClose ?? dashboardEntry?.ohlcv.close_latest ?? null
+		latestCandleClose ?? dashboardEntry?.ohlcv?.close_latest ?? null
 
 	// 24h % change derived from the dashboard snapshot.
-	const closeLatest = dashboardEntry?.ohlcv.close_latest
-	const close24h = dashboardEntry?.ohlcv.close_24h
+	const closeLatest = dashboardEntry?.ohlcv?.close_latest
+	const close24h = dashboardEntry?.ohlcv?.close_24h
 	const priceChange24h: number | null =
 		typeof closeLatest === 'number' &&
 		typeof close24h === 'number' &&

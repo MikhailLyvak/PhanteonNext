@@ -81,30 +81,30 @@ const AssetsTable: React.FC = () => {
 			})
 
 		const sortValue = (d: DashboardAssetData, pairCoin: string): number | string => {
-			const oiNow = d.oi.ointerest_latest
+			const oiNow = d.oi?.ointerest_latest ?? 0
 			switch (sortKey) {
 				case 'pair':
 					return pairCoin
 				case 'price':
-					return d.ohlcv.close_latest
+					return d.ohlcv?.close_latest ?? 0
 				case 'volume24h':
-					return d.quoteVolume24h
+					return d.quote_volume_24h ?? 0
 				case 'oi_1h':
-					return pctChange(oiNow, d.oi.ointerest_1h)
+					return pctChange(oiNow, d.oi?.ointerest_1h)
 				case 'oi_4h':
-					return pctChange(oiNow, d.oi.ointerest_4h)
+					return pctChange(oiNow, d.oi?.ointerest_4h)
 				case 'oi_24h':
-					return pctChange(oiNow, d.oi.ointerest_24h)
+					return pctChange(oiNow, d.oi?.ointerest_24h)
 				case 'cvd_1h':
-					return d.cvd.cvd_1h ?? 0
+					return d.cvd?.cvd_1h ?? 0
 				case 'cvd_4h':
-					return d.cvd.cvd_4h ?? 0
+					return d.cvd?.cvd_4h ?? 0
 				case 'liq_total_1h':
-					return d.liquidations.total_turnover_1h ?? 0
+					return d.liquidations?.total_turnover_1h ?? 0
 				case 'funding':
 					return d.funding?.close_latest ?? 0
 				default:
-					return d.quoteVolume24h
+					return d.quote_volume_24h ?? 0
 			}
 		}
 

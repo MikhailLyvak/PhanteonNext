@@ -12,19 +12,19 @@ export type Period = '1h' | '4h' | '24h'
 export type Timeframe = '1m' | '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | '8h' | '12h' | '1d' | '1w' | '1M'
 
 export interface DashboardAssetData {
-	ohlcv: {
+	ohlcv?: {
 		close_latest: number
 		close_1h?: number
 		close_4h?: number
 		close_24h?: number
 	}
-	oi: {
+	oi?: {
 		ointerest_latest: number
 		ointerest_1h?: number
 		ointerest_4h?: number
 		ointerest_24h?: number
 	}
-	liquidations: {
+	liquidations?: {
 		buy_turnover_1h?: number
 		sell_turnover_1h?: number
 		total_turnover_1h?: number
@@ -35,13 +35,13 @@ export interface DashboardAssetData {
 		sell_turnover_24h?: number
 		total_turnover_24h?: number
 	}
-	cvd: {
+	cvd?: {
 		cvd_1h?: number
 		cvd_4h?: number
 		cvd_24h?: number
 	}
 	funding?: { close_latest: number }
-	quoteVolume24h: number
+	quote_volume_24h?: number
 	tick: number
 	precision: number
 }

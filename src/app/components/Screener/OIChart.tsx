@@ -79,7 +79,7 @@ const OIChart: React.FC<Props> = ({ pair }) => {
 		try {
 			const earliestSec = s.candles[0].time
 			const before = s.candles.length
-			await useTerminalStore.getState().loadOlder(earliestSec * 1000 - 1, s.timeframe, 500)
+			await useTerminalStore.getState().loadOlder(earliestSec - 1, s.timeframe, 500)
 			const after = useTerminalStore.getState().candles.length
 			// OI history is delivered via /chart/history only when backend includes
 			// it — for now backend's history only returns candles+footprints. So

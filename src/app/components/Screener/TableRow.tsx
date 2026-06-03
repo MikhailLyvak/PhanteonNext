@@ -46,18 +46,18 @@ const TableRow: React.FC<Props> = ({ pair, data, hiddenColumns }) => {
 	const show = (key: SortKey) => !hiddenColumns.has(key)
 	const router = useRouter()
 
-	const price = data.ohlcv.close_latest
-	const priceDelta24h = pctChange(price, data.ohlcv.close_24h)
+	const price = data.ohlcv?.close_latest ?? 0
+	const priceDelta24h = pctChange(price, data.ohlcv?.close_24h)
 
-	const oi = data.oi.ointerest_latest
-	const oi1h = pctChange(oi, data.oi.ointerest_1h)
-	const oi4h = pctChange(oi, data.oi.ointerest_4h)
-	const oi24h = pctChange(oi, data.oi.ointerest_24h)
+	const oi = data.oi?.ointerest_latest ?? 0
+	const oi1h = pctChange(oi, data.oi?.ointerest_1h)
+	const oi4h = pctChange(oi, data.oi?.ointerest_4h)
+	const oi24h = pctChange(oi, data.oi?.ointerest_24h)
 
-	const cvd1h = data.cvd.cvd_1h ?? 0
-	const cvd4h = data.cvd.cvd_4h ?? 0
+	const cvd1h = data.cvd?.cvd_1h ?? 0
+	const cvd4h = data.cvd?.cvd_4h ?? 0
 
-	const liqTotal1h = data.liquidations.total_turnover_1h ?? 0
+	const liqTotal1h = data.liquidations?.total_turnover_1h ?? 0
 	const funding = data.funding?.close_latest ?? 0
 
 	const onClick = () => router.push(`/myCabinet/screener/terminal/${pair.code}`)
