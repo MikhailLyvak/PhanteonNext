@@ -4,7 +4,7 @@ import type {
 	DashboardSnapshot,
 } from '@/lib/screener/types'
 
-const BASE = '/api/screener'
+const BASE = '/screener-proxy'
 
 export class ScreenerHttpError extends Error {
 	readonly status: number

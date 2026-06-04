@@ -3,7 +3,7 @@ import type {
 	TradeEvent,
 } from '@/lib/screener/types'
 
-const BASE = '/api/screener'
+const BASE = '/screener-proxy'
 
 export type SseHandlers<T> = {
 	onEvent: (data: T) => void
