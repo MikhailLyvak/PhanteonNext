@@ -308,6 +308,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		const s = useTerminalStore.getState()
 		if (s.candles.length === 0) return
 		loadingOlderRef.current = true
+		const timeRangeBefore = priceChartRef.current?.timeScale().getVisibleRange() ?? null
 		try {
 			const earliestSec = s.candles[0].time
 			const beforeSec = earliestSec - 1
@@ -325,6 +326,19 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				)
 			} else {
 				emptyResponsesRef.current = 0
+				if (timeRangeBefore) {
+					queueMicrotask(() => {
+						syncingRangeRef.current = true
+						try {
+							priceChartRef.current?.timeScale().setVisibleRange(timeRangeBefore)
+							if (hasIndicatorSeriesRef.current) {
+								indicatorsChartRef.current?.timeScale().setVisibleRange(timeRangeBefore)
+							}
+						} finally {
+							syncingRangeRef.current = false
+						}
+					})
+				}
 			}
 		} catch (err) {
 			console.error('[screener] Failed to load older candles:', err)
