@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Screener — Remaining Work &amp; Estimates</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #161a22;
+    --panel-2: #1d212c;
+    --border: #262b38;
+    --text: #D2D2FF;
+    --muted: #98A0B3;
+    --dim: #58587B;
+    --accent: #8AA6FF;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Inter", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 28px 80px; }
+  h1 {
+    font-size: 32px;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, #D2D2FF, #8AA6FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 17px; margin: 22px 0 10px; color: var(--accent); }
+  p, li { color: #c5c8e0; }
+  .lede { color: var(--muted); font-size: 15px; }
+  code {
+    background: #1A1A28;
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #C8D2FF;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px 0 24px;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--panel-2);
+    font-weight: 600;
+    color: var(--text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  td.name { font-weight: 600; color: var(--text); width: 26%; }
+  td.notes { color: #b9bdd6; }
+  .pt-fe { color: var(--accent); }
+  .pt-be { color: var(--warn); }
+  .pt-tot { color: var(--text); }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 14px 0 8px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card .num { font-size: 26px; font-weight: 800; }
+  .card .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+  .card.ok   .num { color: var(--ok); }
+  .card.part .num { color: var(--accent); }
+  .card.warn .num { color: var(--warn); }
+  .card.miss .num { color: var(--bad); }
+
+  .priority {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px; margin-right: 6px;
+    vertical-align: middle;
+  }
+  .p-high { background: rgba(248,113,113,.15); color: var(--bad); }
+  .p-med  { background: rgba(251,191,36,.15);  color: var(--warn); }
+  .p-low  { background: rgba(138,166,255,.15); color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .b-fe-only { background: rgba(74,222,128,.12); color: var(--ok); border: 1px solid rgba(74,222,128,.35); }
+  .b-fe-light { background: rgba(138,166,255,.12); color: var(--accent); border: 1px solid rgba(138,166,255,.35); }
+  .b-be-heavy { background: rgba(251,191,36,.12); color: var(--warn); border: 1px solid rgba(251,191,36,.35); }
+  .b-blocked { background: rgba(248,113,113,.12); color: var(--bad); border: 1px solid rgba(248,113,113,.35); }
+
+  .done-strip {
+    background: rgba(74,222,128,.06);
+    border: 1px solid rgba(74,222,128,.25);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 16px 0 28px;
+  }
+  .done-strip h3 { color: var(--ok); margin: 0 0 6px; }
+  .done-strip ul { margin: 6px 0 0; padding-left: 18px; }
+  .done-strip li { color: #c5e7d2; font-size: 14px; margin: 2px 0; }
+
+  hr { border: 0; border-top: 1px solid var(--border); margin: 26px 0; }
+  .src { color: var(--dim); font-size: 12px; }
+
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .legend .badge { font-size: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Screener — Remaining Work</h1>
+<p class="lede">
+  Snapshot of what's still open after the first audit pass.
+  Frontend-only easy wins were merged (column rework, funding warnings, preset filters, fixed 24h%).
+  This document scopes the remaining gaps with story-point estimates for both frontend and backend.
+</p>
+
+<div class="summary">
+  <div class="card ok">
+    <div class="num">6</div>
+    <div class="lbl">Shipped in this pass</div>
+  </div>
+  <div class="card part">
+    <div class="num">12</div>
+    <div class="lbl">Open gaps</div>
+  </div>
+  <div class="card warn">
+    <div class="num">29</div>
+    <div class="lbl">FE points remaining</div>
+  </div>
+  <div class="card miss">
+    <div class="num">81</div>
+    <div class="lbl">BE points remaining</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="badge b-fe-only">FE-ONLY</span> no backend work required</span>
+  <span><span class="badge b-fe-light">FE-LIGHT</span> small backend touch (a field, a flag)</span>
+  <span><span class="badge b-be-heavy">BE-HEAVY</span> majority of effort is backend</span>
+  <span><span class="badge b-blocked">BLOCKED</span> needs an external system or feed first</span>
+</div>
+
+<div class="done-strip">
+  <h3>✓ Shipped in this pass — FE-only easy wins</h3>
+  <ul>
+    <li><b>Preset filters</b> — "OI Spike" and "Negative Funding" buttons wired to predicates over the dashboard data</li>
+    <li><b>Funding extreme highlighting</b> — yellow at |fr| ≥ 0.05%, red at ≥ 0.1%</li>
+    <li><b>Fixed 24h % column</b> — price delta decoupled from any toggle</li>
+    <li><b>VDelta dual columns</b> — CVD 1h and CVD 4h side-by-side</li>
+    <li><b>OI 1h / 4h / 24h side-by-side columns</b> — bolded for high-magnitude moves</li>
+    <li><b>Liq 1h Total $ column</b> — single rolling 1h aggregate, replaces the period-toggled buy/sell pair</li>
+    <li>Cleanup: removed the now-redundant <code>PeriodToggle</code> + unused store state</li>
+  </ul>
+</div>
+
+<h2>Estimation legend</h2>
+<p class="lede">
+  Points roughly follow Fibonacci. <b>1</b> = a few hours · <b>2–3</b> = ~1 day · <b>5</b> = 2–3 days ·
+  <b>8</b> = ~1 week · <b>13+</b> = multi-week / multi-PR initiative.
+  Backend points include data modelling, ingestion, persistence and the API/WS endpoint.
+</p>
+
+<h2>Remaining gaps — ranked by total cost</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Gap</th>
+      <th class="num">FE</th>
+      <th class="num">BE</th>
+      <th class="num">Total</th>
+      <th>Class</th>
+      <th>Priority</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td class="name">Lift Timeframe control to terminal header</td>
+      <td class="num pt-fe">2</td>
+      <td class="num pt-be">0</td>
+      <td class="num pt-tot">2</td>
+      <td><span class="badge b-fe-only">FE-ONLY</span></td>
+      <td><span class="priority p-med">P1</span></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="name">Market-cap filter</td>
+      <td class="num pt-fe">1</td>
+      <td class="num pt-be">2</td>
+      <td class="num pt-tot">3</td>
+      <td><span class="badge b-fe-light">FE-LIGHT</span></td>
+      <td><span class="priority p-low">P2</span></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="name">Terminal sub-panel reorg (OI+Vol; Liq bars + Funding line overlay)</td>
+      <td class="num pt-fe">3</td>
+      <td class="num pt-be">0</td>
+      <td class="num pt-tot">3</td>
+      <td><span class="badge b-fe-only">FE-ONLY</span></td>
+      <td><span class="priority p-med">P1</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="name">Volume Spike % column (current vs 24h avg)</td>
+      <td class="num pt-fe">1</td>
+      <td class="num pt-be">3</td>
+      <td class="num pt-tot">4</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-high">P0</span></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="name">Exchange filter (Binance, MEXC, …)</td>
+      <td class="num pt-fe">2</td>
+      <td class="num pt-be">5</td>
+      <td class="num pt-tot">7</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-high">P0</span></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td class="name">Time &amp; Sales tape (all prints + "large only" toggle)</td>
+      <td class="num pt-fe">2</td>
+      <td class="num pt-be">5</td>
+      <td class="num pt-tot">7</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-med">P1</span></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="name">Infinite history loader on master chart</td>
+      <td class="num pt-fe">2</td>
+      <td class="num pt-be">5</td>
+      <td class="num pt-tot">7</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-low">P2</span></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td class="name">Pattern recognition column ("Stretched growth", "Trend weakness")</td>
+      <td class="num pt-fe">2</td>
+      <td class="num pt-be">8</td>
+      <td class="num pt-tot">10</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-med">P1</span></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td class="name">Order Book L2 panel ("Стакан")</td>
+      <td class="num pt-fe">5</td>
+      <td class="num pt-be">8</td>
+      <td class="num pt-tot">13</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-high">P0</span></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td class="name">On-chain events panel (exchange in/outflows)</td>
+      <td class="num pt-fe">3</td>
+      <td class="num pt-be">13</td>
+      <td class="num pt-tot">16</td>
+      <td><span class="badge b-blocked">BLOCKED</span></td>
+      <td><span class="priority p-low">P2</span></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td class="name">Telegram alert configuration (context menu + rules + management)</td>
+      <td class="num pt-fe">8</td>
+      <td class="num pt-be">8</td>
+      <td class="num pt-tot">16</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-low">P2</span></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td class="name">Footprint / Cluster chart mode</td>
+      <td class="num pt-fe">8</td>
+      <td class="num pt-be">13</td>
+      <td class="num pt-tot">21</td>
+      <td><span class="badge b-be-heavy">BE-HEAVY</span></td>
+      <td><span class="priority p-high">P0</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h2>Suggested delivery slices</h2>
+
+<h3>Slice A — FE-only follow-ups <span class="badge b-fe-only">FE-ONLY · 5 pts</span></h3>
+<p class="lede">
+  Pure frontend, can ship without any backend coordination. Reasonable next PR.
+</p>
+<table>
+  <thead><tr><th>Item</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="name">Lift Timeframe control to terminal header</td>
+      <td class="notes">
+        Move <code>&lt;TimeframeToggle /&gt;</code> out of <code>MasterChart.tsx</code> and into the terminal page header
+        next to the breadcrumb. Cosmetic now, but required before the future Order Book and Tape can subscribe to the same TF.
+      </td>
+    </tr>
+    <tr>
+      <td class="name">Terminal sub-panel reorg</td>
+      <td class="notes">
+        Use <code>lightweight-charts</code> panes API to put OI line + Volume bars in one pane and Liquidation bars +
+        Funding rate <em>line overlay</em> in another. Drops the standalone funding pane.
+        No backend work — all series already arrive in <code>ChartInitPayload</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Slice B — Cheap backend fields <span class="badge b-fe-light">FE-LIGHT · 7 pts</span></h3>
+<p class="lede">
+  One small additive field per item on the dashboard endpoint; trivial FE rendering.
+  Good "warm-up" work for the screener backend.
+</p>
+<table>
+  <thead><tr><th>Item</th><th>Backend ask</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="name">Market-cap filter (3 pts)</td>
+      <td class="notes">Add <code>marketCap</code> to each pair record. FE adds a min/max numeric filter to <code>Filters.tsx</code>.</td>
+    </tr>
+    <tr>
+      <td class="name">Volume Spike % (4 pts)</td>
+      <td class="notes">
+        Add <code>volume_spike_pct</code> = <code>vol_current / vol_24h_avg × 100</code>.
+        Pre-computed server-side avoids a 24h rolling window on the client. FE just renders a column with color thresholds.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Slice C — Multi-exchange foundation <span class="badge b-be-heavy">BE-HEAVY · 7 pts</span></h3>
+<p class="lede">
+  Unblocks the user's stated MEXC pain point. Touches data ingestion, so worth scheduling next after Slice B.
+</p>
+<ul>
+  <li>Add <code>exchange</code> field on <code>AssetPair</code> (Binance default; MEXC second).</li>
+  <li>Server fans out per-exchange ingestion; same DTO shape returned, just tagged.</li>
+  <li>FE adds a single <code>&lt;select&gt;</code> control + filter predicate (2 pts).</li>
+</ul>
+
+<h3>Slice D — Analysis terminal upgrades <span class="badge b-be-heavy">BE-HEAVY · 27 pts</span></h3>
+<p class="lede">
+  The high-value spec items — what makes the terminal feel like Velo / Coinglass.
+  Each is its own multi-day initiative; sequence them by user impact.
+</p>
+<table>
+  <thead><tr><th>Item</th><th>Total</th><th>Why expensive</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="name">Order Book L2 panel</td>
+      <td class="num pt-tot">13</td>
+      <td class="notes">Live depth WS feed per asset, price-grouping control, depth bar rendering, throttled updates.</td>
+    </tr>
+    <tr>
+      <td class="name">Time &amp; Sales tape</td>
+      <td class="num pt-tot">7</td>
+      <td class="notes">Full prints stream replaces the current "large only" mock. Backpressure + windowed buffer on the client.</td>
+    </tr>
+    <tr>
+      <td class="name">Infinite history loader</td>
+      <td class="num pt-tot">7</td>
+      <td class="notes">Paged history endpoint (<code>?before=&lt;ts&gt;</code>); FE prepend flow already stubbed in <code>MasterChart.tsx</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Slice E — Differentiators <span class="badge b-be-heavy">BE-HEAVY · 47 pts</span></h3>
+<p class="lede">
+  Large initiatives, each a roadmap item on its own. Schedule individually, not as a slice.
+</p>
+<ul>
+  <li><span class="priority p-med">P1</span> <b>Pattern recognition</b> (10) — backend detection job + tagged events; FE renders badge + tooltip.</li>
+  <li><span class="priority p-low">P2</span> <b>Telegram alerts</b> (16) — chart context menu, alert-rule modal, management view, server-side scheduling + Telegram bot integration.</li>
+  <li><span class="priority p-low">P2</span> <b>On-chain events</b> (16) — depends on an on-chain indexer (Nansen / Arkham / custom). Largely blocked on data source decision.</li>
+  <li><span class="priority p-high">P0</span> <b>Footprint chart</b> (21) — per-price-level tick aggregation server-side, custom renderer client-side. The single largest item.</li>
+</ul>
+
+<hr/>
+
+<h2>Recommended sequence</h2>
+<ol>
+  <li><b>Slice A</b> (FE-only, 5 pts) — clean up while backend ramps.</li>
+  <li><b>Slice B</b> (FE-light, 7 pts) — proves the dashboard endpoint contract on small fields.</li>
+  <li><b>Slice C</b> (Exchange, 7 pts) — unlocks MEXC, the user's headline complaint.</li>
+  <li><b>Slice D part 1: Order Book</b> (13 pts) — biggest UX gain in the terminal.</li>
+  <li><b>Slice D part 2 + 3: Tape, History loader</b> (14 pts).</li>
+  <li><b>Slice E</b> items — schedule individually as standalone roadmap initiatives.</li>
+</ol>
+
+<p class="src">
+  Total remaining: ~29 FE points + ~81 BE points across 12 gaps.
+  Slices A→D account for the spec-critical work (~46 pts).
+  Slice E is differentiation that can lag without breaking the core analyst workflow.
+</p>
+
+</div>
+</body>
+</html>

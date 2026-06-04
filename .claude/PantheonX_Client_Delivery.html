@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PantheonX — Cabinet Audit Findings</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #161922;
+    --panel-2: #1c2030;
+    --text: #e6e8ee;
+    --muted: #9aa3b2;
+    --accent: #7c5cff;
+    --border: #262a37;
+    --critical: #ff5b5b;
+    --high: #ff9b3d;
+    --medium: #ffd23f;
+    --low: #57c785;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  header.cover {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  header.cover h1 {
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  header.cover .meta {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  header.cover .meta p { margin: 4px 0; }
+  header.cover .meta strong { color: var(--text); font-weight: 600; }
+
+  h2.section {
+    margin: 56px 0 24px;
+    padding: 12px 16px;
+    font-size: 22px;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2.section.critical { background: rgba(255, 91, 91, 0.12); border-left: 4px solid var(--critical); }
+  h2.section.high     { background: rgba(255, 155, 61, 0.12); border-left: 4px solid var(--high); }
+  h2.section.medium   { background: rgba(255, 210, 63, 0.10); border-left: 4px solid var(--medium); }
+  h2.section.low      { background: rgba(87, 199, 133, 0.10); border-left: 4px solid var(--low); }
+  h2.section.summary  { background: var(--panel-2); border-left: 4px solid var(--accent); }
+
+  .finding {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .finding h3 {
+    margin: 0 0 14px;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .finding h3 .num {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .finding p { margin: 8px 0; }
+  .finding p strong { color: var(--text); }
+  .finding .label {
+    display: inline-block;
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 64px;
+  }
+
+  code {
+    background: var(--panel-2);
+    color: #c4cbd9;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  table.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  table.summary-table th,
+  table.summary-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  table.summary-table th {
+    background: var(--panel-2);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  table.summary-table tr:last-child td { border-bottom: none; }
+  table.summary-table tr.total td { font-weight: 700; background: var(--panel-2); }
+  .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  .dot.critical { background: var(--critical); }
+  .dot.high     { background: var(--high); }
+  .dot.medium   { background: var(--medium); }
+  .dot.low      { background: var(--low); }
+
+  ol.sprint {
+    padding-left: 22px;
+  }
+  ol.sprint li {
+    margin-bottom: 14px;
+    padding-left: 6px;
+  }
+  ol.sprint li strong { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px 48px; }
+    header.cover h1 { font-size: 26px; }
+    h2.section { font-size: 18px; }
+    .finding { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="cover">
+    <h1>PantheonX — Cabinet Audit Findings</h1>
+    <div class="meta">
+      <p><strong>Date:</strong> 2026-05-29</p>
+      <p><strong>Scope:</strong> Authenticated cabinet (Personal Data, Subscriptions, Academy / Study Platform, Certificates, Webinars), post-login landing, global <code>/login</code> and <code>/forgotPassword</code> flows, <code>/privacy</code>, and mobile (390&times;844) experience.</p>
+      <p><strong>Out of scope:</strong> Screener (<code>/dashboard</code>, <code>screener.pantheonx.club</code>), Trading Bots / Algotrading flow, billing/paywall flow, KYC.</p>
+    </div>
+  </header>
+
+  <h2 class="section critical"><span class="dot critical"></span> Critical — Fix First</h2>
+
+  <div class="finding">
+    <h3><span class="num">#1</span> Privacy Policy is placeholder text</h3>
+    <p><span class="label">Problem:</span> <code>/privacy</code> (linked from every footer) renders the literal string <code>Privacy policy content goes here...</code>. Users consent to data processing at registration without any real policy published.</p>
+    <p><span class="label">Impact:</span> GDPR breach for EU users; major credibility hit for a paid product.</p>
+    <p><span class="label">Fix:</span> Publish actual Privacy Policy and Terms of Service. Link both from registration/login consent text.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#2</span> "Forgot password" is non-functional</h3>
+    <p><span class="label">Problem:</span> "Забули пароль?" link on <code>/login</code> does nothing on click. Direct URL <code>/forgotPassword</code> returns a generic English Next.js 404.</p>
+    <p><span class="label">Impact:</span> Users who forget passwords have no recovery path &rarr; lost paying customers.</p>
+    <p><span class="label">Fix:</span> Implement email-based password reset. Until shipped, remove the link from the login screen.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#3</span> "Налаштування" (Settings) link goes to a "coming soon" page</h3>
+    <p><span class="label">Problem:</span> Sidebar item "Налаштування" points to <code>/404page</code>, which renders only <code>🫡omming soon...</code>.</p>
+    <p><span class="label">Impact:</span> The primary entry point for password, 2FA, notifications, and account deletion is broken. Signals lack of QA.</p>
+    <p><span class="label">Fix:</span> Build the Settings page (needed for items #5 and #11 below), or hide the sidebar entry until ready.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#4</span> Cabinet navigation is unreachable on mobile</h3>
+    <p><span class="label">Problem:</span> On a 390px viewport, both the outer sidebar and the inner cabinet tabs render off-canvas. The hamburger/close icons are positioned at x=650–700px (outside the 390px viewport), so the user has no tappable control to open navigation. Inner cabinet tabs collapse to width=0/height=0.</p>
+    <p><span class="label">Impact:</span> Mobile users cannot navigate the cabinet at all — they cannot reach Academy, Subscriptions, or even Logout without retyping URLs.</p>
+    <p><span class="label">Fix:</span> Add a visible hamburger button anchored inside the viewport (fixed top-left). Verify on 360, 390, and 414px widths. Make inner cabinet tabs a horizontally scrollable strip on mobile, or merge them into the drawer.</p>
+  </div>
+
+  <h2 class="section high"><span class="dot high"></span> High Priority</h2>
+
+  <div class="finding">
+    <h3><span class="num">#5</span> No password change, no 2FA, no account deletion</h3>
+    <p><span class="label">Problem:</span> Walking through every cabinet section turned up no UI for: changing password, enabling 2FA, viewing active sessions, or deleting account. Personal Data captures only name, phone, and Solana wallet.</p>
+    <p><span class="label">Impact:</span> Missing 2FA is unacceptable for a product custodying exchange API keys and a real-money balance. No account deletion = GDPR right-to-be-forgotten violation.</p>
+    <p><span class="label">Fix:</span> Build Settings page with: password change, 2FA toggle, active sessions list, account deletion (with confirmation + stated retention policy).</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#6</span> Two parallel inconsistent navigations</h3>
+    <p><span class="label">Problem:</span> The outer sidebar and inner cabinet tab strip overlap and disagree. Examples: outer sidebar shows "Навчання" &rarr; <code>/myCabinet/studyPlatform</code>, while the public header shows "Навчання" &rarr; <code>http://pantheonx.club/interview</code> (same label, different URL). The outer drawer contains "Блог" and "Трейдинг-чат" that the inner strip lacks; the inner strip has "Академія", "Сертифікати", "Керування підписками", "Вебінари" that the outer lacks.</p>
+    <p><span class="label">Impact:</span> Users waste time figuring out which menu owns what. Onboarding and support documentation become much harder.</p>
+    <p><span class="label">Fix:</span> Consolidate to one navigation system. The outer drawer holds global areas; the inner strip holds sub-tabs of the current section — never overlap. Pick one canonical name per destination.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#7</span> Header "Навчання" link is plain HTTP, not HTTPS</h3>
+    <p><span class="label">Problem:</span> The header link "Навчання" points to <code>http://pantheonx.club/interview</code> while everything else is HTTPS.</p>
+    <p><span class="label">Impact:</span> Mixed-content warnings, potential blocked navigation, and a credibility hit on a product handling credentials and API secrets.</p>
+    <p><span class="label">Fix:</span> Change <code>href</code> to <code>https://</code>. Add HSTS header so the protocol cannot be downgraded.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#8</span> Post-login destination is a marketing landing page with a Google Form CTA</h3>
+    <p><span class="label">Problem:</span> After login, users land on <code>/Trading-Chat</code> — a sales page whose primary CTA is an external <code>docs.google.com/forms/...</code> link.</p>
+    <p><span class="label">Impact:</span> Biggest friction point on the activation path. Paying users expect their cabinet (their bots, lessons, balance) — not a pitch for another product served via Google Forms.</p>
+    <p><span class="label">Fix:</span> Redirect post-login to the user's last visited cabinet section (or a sensible default like <code>/myCabinet/personalData</code>). Move the Trading-Chat landing to a public, logged-out route, or restructure it as an in-cabinet upsell card.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#9</span> Webinars page is empty — no data, no empty state, no message</h3>
+    <p><span class="label">Problem:</span> <code>/myCabinet/vebinars</code> renders just the shell with the section title and two empty <code>&lt;div&gt;</code>s. No copy, no CTA, no "coming soon".</p>
+    <p><span class="label">Impact:</span> Users assume the page is broken and lose trust in the rest of the platform.</p>
+    <p><span class="label">Fix:</span> Ship an empty-state component with copy and a CTA (e.g. "Ваша підписка не дає доступ до вебінарів — переглянути підписки" &rarr; <code>/paywall</code>). If webinars are coming, state the date.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#10</span> Persistent failing fetch on every page (Binance ticker API)</h3>
+    <p><span class="label">Problem:</span> Every page — including the public login screen — triggers <code>GET https://api.binance.com/api/v3/ticker/price</code> and logs <code>net::ERR_CONNECTION_REFUSED</code> and <code>TypeError: Failed to fetch</code> to the console. No visible UI uses the data on the login page.</p>
+    <p><span class="label">Impact:</span> Either a legitimate feature is silently broken in production, or dead code is firing on every page load — wasting bandwidth and looking suspect to anyone with DevTools open. Binance's public API is also geo-restricted in several regions.</p>
+    <p><span class="label">Fix:</span> Decide whether the data is needed. If yes, proxy the call through your own backend to avoid geo-restrictions. If no, delete the fetch.</p>
+  </div>
+
+  <h2 class="section medium"><span class="dot medium"></span> Medium Priority</h2>
+
+  <div class="finding">
+    <h3><span class="num">#11</span> URL typo: <code>/myCabinet/vebinars</code></h3>
+    <p><span class="label">Problem:</span> Webinars page lives at <code>/myCabinet/vebinars</code> instead of <code>/myCabinet/webinars</code>.</p>
+    <p><span class="label">Impact:</span> Will be costly to rename once indexed; looks like a developer typo.</p>
+    <p><span class="label">Fix:</span> Rename route to <code>/webinars</code>. Add 301 redirect from old URL.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#12</span> Personal Data form: missing apostrophe + minimal field set</h3>
+    <p><span class="label">Problem:</span> Label "Імя" should be "Ім'я" (Ukrainian apostrophe). Form has only first name, last name, phone, and Solana wallet — no email row, avatar, birthday, timezone, language, or marketing consent toggle.</p>
+    <p><span class="label">Impact:</span> Native speakers will notice the typo immediately. The thin field set offloads every identity/security action to the missing Settings page.</p>
+    <p><span class="label">Fix:</span> Fix the apostrophe. Decide whether Personal Data is a contact form (add email/photo/timezone) or whether it merges into Settings.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#13</span> <code>/forgotPassword</code> renders unbranded English Next.js 404</h3>
+    <p><span class="label">Problem:</span> Direct visit to <code>/forgotPassword</code> shows the default Next.js 404 page in English, despite the audience being Ukrainian-speaking.</p>
+    <p><span class="label">Impact:</span> Every unknown URL leaks a generic "Next.js" answer — bad for trust and SEO.</p>
+    <p><span class="label">Fix:</span> Add a custom <code>not-found.tsx</code> rendering a branded, Ukrainian-localized 404 with a CTA back to <code>/</code> or <code>/myCabinet</code>.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#14</span> Registration form: no password rules, no Terms link, no email-confirmation step</h3>
+    <p><span class="label">Problem:</span> Registration tab collects email, password, password confirmation. No password-strength meter or rules shown, no hyperlinks in the consent paragraph, no "Check your email" step surfaced after submission.</p>
+    <p><span class="label">Impact:</span> Weak-password takeover risk (especially with no 2FA and no password recovery). Missing Terms link compounds finding #1.</p>
+    <p><span class="label">Fix:</span> Enforce a minimum password policy (8+ chars, mixed case/digits). Show requirements inline. Convert consent text into hyperlinks: "погоджуєтесь з [Умовами використання] та [Політикою конфіденційності]". Surface email confirmation if required.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#15</span> Course cards: dense run-on text crammed into one paragraph</h3>
+    <p><span class="label">Problem:</span> Course descriptions on Академія and Сертифікати are walls of text without bullets or hierarchy. The "Macro Systems" card contains the entire 10-lecture syllabus in one paragraph.</p>
+    <p><span class="label">Impact:</span> Users cannot scan and compare courses; relative information density is inverted from price (the $7 course looks heavier than the $900 one).</p>
+    <p><span class="label">Fix:</span> Render curricula as bulleted lists. Truncate card descriptions to ~2 lines with "Read more". Keep prices and lecture counts in consistent positions.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#16</span> Certificates page is misnamed — content is Courses &amp; Modules</h3>
+    <p><span class="label">Problem:</span> <code>/myCabinet/certificates</code> opens by default on the "Курси" tab, showing the same three courses with module progress. The "Мої сертифікати" sub-tab is secondary.</p>
+    <p><span class="label">Impact:</span> Users clicking "Сертифікати" expect to see certificates, not the course catalog again. Confuses two distinct concepts.</p>
+    <p><span class="label">Fix:</span> Default the page to "Мої сертифікати". Move course progress to a "Прогрес" sub-tab on Академія, where it belongs.</p>
+  </div>
+
+  <h2 class="section low"><span class="dot low"></span> Low Priority</h2>
+
+  <div class="finding">
+    <h3><span class="num">#17</span> Brand spelling inconsistency: "Pantheon" vs "Phanteon" vs "PantheonX"</h3>
+    <p><span class="label">Problem:</span> Header logo <code>alt</code> says "Pantheon Logo", sidebar logo <code>alt</code> says "Phanteon Logo", footer copyright says "PantheonX", URL is <code>pantheonx.club</code>.</p>
+    <p><span class="label">Impact:</span> Cosmetic but visible to screen readers and to anyone saving the page. Three spellings on one site is a quality signal.</p>
+    <p><span class="label">Fix:</span> Standardise on "PantheonX" in all <code>alt</code> text, copy, and metadata.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="num">#18</span> Cabinet header shows email handle, not user name</h3>
+    <p><span class="label">Problem:</span> Sidebar shows avatar "A" and heading "andreu.slynchyk+1" — the local part of the email address including the <code>+1</code> Gmail alias.</p>
+    <p><span class="label">Impact:</span> Exposes the email-alias scheme; looks unprofessional in screenshots.</p>
+    <p><span class="label">Fix:</span> Display the first name from Personal Data when present; otherwise fall back to the part of the email before <code>+</code> and before <code>@</code>.</p>
+  </div>
+
+  <h2 class="section summary">Summary</h2>
+
+  <table class="summary-table">
+    <thead>
+      <tr><th>Priority</th><th style="text-align:right;">Count</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="dot critical"></span> Critical</td><td style="text-align:right;">4</td></tr>
+      <tr><td><span class="dot high"></span> High</td><td style="text-align:right;">6</td></tr>
+      <tr><td><span class="dot medium"></span> Medium</td><td style="text-align:right;">6</td></tr>
+      <tr><td><span class="dot low"></span> Low</td><td style="text-align:right;">2</td></tr>
+      <tr class="total"><td>Total</td><td style="text-align:right;">18</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section summary">Recommended First Sprint</h2>
+
+  <ol class="sprint">
+    <li><strong>Build the Settings page and fix navigation labels.</strong> Unblocks #3 (Settings 404), #5 (no password change / 2FA / deletion), and reduces the compliance exposure from #1.</li>
+    <li><strong>Make the cabinet navigable on mobile.</strong> Without this, every mobile user is on a desktop-only product.</li>
+    <li><strong>Fix the post-login destination.</strong> Land users on their cabinet (not the marketing page) so paid users feel they got what they paid for.</li>
+    <li><strong>Publish the real Privacy Policy and Terms.</strong> Removes the most visible legal/credibility risk.</li>
+  </ol>
+
+</div>
+</body>
+</html>

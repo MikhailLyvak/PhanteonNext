@@ -52,3 +52,6 @@ nft-service
 /playwright-report/
 /test-results/
 /playwright/.cache/
+
+# local screenshots
+/screenshots/

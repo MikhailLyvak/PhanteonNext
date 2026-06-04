@@ -210,7 +210,7 @@ const InnerWhiteHeader = () => {
             )}
             {user ? (
               <Link
-                href="https://screener.pantheonx.club/"
+                href="/myCabinet/screener"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
                 Скрінер

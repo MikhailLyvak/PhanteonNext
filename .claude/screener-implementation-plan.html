@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Screener Port — Implementation Plan</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161a22;
+    --panel-2: #1d212c;
+    --border: #262b38;
+    --text: #e6e9f2;
+    --muted: #98a0b3;
+    --accent: #8aa6ff;
+    --accent-2: #d2d2ff;
+    --good: #4ade80;
+    --bad: #f87171;
+    --warn: #fbbf24;
+    --code-bg: #0b0d12;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 28px 80px; }
+  header.hero {
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(138,166,255,0.08), rgba(210,210,255,0.03));
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.01em; }
+  header.hero .sub { color: var(--muted); font-size: 14px; }
+  h2 {
+    margin: 40px 0 14px;
+    font-size: 20px;
+    color: var(--accent-2);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  h3 { margin: 22px 0 8px; font-size: 16px; color: var(--accent); }
+  h4 { margin: 16px 0 6px; font-size: 14px; color: var(--accent); }
+  p, li { font-size: 14px; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: top;
+  }
+  th { background: var(--panel-2); color: var(--accent-2); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .callout {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    color: #fde68a;
+    font-size: 13px;
+  }
+  .callout.good { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.35); color: #bbf7d0; }
+  .callout.info { background: rgba(138,166,255,0.08); border-color: rgba(138,166,255,0.35); color: #c7d2fe; }
+  ul, ol { padding-left: 22px; }
+  .filemono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: var(--accent); }
+  .checklist li { list-style: none; margin: 4px 0; }
+  .checklist li::before { content: "☐ "; color: var(--accent); margin-right: 6px; }
+  .tag {
+    display: inline-block;
+    background: rgba(138,166,255,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(138,166,255,0.25);
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    margin: 0 4px 4px 0;
+  }
+  footer { margin-top: 50px; color: var(--muted); font-size: 12px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Screener Port — Implementation Plan</h1>
+  <div class="sub">Target: <code>/Users/asilverrrr/WebstormProjects/PhanteonNext</code> · Source UX: panscreen · <strong>Frontend only — no backend wiring</strong> · 2026-05-28</div>
+</header>
+
+<div class="callout info">
+This plan is awaiting <strong>your approval</strong> before any code is written. Review sections 1–11, then say "go" / "approved" / "implement" and an implementation subagent will execute it. Push back on anything you want changed first.
+</div>
+
+<h2 id="overview">1. Overview</h2>
+<p>
+The PanScreen UX will be reproduced inside the PhanteonNext cabinet as two new routes under <code>src/app/myCabinet/screener/</code>, wrapped by the existing <code>ProtectedRoute</code> plus a new client-side <code>screener_access</code> subscription check. All data — table rows, candles, footprints, CVD, liquidations, funding, OI, large trades — is served by static fixture modules in <code>src/lib/screener/mock/</code> so the entire UI runs without any HTTP/WS calls. Each fixture module exports an async function (<code>getDashboardSnapshot()</code>, <code>getChartInit(pair, tf)</code>, <code>subscribeLiquidations(pair, cb)</code>, etc.) that mirrors the eventual real signature; future-session work swaps the fixture body for a real Axios call or WS subscription without touching component code. Styling uses Tailwind 3.4 utility classes plus SCSS modules for chart-pane backgrounds, following the existing cabinet design tokens (<code>#D2D2FF</code> accent, <code>#242433</code> panel, dark background, bold titles). The chart is rendered with <code>lightweight-charts@^5.0.8</code> (newly added) on a 6-pane synchronized layout; the heatmap is a custom plugin reproduced verbatim from panscreen but fed by mock footprint frames.
+</p>
+
+<h2 id="deps">2. Dependency changes</h2>
+<p><code>package.json</code> additions:</p>
+<pre>"lightweight-charts": "^5.0.8"</pre>
+<p>No other deps required. <code>framer-motion</code>, <code>lucide-react</code>, <code>react-icons</code>, <code>zustand</code> are already present. No Tailwind upgrade. No new dev deps.</p>
+
+<h2 id="inventory">3. Directory &amp; file inventory</h2>
+
+<h3>New routes</h3>
+<table>
+  <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">src/app/myCabinet/screener/page.tsx</span></td><td>Client page. Wraps <code>ProtectedRoute</code> + cabinet shell pattern (Sidebar + BreadCrump). Renders <code>&lt;Filters /&gt;</code> + <code>&lt;AssetsTable /&gt;</code>.</td></tr>
+    <tr><td><span class="filemono">src/app/myCabinet/screener/terminal/[assetId]/page.tsx</span></td><td>Terminal page. Renders 3-col layout: <code>&lt;MasterChart /&gt;</code> + <code>&lt;LiquidationsFeed /&gt;</code> + <code>&lt;TradesFeed /&gt;</code>. Reads <code>assetId</code> from route param.</td></tr>
+    <tr><td><span class="filemono">src/app/myCabinet/screener/layout.tsx</span></td><td>Thin layout wrapper mounting cabinet sidebar shell (mirrors <code>tradingBots/page.tsx</code>).</td></tr>
+  </tbody>
+</table>
+
+<h3>New components — <code>src/app/components/Screener/</code></h3>
+<table>
+  <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">AssetsTable.tsx</span></td><td>Core table. Subscribes to <code>useScreenerStore</code> for sort/filter/period. Calls <code>getDashboardSnapshot()</code> on mount. Row click → <code>router.push('/myCabinet/screener/terminal/{code}')</code>.</td></tr>
+    <tr><td><span class="filemono">TableRow.tsx</span></td><td>Visual row: pair (icon + code), price + delta %, OI + delta %, CVD, buy/sell liquidations, funding.</td></tr>
+    <tr><td><span class="filemono">Filters.tsx</span></td><td>Search input + period toggle (1h/4h/24h) + preset buttons. Writes to <code>useScreenerStore</code>.</td></tr>
+    <tr><td><span class="filemono">MasterChart.tsx</span></td><td>Hosts the lightweight-charts instance with 6 panes (candles+volume, footprint overlay, CVD line, liquidations histogram, funding histogram, OI line). Timeframe selector (1m/5m/15m/1h/4h/1d). Loads <code>getChartInit(pair, tf)</code> from mock. "Load older" button stubbed with TODO (no infinite scroll in this port).</td></tr>
+    <tr><td><span class="filemono">HeatmapPlugin.ts</span></td><td>Custom lightweight-charts series plugin (<code>ICustomSeriesPaneView</code>). Ported from panscreen — pure visual logic, no data sources.</td></tr>
+    <tr><td><span class="filemono">chartUtils.ts</span></td><td>Data transforms: raw → <code>CandlestickData</code>, footprint frame → heatmap cells, timestamp → <code>UTCTimestamp</code>.</td></tr>
+    <tr><td><span class="filemono">LiquidationsFeed.tsx</span></td><td>FIFO list of 50 liquidation events. Consumes <code>subscribeLiquidations(pair, push)</code> from mock — currently a <code>setInterval</code> emitter.</td></tr>
+    <tr><td><span class="filemono">TradesFeed.tsx</span></td><td>FIFO list of 50 large-trade events. Consumes <code>subscribeTrades(pair, push)</code>.</td></tr>
+    <tr><td><span class="filemono">PeriodToggle.tsx</span></td><td>Small pill switcher (1h/4h/24h). Pulls/writes Zustand.</td></tr>
+    <tr><td><span class="filemono">TimeframeToggle.tsx</span></td><td>1m/5m/15m/1h/4h/1d pill switcher used inside <code>MasterChart</code>.</td></tr>
+    <tr><td><span class="filemono">ScreenerAccessGate.tsx</span></td><td>Client gate that reads user subscriptions and redirects to <code>/paywall</code> if <code>screener_access</code> is missing.</td></tr>
+    <tr><td><span class="filemono">styles/Screener.module.scss</span></td><td>Pane sizing, sticky table header, heatmap canvas styling.</td></tr>
+    <tr><td><span class="filemono">styles/Feeds.module.scss</span></td><td>Feed row colors (buy/sell), monospaced ts column.</td></tr>
+  </tbody>
+</table>
+
+<h3>New library code — <code>src/lib/screener/</code></h3>
+<table>
+  <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">types.ts</span></td><td>Shared TS types — <code>AssetPair</code>, <code>DashboardAssetData</code>, <code>Candle</code>, <code>FootprintFrame</code>, <code>CvdPoint</code>, <code>LiquidationBar</code>, <code>LiquidationEvent</code>, <code>TradeEvent</code>, <code>Period</code>, <code>Timeframe</code>.</td></tr>
+    <tr><td><span class="filemono">format.ts</span></td><td><code>formatUsdShort</code>, <code>formatPercent</code>, <code>formatPrice(price, precision)</code>.</td></tr>
+    <tr><td><span class="filemono">mock/pairs.ts</span></td><td>16 pairs: BTC, ETH, SOL, XRP, BNB, DOGE, ADA, AVAX, TRX, LINK, DOT, MATIC, LTC, BCH, NEAR, ARB.</td></tr>
+    <tr><td><span class="filemono">mock/dashboard.ts</span></td><td><code>getDashboardSnapshot(): Promise&lt;Record&lt;string, DashboardAssetData&gt;&gt;</code> — 16 rows with realistic-looking values.</td></tr>
+    <tr><td><span class="filemono">mock/chart.ts</span></td><td><code>getChartInit(pair, tf)</code> — ~200 deterministic candles per timeframe (seeded RNG) + matching CVD / liquidations / funding / OI series + footprint frame per candle.</td></tr>
+    <tr><td><span class="filemono">mock/feeds.ts</span></td><td><code>subscribeLiquidations</code> / <code>subscribeTrades</code> — <code>setInterval</code> emitters (1 event per 1.5–4 s) + 50 seed events. Returns unsubscribe.</td></tr>
+    <tr><td><span class="filemono">mock/rng.ts</span></td><td>Seedable PRNG (mulberry32) for stable mock data per (pair, tf).</td></tr>
+  </tbody>
+</table>
+
+<h3>New stores — <code>src/store/Screener/</code></h3>
+<table>
+  <thead><tr><th>Path</th><th>State</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">useScreenerStore.ts</span></td><td><code>period: '1h'|'4h'|'24h'</code>, <code>searchTerm</code>, <code>sortKey</code>, <code>sortDir</code>, setters. Not persisted.</td></tr>
+    <tr><td><span class="filemono">useTerminalStore.ts</span></td><td><code>timeframe: Timeframe</code>, <code>heatmapVisible: boolean</code>, setters. Not persisted.</td></tr>
+  </tbody>
+</table>
+
+<h3>Public assets</h3>
+<div class="callout">
+<strong>Coin icons:</strong> the panscreen <code>public/media/</code> directory is empty in this checkout, so nothing is copied. The port will reference <code>https://assets.coingecko.com/coins/images/&hellip;</code> via a <code>COIN_ICON</code> map in <code>pairs.ts</code>, with a text-initial fallback (e.g. <code>BTC</code>) rendered on image error. If the user later supplies PNGs, drop them in <code>public/coins/</code>.
+</div>
+
+<h2 id="mods">4. File modifications</h2>
+<table>
+  <thead><tr><th>File</th><th>Change</th></tr></thead>
+  <tbody>
+    <tr><td><span class="filemono">package.json</span></td><td>Add <code>"lightweight-charts": "^5.0.8"</code>.</td></tr>
+    <tr><td><span class="filemono">src/app/components/HeaderComps/Drawer.tsx</span> (~line 124)</td><td>Change Screener <code>NavItem</code> link from <code>/dashboard</code> to <code>/myCabinet/screener</code>.</td></tr>
+    <tr><td><span class="filemono">src/app/components/LayoutItems/Footer.tsx</span> (~lines 76–90)</td><td>Repoint the Скрінер link from <code>https://screener.pantheonx.club/</code> to <code>/myCabinet/screener</code>.</td></tr>
+    <tr><td><span class="filemono">src/app/dashboard/page.tsx</span></td><td>Replace contents with a server-side <code>redirect('/myCabinet/screener')</code> so old bookmarks keep working.</td></tr>
+    <tr><td><span class="filemono">next.config.ts</span></td><td>Add <code>remotePatterns</code> entry for <code>assets.coingecko.com</code> so <code>next/image</code> can load coin icons.</td></tr>
+  </tbody>
+</table>
+<p>No changes to <code>ProtectedRoute.tsx</code>, <code>getSubscriptions.ts</code>, or <code>useUserStore.ts</code>.</p>
+
+<h2 id="mocks">5. Mock data shapes</h2>
+<pre>// src/lib/screener/types.ts
+export interface AssetPair {
+  id: number;
+  code: string;       // "BTCUSDT"
+  coin: string;       // "BTC"
+  type: 'USDT';
+  tick: number;
+  precision: number;
+  iconUrl: string;    // resolved CoinGecko URL
+}
+
+export type Period = '1h' | '4h' | '24h';
+export type Timeframe = '1m' | '5m' | '15m' | '1h' | '4h' | '1d';
+
+export interface DashboardAssetData {
+  ohlcv:    { close_latest: number; close_1h?: number; close_4h?: number; close_24h?: number };
+  oi:       { ointerest_latest: number; ointerest_1h?: number; ointerest_4h?: number; ointerest_24h?: number };
+  liquidations: {
+    buy_turnover_1h?: number;  sell_turnover_1h?: number;  total_turnover_1h?: number;
+    buy_turnover_4h?: number;  sell_turnover_4h?: number;  total_turnover_4h?: number;
+    buy_turnover_24h?: number; sell_turnover_24h?: number; total_turnover_24h?: number;
+  };
+  cvd:      { cvd_1h?: number; cvd_4h?: number; cvd_24h?: number };
+  funding?: { close_latest: number };
+  tick: number;
+  precision: number;
+}
+
+export interface Candle          { time: number; open: number; high: number; low: number; close: number; volume: number }
+export interface FootprintFrame  { time: number; data: Record&lt;string, { b: number; s: number }&gt; }
+export interface CvdPoint        { time: number; value: number }
+export interface LiquidationBar  { time: number; buy_volume: number; sell_volume: number }
+export interface FundingBar      { time: number; value: number }
+export interface OIPoint         { time: number; value: number }
+
+export interface ChartInitPayload {
+  candles: Candle[];            // ~200 entries
+  footprints: FootprintFrame[]; // ~200 entries, 10-18 price levels each
+  cvd: CvdPoint[];
+  liquidations: LiquidationBar[];
+  funding: FundingBar[];
+  oi: OIPoint[];
+}
+
+export interface LiquidationEvent { ts: number; symbol: string; side: 'buy'|'sell'; price: number; volume: number }
+export interface TradeEvent       { ts: number; symbol: string; side: 'buy'|'sell'; price: number; volume: number; isLarge: true }
+</pre>
+
+<p>Row counts:</p>
+<ul>
+  <li><code>dashboard.ts</code>: <strong>16 rows</strong> (one per pair).</li>
+  <li><code>chart.ts</code>: <strong>~200 candles per (pair, timeframe)</strong>, generated lazily on first call and memoised. Footprint frames: one per candle, 10–18 price levels each.</li>
+  <li><code>feeds.ts</code>: <strong>50 seed events</strong> each for liquidations &amp; trades, then 1 event every 1.5–4 s while subscribed.</li>
+</ul>
+
+<h2 id="components">6. Component breakdown</h2>
+
+<h3>AssetsTable</h3>
+<ul>
+  <li>Client component. On mount: <code>await getDashboardSnapshot()</code> → local <code>rows</code> state.</li>
+  <li>Subscribes to <code>useScreenerStore</code> for <code>period</code>, <code>searchTerm</code>, <code>sortKey</code>, <code>sortDir</code>.</li>
+  <li>Derives display rows: filter by <code>searchTerm</code> (case-insensitive substring on <code>code</code>/<code>coin</code>), compute period-aware deltas, sort.</li>
+  <li>Row click → <code>router.push('/myCabinet/screener/terminal/' + code)</code>.</li>
+  <li><strong>TODO(real-data):</strong> replace <code>getDashboardSnapshot()</code> with Axios <code>GET /api/screener/dashboard</code> and subscribe to <code>/ws/all</code> for live merge.</li>
+</ul>
+
+<h3>MasterChart</h3>
+<ul>
+  <li>Client component. Props: <code>pair: AssetPair</code>.</li>
+  <li>Reads <code>timeframe</code> + <code>heatmapVisible</code> from <code>useTerminalStore</code>.</li>
+  <li><code>useEffect</code> creates a single <code>IChartApi</code> with 6 panes via <code>addPane()</code> (lightweight-charts v5): candle+volume, heatmap overlay (custom series), CVD line, liquidations histogram (buy/sell), funding histogram, OI line.</li>
+  <li>On <code>(pair, timeframe)</code> change: <code>await getChartInit(pair.code, timeframe)</code> → <code>setData</code> on each series.</li>
+  <li>Shared crosshair + legend overlay updates via <code>subscribeCrosshairMove</code>.</li>
+  <li><strong>TODO(real-data):</strong> replace <code>getChartInit()</code> with WS <code>/ws/chart/{pair}?tf={tf}</code> init payload + incremental update events.</li>
+  <li><strong>TODO(real-data):</strong> "Load older" button currently no-ops with a console warning.</li>
+</ul>
+
+<h3>HeatmapPlugin</h3>
+<ul>
+  <li>Implements <code>ICustomSeriesPaneView&lt;Time, FootprintCellData&gt;</code> — <code>renderer()</code>, <code>update()</code>, <code>priceValueBuilder()</code>, <code>defaultOptions()</code>.</li>
+  <li>Pure rendering: for each footprint frame, draws colored rects at price-level y-positions across the candle's x-span. Color = <code>rgba(buy_green, alpha=clamp(b/(b+s)))</code> / <code>rgba(sell_red, alpha=clamp(s/(b+s)))</code>.</li>
+  <li>Reproduced from <code>panscreen/.../HeatmapPlugin.ts</code> with v5 API renames.</li>
+</ul>
+
+<h3>LiquidationsFeed</h3>
+<ul>
+  <li>Client component. Props: <code>pair: AssetPair</code>.</li>
+  <li><code>useEffect</code>: <code>const unsub = subscribeLiquidations(pair.code, evt =&gt; setEvents(p =&gt; [evt, ...p].slice(0, 50)))</code>. Cleanup calls <code>unsub</code>.</li>
+  <li>Seeded with 50 events from the mock.</li>
+  <li>Row layout: <code>ts</code> (HH:MM:SS), side-colored dot, <code>price</code>, <code>formatUsdShort(volume)</code>.</li>
+  <li><strong>TODO(real-data):</strong> swap mock subscribe for <code>new WebSocket(WS_BASE + '/ws/liquidations-stream/' + pair.code)</code>.</li>
+</ul>
+
+<h3>TradesFeed</h3>
+<ul>
+  <li>Identical pattern to <code>LiquidationsFeed</code>, fed from <code>subscribeTrades</code>.</li>
+  <li><strong>TODO(real-data):</strong> <code>/ws/trades-stream/{pair}</code>.</li>
+</ul>
+
+<h3>Filters</h3>
+<ul>
+  <li>Search input bound to <code>searchTerm</code>.</li>
+  <li><code>PeriodToggle</code> writes Zustand.</li>
+  <li>Preset buttons: only "All" wired; others disabled with <code>title="Coming soon"</code>.</li>
+</ul>
+
+<h2 id="auth">7. Routing &amp; auth gate</h2>
+<p>Cabinet root already redirects unauthenticated users at the server level via <code>src/app/myCabinet/layout.tsx</code>. On top of that, both new pages add a client-side subscription guard:</p>
+<pre>// src/app/myCabinet/screener/page.tsx (and terminal/[assetId]/page.tsx)
+'use client';
+return (
+  &lt;ProtectedRoute&gt;
+    &lt;ScreenerAccessGate&gt;
+      {/* cabinet shell: BreadCrump + Sidebar + content */}
+      &lt;Filters /&gt;
+      &lt;AssetsTable /&gt;
+    &lt;/ScreenerAccessGate&gt;
+  &lt;/ProtectedRoute&gt;
+);</pre>
+
+<p><code>ScreenerAccessGate</code> behavior:</p>
+<ol>
+  <li><code>useUserStore</code> to read the user.</li>
+  <li><code>useQuery</code> (already-present <code>@tanstack/react-query</code>) → <code>getSubscriptions()</code> once.</li>
+  <li>If any active <code>Subscription.screener_access === true</code>, render children.</li>
+  <li>Otherwise <code>router.replace('/paywall')</code>.</li>
+  <li>Loading state: small cabinet-style <code>&lt;Loader/&gt;</code>.</li>
+</ol>
+<p>Same gate wraps the terminal page.</p>
+
+<h2 id="styling">8. Styling approach</h2>
+<ul>
+  <li><strong>Tailwind 3.4 utilities</strong> for layout, spacing, typography. Cabinet palette: page bg <code>#1A1A28</code>, panel <code>#242433</code>, accent text <code>#D2D2FF</code>, success <code>#4ADE80</code>, danger <code>#F87171</code>, muted <code>#98A0B3</code>. Headings <code>font-bold text-xl md:text-3xl text-[#D2D2FF]</code> to match <code>tradingBots/page.tsx</code>.</li>
+  <li><strong>SCSS modules</strong>:
+    <ul>
+      <li><code>Screener.module.scss</code>: pane min-heights for the 6 chart panes (<code>.pane--candles { min-height: 360px }</code>, <code>.pane--cvd { min-height: 90px }</code>, etc.), sticky table header with subtle border, hover row highlight <code>rgba(210,210,255,0.06)</code>.</li>
+      <li><code>Feeds.module.scss</code>: monospace ts column, <code>.row--buy { color: #4ade80 }</code>, <code>.row--sell { color: #f87171 }</code>, 50-row scroll container <code>max-height: calc(100vh - 240px); overflow-y: auto</code>.</li>
+    </ul>
+  </li>
+  <li>Dark theme only. No light-mode variant.</li>
+  <li>Coin icon: <code>next/image</code> 24×24, rounded-full, <code>onError</code> fallback to <code>&lt;span&gt;{coin.slice(0,3)}&lt;/span&gt;</code>.</li>
+  <li>Mobile: dashboard table is horizontal-scrollable. Terminal page hides the right column under <code>lg:hidden</code>; chart fills width.</li>
+</ul>
+
+<h2 id="todos">9. Data integration TODOs</h2>
+<p>All grep-able as <code>TODO(real-data)</code>.</p>
+<table>
+  <thead><tr><th>Location</th><th>Swap</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/lib/screener/mock/dashboard.ts</code> → <code>getDashboardSnapshot()</code></td><td>Axios <code>GET /api/screener/dashboard</code>; introduce <code>NEXT_PUBLIC_SCREENER_API_BASE_URL</code>.</td></tr>
+    <tr><td><code>AssetsTable.tsx</code> — inside post-load <code>useEffect</code></td><td>Open <code>new WebSocket(WS_BASE + '/ws/all')</code> and merge <code>ohlcv-1m-update</code> / <code>open-interest-update</code> / <code>liquidations</code> / <code>cvd</code> / <code>funding</code> events into row state.</td></tr>
+    <tr><td><code>src/lib/screener/mock/chart.ts</code> → <code>getChartInit(pair, tf)</code></td><td>Replace with WS <code>/ws/chart/{pair}?tf={tf}</code> — first message is init, keep socket open for incremental updates.</td></tr>
+    <tr><td><code>MasterChart.tsx</code> — "Load older" handler</td><td>Implement infinite backward scroll: request 6000 more candles, prepend via <code>setData</code>.</td></tr>
+    <tr><td><code>src/lib/screener/mock/feeds.ts</code> → <code>subscribeLiquidations</code> / <code>subscribeTrades</code></td><td>Replace <code>setInterval</code> body with <code>new WebSocket(&hellip;/ws/liquidations-stream/&hellip;)</code> and <code>/ws/trades-stream/&hellip;</code>. Same return signature so callers don't change.</td></tr>
+    <tr><td><code>next.config.ts</code></td><td>When real backend is wired, add screener API host to <code>remotePatterns</code> and/or proxy rewrites.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="verify">10. Verification checklist</h2>
+<pre>cd /Users/asilverrrr/WebstormProjects/PhanteonNext
+yarn install              # picks up lightweight-charts
+yarn dev                  # starts Next dev server on :3000
+yarn lint                 # zero errors
+yarn build                # production build succeeds
+npx tsc --noEmit          # zero TS errors</pre>
+
+<p>Manual checks:</p>
+<ul class="checklist">
+  <li>Logged-out user visiting <code>/myCabinet/screener</code> is redirected to <code>/login</code> by the server-layout guard.</li>
+  <li>Logged-in user without <code>screener_access</code> is redirected to <code>/paywall</code> by <code>ScreenerAccessGate</code>.</li>
+  <li>Logged-in user with <code>screener_access</code> sees the table with 16 rows, coin icons (or initials fallback), prices, and period-aware deltas.</li>
+  <li>Sorting any column toggles asc/desc.</li>
+  <li>Typing in the search input filters rows live.</li>
+  <li>Switching the period toggle recomputes deltas.</li>
+  <li>Clicking a row navigates to <code>/myCabinet/screener/terminal/BTCUSDT</code>.</li>
+  <li>Terminal renders 6 chart panes; switching timeframes refetches mock candles.</li>
+  <li>Heatmap toggle shows/hides footprint cells.</li>
+  <li>Liquidations &amp; Trades feeds scroll-prepend new mock events every couple of seconds; capped at 50 rows.</li>
+  <li>Drawer "Screener" link goes to <code>/myCabinet/screener</code>.</li>
+  <li>Footer Скрінер link goes to <code>/myCabinet/screener</code>.</li>
+  <li>Old <code>/dashboard</code> URL redirects to <code>/myCabinet/screener</code>.</li>
+  <li>No browser console errors; no React strict-mode warnings; no <code>lightweight-charts</code> v5 deprecation warnings.</li>
+</ul>
+
+<h2 id="oos">11. Out of scope (explicit)</h2>
+<ul>
+  <li>Any HTTP call to a screener backend (no Axios for screener data; mock modules only).</li>
+  <li>Any WebSocket connection (mock <code>setInterval</code> emitters only).</li>
+  <li>Real footprint heatmap data — heatmap renders, but cells come from synthetic frames.</li>
+  <li>Infinite backward scroll wiring (button exists, no-ops).</li>
+  <li>Tailwind 4 upgrade.</li>
+  <li>Exchanges beyond the 16 Binance USDT-perp pairs.</li>
+  <li>New backend env vars (<code>NEXT_PUBLIC_SCREENER_API_BASE_URL</code> / <code>NEXT_PUBLIC_SCREENER_WS_BASE_URL</code>) — documented in §9 TODOs but not yet added to <code>.env.example</code>.</li>
+  <li>Persistent user preferences (selected period / timeframe / heatmap-on) — Zustand state is in-memory only this round.</li>
+  <li>E2E or unit tests — manual verification only.</li>
+  <li>Mobile terminal-layout polishing beyond hiding the right column.</li>
+  <li>Copying coin icon PNGs (source <code>public/media/</code> is empty; using CoinGecko CDN URLs with text-initial fallback instead).</li>
+</ul>
+
+<footer>
+Screener port implementation plan · awaiting approval · 2026-05-28
+</footer>
+
+</div>
+</body>
+</html>

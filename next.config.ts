@@ -12,13 +12,23 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'assets.coingecko.com',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {
+    const target = process.env.SCREENER_SERVICE_URL ?? 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com'
     return [
       {
         source: '/tron-proxy/:path*',
         destination: 'https://tron.algonix.org/:path*',
+      },
+      {
+        source: '/api/screener/:path*',
+        destination: `${target}/:path*`,
       },
     ]
   },
