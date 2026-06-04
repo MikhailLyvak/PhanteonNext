@@ -2,21 +2,32 @@ import { create } from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import {
 	Candle,
-	ChartInitPayload,
 	CvdPoint,
 	FootprintFrame,
 	FundingBar,
 	LiquidationBar,
 	OIPoint,
-	TickPayload,
 	Timeframe,
 } from '@/lib/screener/types'
-import { openChartStream } from '@/api/Screener/streams'
-import { getChartHistory } from '@/api/Screener/client'
+import { fetchKlines } from '@/api/Screener/getBinanceKlines'
+import {
+	IndicatorPeriod,
+	aggregateFunding,
+	aggregateOI,
+	computeCVDFromCandles,
+	fetchFundingHistory,
+	fetchOIHistory,
+	pickOIPeriod,
+} from '@/api/Screener/getBinanceIndicators'
+
+const LIVE_TAIL_INTERVAL_MS = 1000
 
 export type IndicatorKey = 'volume' | 'cvd' | 'liq' | 'funding' | 'oi'
 
-export const INDICATOR_ORDER: IndicatorKey[] = ['volume', 'cvd', 'funding', 'liq', 'oi']
+// `liq` is intentionally excluded from the visible toggle row for now — the
+// liquidations stream is not yet reliable enough to surface. The full pipeline
+// (types, store slice, chart pane) is left in place for easy re-enable.
+export const INDICATOR_ORDER: IndicatorKey[] = ['volume', 'cvd', 'funding', 'oi']
 
 export const INDICATOR_LABELS: Record<IndicatorKey, string> = {
 	volume: 'Volume',
@@ -44,7 +55,14 @@ interface TerminalState {
 	cvd: CvdPoint[]
 	liquidations: LiquidationBar[]
 	funding: FundingBar[]
+	// Raw funding events (every 8h, sparse). Kept alongside the aggregated
+	// `funding` series so scroll-back can extend backward and re-aggregate the
+	// forward-filled bars over the wider candle window.
+	fundingRaw: FundingBar[]
 	oi: OIPoint[]
+	// Binance OI period chosen at init based on the candle window. Kept so
+	// scroll-back can fetch older OI with the same resolution.
+	oiPeriod: IndicatorPeriod | null
 
 	subscribe: (pair: string, tf: Timeframe) => () => void
 	loadOlder: (before: number, tf: Timeframe, limit?: number) => Promise<void>
@@ -67,7 +85,9 @@ const EMPTY_DATA = {
 	cvd: [] as CvdPoint[],
 	liquidations: [] as LiquidationBar[],
 	funding: [] as FundingBar[],
+	fundingRaw: [] as FundingBar[],
 	oi: [] as OIPoint[],
+	oiPeriod: null as IndicatorPeriod | null,
 }
 
 // Generic helper: update the last element of `series` if `incoming.time` matches
@@ -92,7 +112,6 @@ function dedupeAndPrepend<T extends { time: number }>(older: T[], existing: T[])
 	const seen = new Set(existing.map(e => e.time))
 	const filtered = older.filter(o => !seen.has(o.time))
 	if (filtered.length === 0) return existing
-	// Older arrives sorted ascending by time per contract; if not, sort defensively.
 	filtered.sort((a, b) => a.time - b.time)
 	return [...filtered, ...existing]
 }
@@ -101,7 +120,7 @@ export const useTerminalStore = create<TerminalState>()(
 	subscribeWithSelector(
 		persist(
 			(set, get) => ({
-				timeframe: '15m',
+				timeframe: '1h',
 				heatmapVisible: true,
 				indicators: DEFAULT_INDICATORS,
 				setTimeframe: timeframe => set({ timeframe }),
@@ -117,45 +136,96 @@ export const useTerminalStore = create<TerminalState>()(
 				subscribe: (pair, tf) => {
 					set({ ...EMPTY_DATA, currentPair: pair, loading: true })
 
-					const applyInit = (p: ChartInitPayload) => {
-						set({
-							currentPair: pair,
-							loading: false,
-							candles: p.candles,
-							footprints: p.footprints,
-							cvd: p.cvd,
-							liquidations: p.liquidations,
-							funding: p.funding,
-							oi: p.oi,
-						})
-					}
+					let cancelled = false
+					let pollInterval: ReturnType<typeof setInterval> | null = null
 
-					const applyTick = (t: TickPayload) => {
-						// Only apply if we still own this pair (avoid races on rapid resubscribe).
-						if (get().currentPair !== pair) return
-						const s = get()
-						const patch: Partial<TerminalState> = {}
-						if (t.candle) patch.candles = upsertLastByTime(s.candles, t.candle)
-						if (t.footprint) patch.footprints = upsertLastByTime(s.footprints, t.footprint)
-						if (t.cvd) patch.cvd = upsertLastByTime(s.cvd, t.cvd)
-						if (t.liquidations) patch.liquidations = upsertLastByTime(s.liquidations, t.liquidations)
-						if (t.funding) patch.funding = upsertLastByTime(s.funding, t.funding)
-						if (t.oi) patch.oi = upsertLastByTime(s.oi, t.oi)
-						if (Object.keys(patch).length > 0) set(patch)
-					}
+					;(async () => {
+						try {
+							// 1. Most-recent batch only (~1 Binance call, ~300ms). The chart
+							//    appears immediately; older history is pulled on scroll-back
+							//    via loadOlder, indicators arrive in step 3 below without
+							//    blocking the first paint.
+							const candles = await fetchKlines(pair, tf, 1500)
+							if (cancelled || get().currentPair !== pair) return
+							set({
+								currentPair: pair,
+								loading: false,
+								candles,
+								footprints: [],
+								cvd: computeCVDFromCandles(candles),
+								liquidations: [],
+								funding: [],
+								oi: [],
+							})
 
-					const unsubscribe = openChartStream(pair, tf, {
-						onInit: applyInit,
-						onTick: applyTick,
-						onBarClose: applyTick,
-						onError: () => {
-							// EventSource auto-reconnects — surface nothing transient.
-						},
-					})
+							// 2. Live tail: poll the last 2 klines every 1s and upsert.
+							//    Started only after init so the polled bar can never land
+							//    before the historical window does.
+							pollInterval = setInterval(async () => {
+								if (cancelled || get().currentPair !== pair) return
+								try {
+									const tail = await fetchKlines(pair, tf, 2)
+									if (cancelled || get().currentPair !== pair) return
+									const s = get()
+									let next = s.candles
+									for (const c of tail) {
+										next = upsertLastByTime(next, c)
+									}
+									if (next === s.candles) return
+									const update: Partial<TerminalState> = {
+										candles: next,
+										cvd: computeCVDFromCandles(next),
+									}
+									// Forward-fill funding into freshly opened candle slots so
+									// the histogram keeps painting columns past the last raw
+									// funding event (which only arrives every 8h).
+									if (s.funding.length > 0) {
+										const last = s.funding[s.funding.length - 1]
+										const newestCandleTime = next[next.length - 1].time
+										if (newestCandleTime > last.time) {
+											update.funding = [
+												...s.funding,
+												{ time: newestCandleTime, value: last.value },
+											]
+										}
+									}
+									set(update)
+								} catch {
+									// Transient Binance error — next interval retries.
+								}
+							}, LIVE_TAIL_INTERVAL_MS)
+
+							// 3. Indicators in parallel; each failure swallowed → keeps empty.
+							//    Liquidations are not fetched — Binance public API only exposes
+							//    taker buy/sell ratio (a misleading proxy), not real liquidation flow.
+							//    OI period is picked to cover the candle window in a single
+							//    500-row request, since Binance caps `limit` at 500.
+							const candleWindowSec =
+								candles.length > 1 ? candles[candles.length - 1].time - candles[0].time : 0
+							const oiPeriod = pickOIPeriod(candleWindowSec)
+							const [oiRes, fundingRes] = await Promise.all([
+								fetchOIHistory(pair, oiPeriod, 500).catch(() => [] as OIPoint[]),
+								fetchFundingHistory(pair, 1000).catch(() => [] as FundingBar[]),
+							])
+							if (cancelled || get().currentPair !== pair) return
+							set({
+								oi: aggregateOI(oiRes, candles, tf, oiPeriod),
+								funding: aggregateFunding(fundingRes, candles, tf),
+								fundingRaw: fundingRes,
+								oiPeriod,
+							})
+						} catch (err) {
+							// eslint-disable-next-line no-console
+							console.error('[screener] chart init failed:', err)
+							if (!cancelled && get().currentPair === pair) {
+								set({ loading: false })
+							}
+						}
+					})()
 
 					return () => {
-						unsubscribe()
-						// Reset if no resubscribe has happened in between (handled by next subscribe call).
+						cancelled = true
+						if (pollInterval) clearInterval(pollInterval)
 						if (get().currentPair === pair) {
 							set({ ...EMPTY_DATA })
 						}
@@ -165,14 +235,61 @@ export const useTerminalStore = create<TerminalState>()(
 				loadOlder: async (before, tf, limit = 500) => {
 					const pair = get().currentPair
 					if (!pair) return
-					const res = await getChartHistory(pair, { before, tf, limit })
-					// Bail if pair changed mid-flight.
-					if (get().currentPair !== pair) return
+
 					const s = get()
-					set({
-						candles: dedupeAndPrepend(res.candles, s.candles),
-						footprints: dedupeAndPrepend(res.footprints, s.footprints),
+					const oiPeriod = s.oiPeriod
+					const earliestOiMs = s.oi.length > 0 ? s.oi[0].time * 1000 : null
+					const earliestFundingMs =
+						s.fundingRaw.length > 0 ? s.fundingRaw[0].time * 1000 : null
+
+					// Fetch older candles, older OI (when we have a known period), and
+					// older raw funding events in parallel so scroll-back latency is
+					// max(fetch), not sum.
+					const candlesPromise = fetchKlines(pair, tf, limit, {
+						endTime: before * 1000 - 1,
 					})
+					const oiPromise: Promise<OIPoint[]> =
+						oiPeriod && earliestOiMs !== null
+							? fetchOIHistory(pair, oiPeriod, 500, { endTime: earliestOiMs - 1 }).catch(
+									() => [] as OIPoint[],
+								)
+							: Promise.resolve([])
+					const fundingPromise: Promise<FundingBar[]> =
+						earliestFundingMs !== null
+							? fetchFundingHistory(pair, 1000, undefined, earliestFundingMs - 1).catch(
+									() => [] as FundingBar[],
+								)
+							: Promise.resolve([])
+					const [olderCandles, olderOi, olderFunding] = await Promise.all([
+						candlesPromise,
+						oiPromise,
+						fundingPromise,
+					])
+
+					if (get().currentPair !== pair) return
+					const sNow = get()
+					const candlesMerged = dedupeAndPrepend(olderCandles, sNow.candles)
+					const update: Partial<TerminalState> = {
+						candles: candlesMerged,
+						// Recompute CVD over the extended window so the curve is continuous.
+						cvd: computeCVDFromCandles(candlesMerged),
+					}
+					if (olderOi.length > 0 && oiPeriod) {
+						const oiMerged = dedupeAndPrepend(olderOi, sNow.oi)
+						update.oi = aggregateOI(oiMerged, candlesMerged, tf, oiPeriod)
+					}
+					// Re-aggregate funding over the (now larger) candle window so the
+					// forward-filled histogram extends across the freshly-prepended
+					// bars. Merge older raw funding events when present.
+					const fundingRawMerged =
+						olderFunding.length > 0
+							? dedupeAndPrepend(olderFunding, sNow.fundingRaw)
+							: sNow.fundingRaw
+					if (fundingRawMerged.length > 0) {
+						update.fundingRaw = fundingRawMerged
+						update.funding = aggregateFunding(fundingRawMerged, candlesMerged, tf)
+					}
+					set(update)
 				},
 
 				clear: () => set({ ...EMPTY_DATA }),

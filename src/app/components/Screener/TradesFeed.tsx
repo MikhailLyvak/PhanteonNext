@@ -16,12 +16,15 @@ function formatTs(ts: number): string {
 
 const TradesFeed: React.FC<Props> = ({ pair }) => {
 	const [events, setEvents] = useState<TradeEvent[]>([])
+	const [seeded, setSeeded] = useState(false)
 
 	useEffect(() => {
 		setEvents([])
+		setSeeded(false)
 		const unsubscribe = openTradesStream(pair.code, {
 			onSeed: seed => {
 				setEvents(seed.slice(0, 50))
+				setSeeded(true)
 			},
 			onEvent: evt => {
 				setEvents(prev => [evt, ...prev].slice(0, 50))
@@ -30,8 +33,10 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 		return unsubscribe
 	}, [pair.code])
 
+	const empty = seeded && events.length === 0
+
 	return (
-		<div className='overflow-y-auto flex-1 min-h-0'>
+		<div className='overflow-y-auto flex-1 min-h-0 relative'>
 			<table className='w-full text-xs'>
 				<thead className='sticky top-0 bg-[#1d212c] text-[#7A7AA0]'>
 					<tr>
@@ -41,6 +46,40 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 					</tr>
 				</thead>
 				<tbody>
+					{!seeded && (
+						<tr>
+							<td colSpan={3} className='py-0'>
+								<div className='flex flex-col items-center justify-center gap-2 py-10 text-[#7A7AA0]'>
+									<div className='flex items-center gap-1.5'>
+										<span className='h-1.5 w-1.5 rounded-full bg-[#8AA6FF] animate-pulse' />
+										<span
+											className='h-1.5 w-1.5 rounded-full bg-[#8AA6FF] animate-pulse'
+											style={{ animationDelay: '0.15s' }}
+										/>
+										<span
+											className='h-1.5 w-1.5 rounded-full bg-[#8AA6FF] animate-pulse'
+											style={{ animationDelay: '0.3s' }}
+										/>
+									</div>
+									<span className='text-xs'>Завантаження угод…</span>
+								</div>
+							</td>
+						</tr>
+					)}
+					{empty && (
+						<tr>
+							<td colSpan={3} className='py-0'>
+								<div className='flex flex-col items-center justify-center gap-1 py-10 px-3 text-center'>
+									<span className='text-sm text-[#98A0B3]'>
+										Поки немає великих угод
+									</span>
+									<span className='text-[11px] text-[#58587B]'>
+										Очікуємо аномальні обʼєми
+									</span>
+								</div>
+							</td>
+						</tr>
+					)}
 					{events.map((e, i) => (
 						<tr key={`${e.ts}-${i}`} className='border-t border-[#262b38]/50'>
 							<td className='py-1 font-mono text-[#98A0B3]'>{formatTs(e.ts)}</td>

@@ -117,7 +117,7 @@ GET https://fapi.binance.com/fapi/v1/fundingRate?symbol={code}&limit={…} [&sta
 
 | FE env var | Purpose | Example | Status |
 | --- | --- | --- | --- |
-| `SCREENER_SERVICE_URL` (server-side, in `next.config.ts`) | Target the Next.js rewrite `/api/screener/:path*` → screener-service. REST and SSE both ride on this single base URL. | `http://localhost:4000` (dev), service URL in prod | declared in `screener-service/README.md` §11, **not yet wired in code** |
+| `SCREENER_SERVICE_URL` (server-side, in `next.config.ts`) | Target the Next.js rewrite `/api/screener/:path*` → screener-service. REST and SSE both ride on this single base URL. | default `https://pantheon-screener-service-47a52e37ec37.herokuapp.com`; override to `http://localhost:4000` when running screener-service locally | wired in `next.config.ts` |
 
 Auth: **TBD — see Open Questions**. Assume for now that the same `local_access_token` cookie used elsewhere in the cabinet is in scope for both REST and WS.
 

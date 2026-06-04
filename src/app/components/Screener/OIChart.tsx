@@ -81,9 +81,8 @@ const OIChart: React.FC<Props> = ({ pair }) => {
 			const before = s.candles.length
 			await useTerminalStore.getState().loadOlder(earliestSec - 1, s.timeframe, 500)
 			const after = useTerminalStore.getState().candles.length
-			// OI history is delivered via /chart/history only when backend includes
-			// it — for now backend's history only returns candles+footprints. So
-			// rely on chart store; once OI prepended length is zero, stop trying.
+			// loadOlder pulls candles + OI + funding from Binance directly. If
+			// no new candles came back we've hit the end of available history.
 			if (after === before) {
 				allLoadedRef.current = true
 			}

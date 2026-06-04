@@ -1,9 +1,7 @@
 import type {
 	AssetPair,
-	ChartHistoryResponse,
+	DashboardEntry,
 	DashboardSnapshot,
-	ScreenerHealth,
-	Timeframe,
 } from '@/lib/screener/types'
 
 const BASE = '/api/screener'
@@ -26,26 +24,26 @@ async function request<T>(path: string): Promise<T> {
 	return (await r.json()) as T
 }
 
-export function getHealth(): Promise<ScreenerHealth> {
-	return request<ScreenerHealth>('/health')
-}
-
-export function getPairs(): Promise<AssetPair[]> {
-	return request<AssetPair[]>('/pairs')
-}
-
 export function getDashboard(): Promise<DashboardSnapshot> {
 	return request<DashboardSnapshot>('/dashboard')
 }
 
-export function getChartHistory(
-	pair: string,
-	params: { before: number; tf: Timeframe; limit?: number },
-): Promise<ChartHistoryResponse> {
-	const q = new URLSearchParams({
-		before: String(params.before),
-		tf: params.tf,
-	})
-	if (params.limit !== undefined) q.set('limit', String(params.limit))
-	return request<ChartHistoryResponse>(`/chart/${encodeURIComponent(pair)}/history?${q.toString()}`)
+// Derives the AssetPair[] used by selectors / lookups from the merged
+// /dashboard response. Sorted by id so the order is stable across renders.
+export function extractPairs(snapshot: DashboardSnapshot): AssetPair[] {
+	const out: AssetPair[] = []
+	for (const code of Object.keys(snapshot)) {
+		const e = snapshot[code] as DashboardEntry
+		out.push({
+			id: e.id,
+			code,
+			coin: e.coin,
+			type: e.type,
+			tick: e.tick,
+			precision: e.precision,
+			iconUrl: e.iconUrl,
+		})
+	}
+	out.sort((a, b) => a.id - b.id)
+	return out
 }

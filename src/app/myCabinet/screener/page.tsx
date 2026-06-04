@@ -4,7 +4,6 @@ import React from 'react'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Filters from '@/app/components/Screener/Filters'
 import AssetsTable from '@/app/components/Screener/AssetsTable'
-import HealthBadge from '@/app/components/Screener/HealthBadge'
 
 const ScreenerPage = () => {
 	return (
@@ -15,7 +14,6 @@ const ScreenerPage = () => {
 						<h6 className='text-[#D2D2FF] text-xl md:text-4xl font-bold'>
 							Скрінер
 						</h6>
-						<HealthBadge />
 					</div>
 					<div className='mt-8'>
 						<Filters />

@@ -36,5 +36,10 @@ export const toLiquidationSell = (bars: LiquidationBar[]): HistogramData<Time>[]
 		color: 'rgba(248,113,113,0.7)',
 	}))
 
+export const fundingToPercent = (value: number): number => value * 100
+
 export const toFundingLineData = (bars: FundingBar[]): LineData<Time>[] =>
-	bars.map(b => ({ time: toTime(b.time), value: b.value }))
+	bars.map(b => ({
+		time: toTime(b.time),
+		value: fundingToPercent(b.value),
+	}))

@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const target = process.env.SCREENER_SERVICE_URL ?? 'http://localhost:4000'
+    const target = process.env.SCREENER_SERVICE_URL ?? 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com'
     return [
       {
         source: '/tron-proxy/:path*',

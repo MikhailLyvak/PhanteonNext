@@ -49,10 +49,12 @@ const TableRow: React.FC<Props> = ({ pair, data, hiddenColumns }) => {
 	const price = data.ohlcv?.close_latest ?? 0
 	const priceDelta24h = pctChange(price, data.ohlcv?.close_24h)
 
-	const oi = data.oi?.ointerest_latest ?? 0
-	const oi1h = pctChange(oi, data.oi?.ointerest_1h)
-	const oi4h = pctChange(oi, data.oi?.ointerest_4h)
-	const oi24h = pctChange(oi, data.oi?.ointerest_24h)
+	// Backend already delivers `ointerest_1h/4h/24h` as pre-computed percent
+	// change values (not absolute reference OI any more), so we display them
+	// directly — no client-side pctChange against `ointerest_latest`.
+	const oi1h = data.oi?.ointerest_1h ?? 0
+	const oi4h = data.oi?.ointerest_4h ?? 0
+	const oi24h = data.oi?.ointerest_24h ?? 0
 
 	const cvd1h = data.cvd?.cvd_1h ?? 0
 	const cvd4h = data.cvd?.cvd_4h ?? 0

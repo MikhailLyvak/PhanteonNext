@@ -35,7 +35,7 @@ Companions:
 
 ```ts
 async rewrites() {
-  const target = process.env.SCREENER_SERVICE_URL ?? 'http://localhost:4000'
+  const target = process.env.SCREENER_SERVICE_URL ?? 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com'
   return [
     { source: '/tron-proxy/:path*', destination: 'https://tron.algonix.org/:path*' },
     { source: '/api/screener/:path*', destination: `${target}/:path*` },
@@ -46,8 +46,8 @@ async rewrites() {
 **SSE through Next.js rewrites.** Next 15 proxies SSE correctly out of the box — no buffering, no chunked-encoding stripping. Verified by hitting `/api/screener/health` and `/api/screener/stream/dashboard` from the browser DevTools network tab and watching events stream live.
 
 **Env wiring.**
-- `.env.local` (dev): `SCREENER_SERVICE_URL=http://localhost:4000` (or omit — that's the default).
-- `.env.production` / AWS env: `SCREENER_SERVICE_URL=https://<deployed-service-url>`. **Production deploy of the FE blocks on the backend being reachable at that URL** — add a deploy-time smoke check that hits `/api/screener/health` and 503s the deploy if upstream is degraded.
+- `.env.local` (dev): omit — the default already points at the deployed Heroku instance `https://pantheon-screener-service-47a52e37ec37.herokuapp.com`. Set `SCREENER_SERVICE_URL=http://localhost:4000` only when running the screener-service locally.
+- `.env.production` / AWS env: `SCREENER_SERVICE_URL=https://<deployed-service-url>` (override only if a different backend is used). **Production deploy of the FE blocks on the backend being reachable at that URL** — add a deploy-time smoke check that hits `/api/screener/health` and 503s the deploy if upstream is degraded.
 
 **Acceptance.**
 - `curl http://localhost:3000/api/screener/health` → 200 with the body from `screener-service`.

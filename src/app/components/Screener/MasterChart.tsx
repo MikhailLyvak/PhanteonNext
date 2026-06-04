@@ -10,6 +10,8 @@ import {
 	ISeriesApi,
 	CrosshairMode,
 	LineStyle,
+	LineType,
+	LogicalRange,
 	Time,
 } from 'lightweight-charts'
 import { AssetPair } from '@/lib/screener/types'
@@ -19,6 +21,7 @@ import {
 	INDICATOR_LABELS,
 } from '@/store/Screener/useTerminalStore'
 import {
+	fundingToPercent,
 	toCandlestickData,
 	toFundingLineData,
 	toLineData,
@@ -34,8 +37,6 @@ interface Props {
 	pair: AssetPair
 }
 
-const MAIN_PANE_STRETCH = 4
-
 interface IndicatorSeriesRefs {
 	volume: ISeriesApi<'Histogram'> | null
 	cvd: ISeriesApi<'Line'> | null
@@ -45,9 +46,31 @@ interface IndicatorSeriesRefs {
 	oi: ISeriesApi<'Line'> | null
 }
 
+// Shared options between the price chart and the indicators chart so they line
+// up edge-to-edge. The minimum right-scale width keeps both charts' right edges
+// aligned even when label widths differ slightly between price and indicator
+// values — otherwise the time axis on the top chart would visually drift right
+// of the indicator panes underneath.
+const COMMON_CHART_OPTIONS = {
+	layout: {
+		background: { color: '#161a22' },
+		textColor: '#98A0B3',
+		panes: { separatorColor: '#262b38', separatorHoverColor: '#2F2F40' },
+	},
+	grid: {
+		vertLines: { color: 'rgba(38,43,56,0.5)' },
+		horzLines: { color: 'rgba(38,43,56,0.5)' },
+	},
+	crosshair: { mode: CrosshairMode.Normal },
+	rightPriceScale: { borderColor: '#262b38', minimumWidth: 80 },
+	autoSize: true,
+} as const
+
 const MasterChart: React.FC<Props> = ({ pair }) => {
-	const containerRef = useRef<HTMLDivElement>(null)
-	const chartRef = useRef<IChartApi | null>(null)
+	const priceContainerRef = useRef<HTMLDivElement>(null)
+	const indicatorsContainerRef = useRef<HTMLDivElement>(null)
+	const priceChartRef = useRef<IChartApi | null>(null)
+	const indicatorsChartRef = useRef<IChartApi | null>(null)
 	const candleRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
 	const heatmapRef = useRef<ISeriesApi<'Custom'> | null>(null)
 	const indicatorRefs = useRef<IndicatorSeriesRefs>({
@@ -60,6 +83,25 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	})
 	const loadingOlderRef = useRef(false)
 	const allLoadedRef = useRef(false)
+	// Re-entrancy guard for the price↔indicators time-range sync. Without it,
+	// each setVisibleLogicalRange on one chart would fire the other chart's
+	// subscriber, which would in turn fire the first chart's subscriber, ad
+	// infinitum.
+	const syncingRangeRef = useRef(false)
+	// False until the first batch of candles has landed AND we've explicitly
+	// positioned both charts on the most-recent window. Until then we suppress
+	// the bidirectional range sync — otherwise each chart's setData triggers
+	// its own auto-fit, the auto-fit ranges differ between the two charts
+	// (price has 1 pane, indicators may have several), and whichever one fires
+	// last clobbers the user's view, sometimes leaving the price chart zoomed
+	// onto the very first candle.
+	const initialPaintReadyRef = useRef(false)
+	// True once the indicators chart has at least one series attached. Calling
+	// setVisibleRange on a chart with zero series throws ("Cannot update
+	// timeScale before the data is set"), so every sync target on the
+	// indicators chart must gate on this — otherwise toggling off every
+	// indicator chip crashes the page on the next sync tick.
+	const hasIndicatorSeriesRef = useRef(false)
 
 	const timeframe = useTerminalStore(s => s.timeframe)
 	const heatmapVisible = useTerminalStore(s => s.heatmapVisible)
@@ -107,7 +149,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			const total = s.candles.length
 			const visible = Math.min(100, total)
 			requestAnimationFrame(() => {
-				chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
+				priceChartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
 			})
 		}
 
@@ -123,26 +165,35 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	}
 
 	useEffect(() => {
-		if (!containerRef.current) return
+		if (!priceContainerRef.current || !indicatorsContainerRef.current) return
 
-		const chart = createChart(containerRef.current, {
-			layout: {
-				background: { color: '#161a22' },
-				textColor: '#98A0B3',
-				panes: { separatorColor: '#262b38', separatorHoverColor: '#2F2F40' },
+		// Top chart: price + heatmap, with a visible time axis directly underneath.
+		const priceChart = createChart(priceContainerRef.current, {
+			...COMMON_CHART_OPTIONS,
+			timeScale: {
+				borderColor: '#262b38',
+				timeVisible: true,
+				secondsVisible: false,
+				visible: true,
 			},
-			grid: {
-				vertLines: { color: 'rgba(38,43,56,0.5)' },
-				horzLines: { color: 'rgba(38,43,56,0.5)' },
-			},
-			crosshair: { mode: CrosshairMode.Normal },
-			rightPriceScale: { borderColor: '#262b38' },
-			timeScale: { borderColor: '#262b38', timeVisible: true, secondsVisible: false },
-			autoSize: true,
 		})
-		chartRef.current = chart
+		priceChartRef.current = priceChart
 
-		const candle = chart.addSeries(CandlestickSeries, {
+		// Bottom chart: indicator panes only. Time axis hidden because the top
+		// chart already shows it — the two charts share their visible range via
+		// the sync callbacks below.
+		const indicatorsChart = createChart(indicatorsContainerRef.current, {
+			...COMMON_CHART_OPTIONS,
+			timeScale: {
+				borderColor: '#262b38',
+				timeVisible: true,
+				secondsVisible: false,
+				visible: false,
+			},
+		})
+		indicatorsChartRef.current = indicatorsChart
+
+		const candle = priceChart.addSeries(CandlestickSeries, {
 			upColor: '#4ade80',
 			downColor: '#f87171',
 			borderUpColor: '#4ade80',
@@ -157,14 +208,12 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		})
 		candleRef.current = candle
 
-		const heatmap = chart.addCustomSeries(new HeatmapSeriesView(), {
+		const heatmap = priceChart.addCustomSeries(new HeatmapSeriesView(), {
 			cellHeight: 3,
 		})
 		heatmapRef.current = heatmap
 
-		chart.panes()[0].setStretchFactor(MAIN_PANE_STRETCH)
-
-		chart.subscribeCrosshairMove(param => {
+		priceChart.subscribeCrosshairMove(param => {
 			if (!param.time || !param.seriesData) {
 				setLegend('')
 				return
@@ -177,20 +226,63 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			}
 		})
 
-		const handleResize = () => chart.timeScale().fitContent()
+		const handleResize = () => {
+			priceChart.timeScale().fitContent()
+		}
 		window.addEventListener('resize', handleResize)
 
-		chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+		// Bidirectional sync: panning/zooming either chart drives the other so
+		// price and indicators always show the same time window. The scroll-back
+		// trigger lives on the price chart's subscriber so it fires off the same
+		// barsInLogicalRange check we used before the split.
+		// Sync via TIME range, not logical indices. The two charts can have
+		// different unified time bases internally (e.g. OI on indicators chart
+		// uses 5m bins which may extend further back than the candle series on
+		// the price chart), so the same logical index doesn't necessarily map
+		// to the same time. Time is absolute and consistent between charts.
+		const onPriceRangeChange = (range: LogicalRange | null) => {
+			if (
+				initialPaintReadyRef.current &&
+				!syncingRangeRef.current &&
+				hasIndicatorSeriesRef.current
+			) {
+				const timeRange = priceChartRef.current?.timeScale().getVisibleRange() ?? null
+				if (timeRange) {
+					syncingRangeRef.current = true
+					try {
+						indicatorsChartRef.current?.timeScale().setVisibleRange(timeRange)
+					} finally {
+						syncingRangeRef.current = false
+					}
+				}
+			}
 			if (!range || loadingOlderRef.current || allLoadedRef.current) return
-			if (range.from < 500) {
+			const barsInfo = candleRef.current?.barsInLogicalRange(range)
+			if (!barsInfo) return
+			if (barsInfo.barsBefore < LOAD_OLDER_THRESHOLD) {
 				loadOlderCandles()
 			}
-		})
+		}
+		const onIndicatorsRangeChange = () => {
+			if (!initialPaintReadyRef.current || syncingRangeRef.current) return
+			const timeRange = indicatorsChartRef.current?.timeScale().getVisibleRange() ?? null
+			if (!timeRange) return
+			syncingRangeRef.current = true
+			try {
+				priceChartRef.current?.timeScale().setVisibleRange(timeRange)
+			} finally {
+				syncingRangeRef.current = false
+			}
+		}
+		priceChart.timeScale().subscribeVisibleLogicalRangeChange(onPriceRangeChange)
+		indicatorsChart.timeScale().subscribeVisibleLogicalRangeChange(onIndicatorsRangeChange)
 
 		return () => {
 			window.removeEventListener('resize', handleResize)
-			chart.remove()
-			chartRef.current = null
+			priceChart.remove()
+			indicatorsChart.remove()
+			priceChartRef.current = null
+			indicatorsChartRef.current = null
 			candleRef.current = null
 			heatmapRef.current = null
 			indicatorRefs.current = {
@@ -204,30 +296,35 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		}
 	}, [pair.precision])
 
-	const loadOlderCandles = async () => {
+	const emptyResponsesRef = useRef(0)
+	const EMPTY_RETRY_THRESHOLD = 5
+	// Pull more history when the visible window has fewer than this many bars
+	// to the left of the data start. Small natural value — each new scroll
+	// re-triggers another fetch.
+	const LOAD_OLDER_THRESHOLD = 500
+
+	const loadOlderCandles = async (): Promise<void> => {
+		if (loadingOlderRef.current || allLoadedRef.current) return
 		const s = useTerminalStore.getState()
-		if (s.candles.length === 0 || loadingOlderRef.current || allLoadedRef.current) return
+		if (s.candles.length === 0) return
 		loadingOlderRef.current = true
 		try {
 			const earliestSec = s.candles[0].time
 			const beforeSec = earliestSec - 1
 			const tf = useTerminalStore.getState().timeframe
 			const before = s.candles.length
-			await useTerminalStore.getState().loadOlder(beforeSec, tf, 500)
+			await useTerminalStore.getState().loadOlder(beforeSec, tf, 1500)
 			const after = useTerminalStore.getState().candles.length
-			const prepended = after - before
-			if (prepended <= 0) {
-				allLoadedRef.current = true
-				return
-			}
-			const chart = chartRef.current
-			const range = chart?.timeScale().getVisibleLogicalRange()
-			applyAllFromStore(false)
-			if (chart && range) {
-				chart.timeScale().setVisibleLogicalRange({
-					from: range.from + prepended,
-					to: range.to + prepended,
-				})
+			if (after === before) {
+				emptyResponsesRef.current += 1
+				if (emptyResponsesRef.current >= EMPTY_RETRY_THRESHOLD) {
+					allLoadedRef.current = true
+				}
+				console.warn(
+					`[screener] loadOlder returned no new candles (attempt ${emptyResponsesRef.current}/${EMPTY_RETRY_THRESHOLD})`,
+				)
+			} else {
+				emptyResponsesRef.current = 0
 			}
 		} catch (err) {
 			console.error('[screener] Failed to load older candles:', err)
@@ -236,9 +333,6 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		}
 	}
 
-	// On first SSE init, backend currently delivers only a handful of bars
-	// (sometimes just the live one). Eagerly fetch history so the chart has a
-	// reasonable initial window instead of zooming onto a single candle.
 	const loadInitialBackfill = async () => {
 		const s = useTerminalStore.getState()
 		if (s.candles.length === 0 || loadingOlderRef.current || allLoadedRef.current) return
@@ -247,13 +341,13 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			const earliestSec = s.candles[0].time
 			const tf = useTerminalStore.getState().timeframe
 			const before = s.candles.length
-			await useTerminalStore.getState().loadOlder(earliestSec - 1, tf, 500)
+			await useTerminalStore.getState().loadOlder(earliestSec - 1, tf, 1500)
 			const after = useTerminalStore.getState().candles.length
 			if (after === before) {
 				allLoadedRef.current = true
 				return
 			}
-			const chart = chartRef.current
+			const chart = priceChartRef.current
 			if (!chart) return
 			const visible = Math.min(100, after)
 			requestAnimationFrame(() => {
@@ -271,6 +365,8 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	useEffect(() => {
 		allLoadedRef.current = false
 		loadingOlderRef.current = false
+		emptyResponsesRef.current = 0
+		initialPaintReadyRef.current = false
 
 		// Track per-array length so we can decide between setData and update.
 		let lastCandlesLen = 0
@@ -289,6 +385,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				lastCandlesLen = 0
 				return
 			}
+			const isFirstFill = lastCandlesLen === 0
 			// Full replace when length jumps non-monotonically (init / prepend / clear).
 			if (arr.length < lastCandlesLen || arr.length - lastCandlesLen > 1) {
 				candleRef.current?.setData(toCandlestickData(arr))
@@ -313,6 +410,34 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				})
 			}
 			lastCandlesLen = arr.length
+
+			// First time we put real data on the chart: position both charts on
+			// the most-recent window via a TIME range. Deferred to a microtask
+			// so every other handle* subscriber has a chance to commit its
+			// setData first — otherwise their late range-adjustments (each
+			// setData on indicatorsChart triggers an auto-fit) would clobber
+			// the position we set here.
+			if (isFirstFill && arr.length > 0) {
+				const total = arr.length
+				const visible = Math.min(100, total)
+				const fromT = arr[total - visible].time
+				const toT = arr[total - 1].time
+				queueMicrotask(() => {
+					const state = useTerminalStore.getState()
+					if (state.candles.length === 0) return
+					const range = { from: toTime(fromT), to: toTime(toT) }
+					syncingRangeRef.current = true
+					try {
+						priceChartRef.current?.timeScale().setVisibleRange(range)
+						if (hasIndicatorSeriesRef.current) {
+							indicatorsChartRef.current?.timeScale().setVisibleRange(range)
+						}
+					} finally {
+						syncingRangeRef.current = false
+					}
+					initialPaintReadyRef.current = true
+				})
+			}
 
 			// Live-price chrome.
 			const prev = prevPriceRef.current
@@ -409,7 +534,10 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				ref.setData(toFundingLineData(arr))
 			} else {
 				const last = arr[arr.length - 1]
-				ref.update({ time: toTime(last.time), value: last.value })
+				ref.update({
+					time: toTime(last.time),
+					value: fundingToPercent(last.value),
+				})
 			}
 			lastFundingLen = arr.length
 		}
@@ -432,7 +560,6 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			lastOiLen = arr.length
 		}
 
-		// Wire imperative subscriptions for each series.
 		const unsubs = [
 			useTerminalStore.subscribe(s => s.candles, handleCandles),
 			useTerminalStore.subscribe(s => s.footprints, handleFootprints),
@@ -442,26 +569,18 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			useTerminalStore.subscribe(s => s.oi, handleOi),
 		]
 
-		// Open the stream — this resets data then onInit fills it (triggers the
-		// subscribers above which will setData on the lightweight-charts series).
 		const unsubscribeStream = useTerminalStore.getState().subscribe(pair.code, timeframe)
 
-		// Apply current state once on mount in case data already exists for this pair.
 		applyAllFromStore(true)
 
-		// After init populates data we want fitContent — handle via a one-shot.
-		let didFit = false
+		// Backfill watchdog: if the initial fetch returns a very thin window
+		// (<100 candles), pull more history so the chart isn't stuck on a tiny
+		// slice. The visible range itself is positioned by handleCandles above.
+		let didBackfillCheck = false
 		const fitUnsub = useTerminalStore.subscribe(s => s.candles, candles => {
-			if (!didFit && candles.length > 0) {
-				didFit = true
-				const total = candles.length
-				const visible = Math.min(100, total)
-				requestAnimationFrame(() => {
-					chartRef.current?.timeScale().setVisibleLogicalRange({ from: total - visible, to: total - 1 })
-				})
-				// If the SSE init delivered a thin slice (often only the current bar),
-				// fetch history once so the chart isn't stuck zoomed on a handful of bars.
-				if (total < 100) {
+			if (!didBackfillCheck && candles.length > 0) {
+				didBackfillCheck = true
+				if (candles.length < 100) {
 					void loadInitialBackfill()
 				}
 			}
@@ -475,11 +594,11 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	}, [pair.code, timeframe])
 
 	useEffect(() => {
-		const chart = chartRef.current
+		const chart = indicatorsChartRef.current
 		if (!chart) return
 
 		const refs = indicatorRefs.current
-		const secondary: (ISeriesApi<'Line' | 'Histogram'> | null)[] = [
+		const existing: (ISeriesApi<'Line' | 'Histogram'> | null)[] = [
 			refs.volume,
 			refs.cvd,
 			refs.liqBuy,
@@ -487,7 +606,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			refs.funding,
 			refs.oi,
 		]
-		for (const s of secondary) {
+		for (const s of existing) {
 			if (s) chart.removeSeries(s)
 		}
 		refs.volume = null
@@ -501,9 +620,21 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			chart.removePane(chart.panes().length - 1)
 		}
 
-		if (indicators.volume) {
+		// Reuse pane 0 for the first enabled indicator, then addPane for each
+		// subsequent one. Without this the chart would always have an empty
+		// pane 0 stretching across the top of the indicators block.
+		let firstPaneTaken = false
+		const nextPaneIdx = () => {
+			if (!firstPaneTaken) {
+				firstPaneTaken = true
+				return 0
+			}
 			chart.addPane()
-			const idx = chart.panes().length - 1
+			return chart.panes().length - 1
+		}
+
+		if (indicators.volume) {
+			const idx = nextPaneIdx()
 			refs.volume = chart.addSeries(
 				HistogramSeries,
 				{
@@ -515,8 +646,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			)
 		}
 		if (indicators.cvd) {
-			chart.addPane()
-			const idx = chart.panes().length - 1
+			const idx = nextPaneIdx()
 			refs.cvd = chart.addSeries(
 				LineSeries,
 				{ color: '#8AA6FF', lineWidth: 2, priceLineVisible: false, title: 'CVD' },
@@ -524,13 +654,13 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			)
 		}
 		if (indicators.funding) {
-			chart.addPane()
-			const idx = chart.panes().length - 1
+			const idx = nextPaneIdx()
 			refs.funding = chart.addSeries(
 				LineSeries,
 				{
-					color: '#fbbf24',
+					color: '#FACC15',
 					lineWidth: 2,
+					lineType: LineType.WithSteps,
 					priceFormat: { type: 'price', precision: 4, minMove: 0.0001 },
 					priceLineVisible: false,
 					title: 'Funding',
@@ -546,9 +676,26 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				title: '',
 			})
 		}
-		if (indicators.liq) {
-			chart.addPane()
-			const idx = chart.panes().length - 1
+		if (indicators.oi) {
+			const idx = nextPaneIdx()
+			refs.oi = chart.addSeries(
+				LineSeries,
+				{
+					color: '#D2D2FF',
+					lineWidth: 2,
+					priceLineVisible: false,
+					title: 'OI',
+					priceFormat: { type: 'volume' },
+				},
+				idx
+			)
+		}
+		// Liq pane disabled for now — see INDICATOR_ORDER in useTerminalStore.
+		// Persisted state may still have `liq: true` from before the toggle was
+		// hidden, so we gate on a constant here too.
+		const LIQ_PANE_ENABLED = false
+		if (LIQ_PANE_ENABLED && indicators.liq) {
+			const idx = nextPaneIdx()
 			refs.liqBuy = chart.addSeries(
 				HistogramSeries,
 				{
@@ -570,24 +717,32 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 				idx
 			)
 		}
-		if (indicators.oi) {
-			chart.addPane()
-			const idx = chart.panes().length - 1
-			refs.oi = chart.addSeries(
-				LineSeries,
-				{
-					color: '#D2D2FF',
-					lineWidth: 2,
-					priceLineVisible: false,
-					title: 'OI',
-					priceFormat: { type: 'volume' },
-				},
-				idx
-			)
-		}
 
-		chart.panes()[0].setStretchFactor(MAIN_PANE_STRETCH)
+		hasIndicatorSeriesRef.current =
+			refs.volume !== null ||
+			refs.cvd !== null ||
+			refs.liqBuy !== null ||
+			refs.liqSell !== null ||
+			refs.funding !== null ||
+			refs.oi !== null
+
 		applyAllFromStore(false)
+
+		// After rebuilding indicator series, force the indicators chart to match
+		// the price chart's visible TIME range so the two stay aligned through
+		// the re-render. Logical sync wouldn't work because the indicators
+		// chart's time base just changed (different series → different time
+		// scale union). Skipped when no series exist — setVisibleRange on an
+		// empty chart throws.
+		const timeRange = priceChartRef.current?.timeScale().getVisibleRange()
+		if (timeRange && hasIndicatorSeriesRef.current) {
+			syncingRangeRef.current = true
+			try {
+				chart.timeScale().setVisibleRange(timeRange)
+			} finally {
+				syncingRangeRef.current = false
+			}
+		}
 	}, [indicators])
 
 	useEffect(() => {
@@ -598,6 +753,11 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 		'px-2.5 py-1 text-xs rounded-lg border transition-colors whitespace-nowrap shrink-0'
 	const chipOn = 'bg-[#2F2F40] border-[#8AA6FF] text-[#D2D2FF]'
 	const chipOff = 'bg-[#1A1A28] border-[#262b38] text-[#98A0B3] hover:text-[#D2D2FF]'
+
+	// Only count the user-toggleable indicators — `indicators.liq` may be
+	// stuck true from a previous persisted state but isn't rendered, so it
+	// shouldn't keep the empty bottom chart open.
+	const hasAnyIndicator = INDICATOR_ORDER.some(key => indicators[key])
 
 	return (
 		<div className='bg-[#161a22] border border-[#262b38] rounded-2xl p-3 flex flex-col min-h-0 lg:h-full'>
@@ -640,7 +800,27 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			<div className='h-4 mb-1 text-xs text-[#98A0B3] font-mono whitespace-nowrap overflow-hidden'>
 				{legend}
 			</div>
-			<div ref={containerRef} className='w-full flex-1' style={{ minHeight: 700 }} />
+			<div className='flex-1 flex flex-col min-h-0' style={{ minHeight: 700 }}>
+				<div
+					ref={priceContainerRef}
+					className='w-full'
+					style={{ flexGrow: 3, flexShrink: 1, flexBasis: 0, minHeight: 0 }}
+				/>
+				<div
+					ref={indicatorsContainerRef}
+					className='w-full'
+					style={{
+						// Collapse to zero height when no indicator is active —
+						// otherwise the empty bottom chart reads as an orphan
+						// pane (which users have called "the liquidations pane").
+						flexGrow: hasAnyIndicator ? 2 : 0,
+						flexShrink: 1,
+						flexBasis: 0,
+						minHeight: 0,
+						display: hasAnyIndicator ? undefined : 'none',
+					}}
+				/>
+			</div>
 		</div>
 	)
 }

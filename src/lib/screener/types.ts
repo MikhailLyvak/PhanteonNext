@@ -82,15 +82,6 @@ export interface OIPoint {
 	value: number
 }
 
-export interface ChartInitPayload {
-	candles: Candle[]
-	footprints: FootprintFrame[]
-	cvd: CvdPoint[]
-	liquidations: LiquidationBar[]
-	funding: FundingBar[]
-	oi: OIPoint[]
-}
-
 export interface LiquidationEvent {
 	ts: number
 	symbol: string
@@ -108,7 +99,17 @@ export interface TradeEvent {
 	isLarge: true
 }
 
-export type DashboardSnapshot = Record<string, DashboardAssetData>
+// Each /dashboard entry carries identity metadata (`id`, `coin`, `type`,
+// `iconUrl`) alongside the live DashboardAssetData fields. The pair `code`
+// is the map key — it's not duplicated inside the entry.
+export interface DashboardEntry extends DashboardAssetData {
+	id: number
+	coin: string
+	type: 'USDT'
+	iconUrl: string
+}
+
+export type DashboardSnapshot = Record<string, DashboardEntry>
 
 export type DeepPartial<T> = {
 	[K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
@@ -119,21 +120,3 @@ export interface DashboardUpdateMessage {
 	updates: Array<{ code: string; patch: DeepPartial<DashboardAssetData> }>
 }
 
-export interface TickPayload {
-	candle?: Candle
-	footprint?: FootprintFrame
-	cvd?: CvdPoint
-	liquidations?: LiquidationBar
-	funding?: FundingBar
-	oi?: OIPoint
-}
-
-export interface ChartHistoryResponse {
-	candles: Candle[]
-	footprints: FootprintFrame[]
-}
-
-export interface ScreenerHealth {
-	status: 'ok' | 'degraded'
-	upstream?: Record<string, { last_msg_ms_ago: number }>
-}

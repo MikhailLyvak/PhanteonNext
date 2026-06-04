@@ -1,12 +1,7 @@
 import { create } from 'zustand'
-import type { AssetPair, DashboardSnapshot, DashboardUpdateMessage, DeepPartial } from '@/lib/screener/types'
-import { getDashboard, getHealth, getPairs } from '@/api/Screener/client'
+import type { AssetPair, DashboardSnapshot, DashboardUpdateMessage, DeepPartial, DashboardEntry } from '@/lib/screener/types'
+import { extractPairs, getDashboard } from '@/api/Screener/client'
 import { openDashboardStream } from '@/api/Screener/streams'
-
-const HEALTH_POLL_MS = 30_000
-const SILENCE_TICK_MS = 5_000
-const SILENCE_THRESHOLD_MS = 15_000
-const HEALTH_FAILURE_THRESHOLD = 2
 
 export type SortKey =
 	| 'pair'
@@ -24,8 +19,6 @@ export type SortDir = 'asc' | 'desc'
 
 export type Preset = 'all'
 
-export type HealthStatus = 'live' | 'stale' | 'disconnected'
-
 interface ScreenerState {
 	searchTerm: string
 	sortKey: SortKey | null
@@ -35,7 +28,6 @@ interface ScreenerState {
 	pageSize: number
 	pairs: AssetPair[]
 	data: DashboardSnapshot
-	healthStatus: HealthStatus
 	setSearchTerm: (s: string) => void
 	setSort: (key: SortKey) => void
 	setPreset: (p: Preset) => void
@@ -62,7 +54,60 @@ function deepMerge<T>(target: T, patch: DeepPartial<T>): T {
 	return out as T
 }
 
-export const useScreenerStore = create<ScreenerState>((set, get) => ({
+// Ref-counted shared SSE subscription. Multiple components (CryptoTicker in the
+// header, AssetsTable on /screener, etc.) call subscribe() — only the first
+// fetches /dashboard and opens the SSE stream; the rest piggyback on the same
+// snapshot. When the last subscriber unmounts, the stream closes.
+let refCount = 0
+let closeShared: (() => void) | null = null
+
+function startShared() {
+	let cancelled = false
+	let stream: (() => void) | null = null
+
+	;(async () => {
+		let snapshot: DashboardSnapshot
+		try {
+			snapshot = await getDashboard()
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.error('[screener] /dashboard failed:', err)
+			return
+		}
+		if (cancelled) return
+
+		const pairs = extractPairs(snapshot)
+		useScreenerStore.setState({ pairs, data: snapshot })
+
+		stream = openDashboardStream({
+			onEvent: (msg: DashboardUpdateMessage) => {
+				const current = useScreenerStore.getState().data
+				const next: DashboardSnapshot = { ...current }
+				for (const u of msg.updates) {
+					const existing = next[u.code]
+					if (existing) {
+						// Patches only touch DashboardAssetData fields; metadata (id,
+						// coin, iconUrl, type) on the existing entry stays put.
+						next[u.code] = deepMerge(existing, u.patch as DeepPartial<DashboardEntry>)
+					}
+				}
+				useScreenerStore.setState({ data: next })
+			},
+			onError: () => {
+				// EventSource auto-reconnects — transient SSE errors are not surfaced.
+			},
+		})
+	})()
+
+	closeShared = () => {
+		cancelled = true
+		if (stream) stream()
+		stream = null
+		closeShared = null
+	}
+}
+
+export const useScreenerStore = create<ScreenerState>(set => ({
 	searchTerm: '',
 	sortKey: null,
 	sortDir: 'desc',
@@ -71,7 +116,6 @@ export const useScreenerStore = create<ScreenerState>((set, get) => ({
 	pageSize: 25,
 	pairs: [],
 	data: {},
-	healthStatus: 'disconnected',
 	setSearchTerm: searchTerm => set({ searchTerm, currentPage: 1 }),
 	setPreset: preset => set({ preset, currentPage: 1 }),
 	setPage: currentPage => set({ currentPage }),
@@ -86,87 +130,11 @@ export const useScreenerStore = create<ScreenerState>((set, get) => ({
 			return { sortKey: key, sortDir: 'desc', currentPage: 1 }
 		}),
 	subscribe: () => {
-		let cancelled = false
-		let close: (() => void) | null = null
-		let lastEventTs = Date.now()
-		let consecutiveFailures = 0
-
-		const handleEvent = (msg: DashboardUpdateMessage) => {
-			lastEventTs = Date.now()
-			const current = get().data
-			const next: DashboardSnapshot = { ...current }
-			for (const u of msg.updates) {
-				const existing = next[u.code]
-				if (existing) {
-					next[u.code] = deepMerge(existing, u.patch)
-				}
-			}
-			set({ data: next, healthStatus: 'live' })
-		}
-
-		const probeHealth = async () => {
-			try {
-				const h = await getHealth()
-				if (cancelled) return
-				if (h.status === 'degraded') {
-					consecutiveFailures = 0
-					set({ healthStatus: 'disconnected' })
-					return
-				}
-				consecutiveFailures = 0
-				// Only flip to 'live' if we are not currently 'stale' — the silence
-				// watchdog owns the stale->live transition (which happens on next event).
-				if (get().healthStatus !== 'stale') {
-					set({ healthStatus: 'live' })
-				}
-			} catch {
-				if (cancelled) return
-				consecutiveFailures += 1
-				if (consecutiveFailures >= HEALTH_FAILURE_THRESHOLD) {
-					set({ healthStatus: 'disconnected' })
-				}
-			}
-		}
-
-		const healthInterval: ReturnType<typeof setInterval> = setInterval(probeHealth, HEALTH_POLL_MS)
-		const silenceInterval: ReturnType<typeof setInterval> = setInterval(() => {
-			if (cancelled) return
-			const silentFor = Date.now() - lastEventTs
-			if (silentFor > SILENCE_THRESHOLD_MS && get().healthStatus === 'live') {
-				set({ healthStatus: 'stale' })
-			}
-		}, SILENCE_TICK_MS)
-
-		// Fire an immediate health probe so the badge has signal before the first poll tick.
-		void probeHealth()
-
-		;(async () => {
-			try {
-				const [pairs, snapshot] = await Promise.all([getPairs(), getDashboard()])
-				if (cancelled) return
-				set({ pairs, data: snapshot })
-				lastEventTs = Date.now()
-				close = openDashboardStream({
-					onEvent: handleEvent,
-					onError: () => {
-						// Chart and trades streams auto-reconnect; transient SSE errors
-						// for the dashboard stream are NOT surfaced as a status change.
-						// The /health poll + silence watchdog drive healthStatus.
-					},
-				})
-			} catch (err) {
-				if (!cancelled) {
-					// eslint-disable-next-line no-console
-					console.error('[screener] subscribe failed:', err)
-				}
-			}
-		})()
-
+		refCount++
+		if (refCount === 1) startShared()
 		return () => {
-			cancelled = true
-			clearInterval(healthInterval)
-			clearInterval(silenceInterval)
-			if (close) close()
+			refCount--
+			if (refCount === 0 && closeShared) closeShared()
 		}
 	},
 }))

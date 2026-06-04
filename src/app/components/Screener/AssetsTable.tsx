@@ -25,11 +25,6 @@ const COLUMNS: Column[] = [
 	{ key: 'funding', label: 'Funding', align: 'right' },
 ]
 
-function pctChange(curr: number, prev: number | undefined): number {
-	if (!prev) return 0
-	return ((curr - prev) / prev) * 100
-}
-
 const AssetsTable: React.FC = () => {
 	const searchTerm = useScreenerStore(s => s.searchTerm)
 	const sortKey = useScreenerStore(s => s.sortKey)
@@ -81,7 +76,6 @@ const AssetsTable: React.FC = () => {
 			})
 
 		const sortValue = (d: DashboardAssetData, pairCoin: string): number | string => {
-			const oiNow = d.oi?.ointerest_latest ?? 0
 			switch (sortKey) {
 				case 'pair':
 					return pairCoin
@@ -90,11 +84,11 @@ const AssetsTable: React.FC = () => {
 				case 'volume24h':
 					return d.quote_volume_24h ?? 0
 				case 'oi_1h':
-					return pctChange(oiNow, d.oi?.ointerest_1h)
+					return d.oi?.ointerest_1h ?? 0
 				case 'oi_4h':
-					return pctChange(oiNow, d.oi?.ointerest_4h)
+					return d.oi?.ointerest_4h ?? 0
 				case 'oi_24h':
-					return pctChange(oiNow, d.oi?.ointerest_24h)
+					return d.oi?.ointerest_24h ?? 0
 				case 'cvd_1h':
 					return d.cvd?.cvd_1h ?? 0
 				case 'cvd_4h':
