@@ -25,10 +25,6 @@ const nextConfig: NextConfig = {
         source: '/tron-proxy/:path*',
         destination: 'https://tron.algonix.org/:path*',
       },
-      {
-        source: '/screener-proxy/:path*',
-        destination: 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com/:path*',
-      },
     ]
   },
 };
