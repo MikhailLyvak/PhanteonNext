@@ -11,9 +11,6 @@ interface Props {
 }
 
 const LivePrice: React.FC<Props> = ({ pair }) => {
-	// Live mark price: prefer the latest candle from the chart stream;
-	// fall back to the dashboard snapshot's close_latest if candles haven't
-	// arrived yet (initial load before /stream/chart pushes its first frame).
 	const latestCandleClose = useTerminalStore(s =>
 		s.currentPair === pair.code && s.candles.length > 0
 			? s.candles[s.candles.length - 1].close
@@ -24,7 +21,6 @@ const LivePrice: React.FC<Props> = ({ pair }) => {
 	const price =
 		latestCandleClose ?? dashboardEntry?.ohlcv?.close_latest ?? null
 
-	// 24h % change derived from the dashboard snapshot.
 	const closeLatest = dashboardEntry?.ohlcv?.close_latest
 	const close24h = dashboardEntry?.ohlcv?.close_24h
 	const priceChange24h: number | null =
@@ -34,7 +30,6 @@ const LivePrice: React.FC<Props> = ({ pair }) => {
 			? ((closeLatest - close24h) / close24h) * 100
 			: null
 
-	// Track up/down flash from successive live prices.
 	const [priceDir, setPriceDir] = useState<'up' | 'down' | 'flat'>('flat')
 	const prevPriceRef = useRef<number>(0)
 
