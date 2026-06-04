@@ -20,7 +20,6 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const target = process.env.SCREENER_SERVICE_URL ?? 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com'
     return [
       {
         source: '/tron-proxy/:path*',
@@ -28,7 +27,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/api/screener/:path*',
-        destination: `${target}/:path*`,
+        destination: 'https://pantheon-screener-service-47a52e37ec37.herokuapp.com/:path*',
       },
     ]
   },
