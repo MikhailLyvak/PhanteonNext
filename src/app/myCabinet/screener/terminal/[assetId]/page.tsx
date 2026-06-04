@@ -13,11 +13,31 @@ import TerminalSkeleton from '@/app/components/Screener/TerminalSkeleton'
 import { extractPairs, getDashboard } from '@/api/Screener/client'
 import { AssetPair } from '@/lib/screener/types'
 
+const CHART_HEIGHT_STORAGE_KEY = 'screener.terminal.chartHeight'
+const SIDEBAR_WIDTH_STORAGE_KEY = 'screener.terminal.sidebarWidth'
+const MIN_CHART_HEIGHT = 360
+const MAX_CHART_HEIGHT = 1600
+const DEFAULT_CHART_HEIGHT = 760
+const MIN_SIDEBAR_WIDTH = 220
+const MAX_SIDEBAR_WIDTH = 720
+const DEFAULT_SIDEBAR_WIDTH = 320
+
 const TerminalPage = () => {
 	const params = useParams<{ assetId: string }>()
 	const router = useRouter()
 	const assetId = (params?.assetId ?? '').toUpperCase()
 	const [pair, setPair] = useState<AssetPair | null | undefined>(undefined)
+	const [chartHeight, setChartHeight] = useState<number>(DEFAULT_CHART_HEIGHT)
+	const [sidebarWidth, setSidebarWidth] = useState<number>(DEFAULT_SIDEBAR_WIDTH)
+	const [isDesktop, setIsDesktop] = useState<boolean>(false)
+
+	useEffect(() => {
+		const mq = window.matchMedia('(min-width: 1024px)')
+		const apply = () => setIsDesktop(mq.matches)
+		apply()
+		mq.addEventListener('change', apply)
+		return () => mq.removeEventListener('change', apply)
+	}, [])
 
 	useEffect(() => {
 		getDashboard()
@@ -27,6 +47,41 @@ const TerminalPage = () => {
 			})
 			.catch(() => setPair(null))
 	}, [assetId])
+
+	useEffect(() => {
+		try {
+			const storedH = window.localStorage.getItem(CHART_HEIGHT_STORAGE_KEY)
+			if (storedH) {
+				const parsed = Number.parseInt(storedH, 10)
+				if (Number.isFinite(parsed)) {
+					setChartHeight(Math.min(MAX_CHART_HEIGHT, Math.max(MIN_CHART_HEIGHT, parsed)))
+				}
+			}
+			const storedW = window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY)
+			if (storedW) {
+				const parsed = Number.parseInt(storedW, 10)
+				if (Number.isFinite(parsed)) {
+					setSidebarWidth(Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, parsed)))
+				}
+			}
+		} catch {}
+	}, [])
+
+	const handleResize = (next: number) => {
+		const clamped = Math.min(MAX_CHART_HEIGHT, Math.max(MIN_CHART_HEIGHT, next))
+		setChartHeight(clamped)
+		try {
+			window.localStorage.setItem(CHART_HEIGHT_STORAGE_KEY, String(clamped))
+		} catch {}
+	}
+
+	const handleResizeWidth = (next: number) => {
+		const clamped = Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, next))
+		setSidebarWidth(clamped)
+		try {
+			window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(clamped))
+		} catch {}
+	}
 
 	return (
 		<ProtectedRoute>
@@ -55,11 +110,29 @@ const TerminalPage = () => {
 							Пара не знайдена: {assetId}
 						</div>
 					) : (
-						<div className='mt-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] lg:grid-rows-[760px] gap-4'>
-							<div className='flex flex-col gap-4 min-h-0'>
-								<MasterChart pair={pair} />
+						<div
+							className='mt-6 grid grid-cols-1 gap-4'
+							style={{
+								gridTemplateRows: `${chartHeight}px`,
+								...(isDesktop && {
+									gridTemplateColumns: `minmax(0, 1fr) ${sidebarWidth}px`,
+								}),
+							}}
+						>
+							<div className='flex flex-col gap-4 min-h-0 min-w-0'>
+								<MasterChart
+									pair={pair}
+									height={chartHeight}
+									onResize={handleResize}
+									minHeight={MIN_CHART_HEIGHT}
+									maxHeight={MAX_CHART_HEIGHT}
+									sidebarWidth={sidebarWidth}
+									onResizeWidth={isDesktop ? handleResizeWidth : undefined}
+									minSidebarWidth={MIN_SIDEBAR_WIDTH}
+									maxSidebarWidth={MAX_SIDEBAR_WIDTH}
+								/>
 							</div>
-							<div className='h-[420px] lg:h-full min-h-0'>
+							<div className='h-[420px] lg:h-full min-h-0 min-w-0'>
 								<FeedTabs pair={pair} />
 							</div>
 						</div>

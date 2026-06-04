@@ -35,6 +35,14 @@ import { HeatmapDatum, HeatmapSeriesView } from './HeatmapPlugin'
 
 interface Props {
 	pair: AssetPair
+	height?: number
+	minHeight?: number
+	maxHeight?: number
+	onResize?: (next: number) => void
+	sidebarWidth?: number
+	minSidebarWidth?: number
+	maxSidebarWidth?: number
+	onResizeWidth?: (nextSidebarWidth: number) => void
 }
 
 interface IndicatorSeriesRefs {
@@ -66,7 +74,81 @@ const COMMON_CHART_OPTIONS = {
 	autoSize: true,
 } as const
 
-const MasterChart: React.FC<Props> = ({ pair }) => {
+const MasterChart: React.FC<Props> = ({
+	pair,
+	height,
+	minHeight = 360,
+	maxHeight = 1600,
+	onResize,
+	sidebarWidth,
+	minSidebarWidth = 220,
+	maxSidebarWidth = 720,
+	onResizeWidth,
+}) => {
+	const resizeStartRef = useRef<{ y: number; startHeight: number } | null>(null)
+	const widthResizeStartRef = useRef<{ x: number; startSidebarWidth: number } | null>(null)
+
+	const handleResizeStart = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!onResize || height === undefined) return
+		e.preventDefault()
+		const target = e.currentTarget
+		target.setPointerCapture(e.pointerId)
+		resizeStartRef.current = { y: e.clientY, startHeight: height }
+		document.body.style.cursor = 'row-resize'
+		document.body.style.userSelect = 'none'
+	}
+
+	const handleResizeMove = (e: React.PointerEvent<HTMLDivElement>) => {
+		const start = resizeStartRef.current
+		if (!start || !onResize) return
+		const delta = e.clientY - start.y
+		const next = Math.min(maxHeight, Math.max(minHeight, start.startHeight + delta))
+		onResize(next)
+	}
+
+	const handleResizeEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!resizeStartRef.current) return
+		resizeStartRef.current = null
+		try {
+			e.currentTarget.releasePointerCapture(e.pointerId)
+		} catch {}
+		document.body.style.cursor = ''
+		document.body.style.userSelect = ''
+	}
+
+	const handleWidthResizeStart = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!onResizeWidth || sidebarWidth === undefined) return
+		e.preventDefault()
+		const target = e.currentTarget
+		target.setPointerCapture(e.pointerId)
+		widthResizeStartRef.current = { x: e.clientX, startSidebarWidth: sidebarWidth }
+		document.body.style.cursor = 'col-resize'
+		document.body.style.userSelect = 'none'
+	}
+
+	const handleWidthResizeMove = (e: React.PointerEvent<HTMLDivElement>) => {
+		const start = widthResizeStartRef.current
+		if (!start || !onResizeWidth) return
+		// Dragging the handle right (positive delta) makes the chart wider and
+		// the sidebar narrower — the chart sits left of the sidebar.
+		const delta = e.clientX - start.x
+		const next = Math.min(
+			maxSidebarWidth,
+			Math.max(minSidebarWidth, start.startSidebarWidth - delta),
+		)
+		onResizeWidth(next)
+	}
+
+	const handleWidthResizeEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!widthResizeStartRef.current) return
+		widthResizeStartRef.current = null
+		try {
+			e.currentTarget.releasePointerCapture(e.pointerId)
+		} catch {}
+		document.body.style.cursor = ''
+		document.body.style.userSelect = ''
+	}
+
 	const priceContainerRef = useRef<HTMLDivElement>(null)
 	const indicatorsContainerRef = useRef<HTMLDivElement>(null)
 	const priceChartRef = useRef<IChartApi | null>(null)
@@ -774,7 +856,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 	const hasAnyIndicator = INDICATOR_ORDER.some(key => indicators[key])
 
 	return (
-		<div className='bg-[#161a22] border border-[#262b38] rounded-2xl p-3 flex flex-col min-h-0 lg:h-full'>
+		<div className='bg-[#161a22] border border-[#262b38] rounded-2xl p-3 flex flex-col min-h-0 h-full relative'>
 			<div className='flex items-center justify-between mb-2 gap-2'>
 				<div className='flex items-center gap-3'>
 					<h3 className='text-base font-bold text-[#D2D2FF]'>
@@ -814,7 +896,7 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 			<div className='h-4 mb-1 text-xs text-[#98A0B3] font-mono whitespace-nowrap overflow-hidden'>
 				{legend}
 			</div>
-			<div className='flex-1 flex flex-col min-h-0' style={{ minHeight: 700 }}>
+			<div className='flex-1 flex flex-col min-h-0' style={{ minHeight: 0 }}>
 				<div
 					ref={priceContainerRef}
 					className='w-full'
@@ -835,6 +917,36 @@ const MasterChart: React.FC<Props> = ({ pair }) => {
 					}}
 				/>
 			</div>
+			{onResize && (
+				<div
+					onPointerDown={handleResizeStart}
+					onPointerMove={handleResizeMove}
+					onPointerUp={handleResizeEnd}
+					onPointerCancel={handleResizeEnd}
+					role='separator'
+					aria-orientation='horizontal'
+					aria-label='Resize chart height'
+					title='Drag to resize chart'
+					className='group absolute left-0 right-0 -bottom-1 h-3 flex items-center justify-center cursor-row-resize touch-none z-10'
+				>
+					<div className='h-1 w-16 rounded-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />
+				</div>
+			)}
+			{onResizeWidth && (
+				<div
+					onPointerDown={handleWidthResizeStart}
+					onPointerMove={handleWidthResizeMove}
+					onPointerUp={handleWidthResizeEnd}
+					onPointerCancel={handleWidthResizeEnd}
+					role='separator'
+					aria-orientation='vertical'
+					aria-label='Resize chart width'
+					title='Drag to resize chart width'
+					className='group absolute top-0 bottom-0 -right-1 w-3 flex items-center justify-center cursor-col-resize touch-none z-10'
+				>
+					<div className='w-1 h-16 rounded-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />
+				</div>
+			)}
 		</div>
 	)
 }

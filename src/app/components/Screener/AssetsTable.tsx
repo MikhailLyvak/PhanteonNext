@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDown, ArrowUp, Columns3 } from 'lucide-react'
 import { useScreenerStore, SortKey } from '@/store/Screener/useScreenerStore'
 import { DashboardAssetData } from '@/lib/screener/types'
@@ -25,6 +25,24 @@ const COLUMNS: Column[] = [
 	{ key: 'funding', label: 'Funding', align: 'right' },
 ]
 
+const DEFAULT_COLUMN_WIDTHS: Record<SortKey, number> = {
+	pair: 120,
+	price: 140,
+	volume24h: 110,
+	oi_1h: 100,
+	oi_4h: 100,
+	oi_24h: 100,
+	cvd_1h: 120,
+	cvd_4h: 120,
+	liq_total_1h: 110,
+	funding: 110,
+}
+
+const ACTIONS_COL_WIDTH = 40
+const MIN_COL_WIDTH = 60
+const MAX_COL_WIDTH = 600
+const COLUMN_WIDTHS_STORAGE_KEY = 'screener.assets.columnWidths'
+
 const AssetsTable: React.FC = () => {
 	const searchTerm = useScreenerStore(s => s.searchTerm)
 	const sortKey = useScreenerStore(s => s.sortKey)
@@ -37,6 +55,76 @@ const AssetsTable: React.FC = () => {
 
 	const [hiddenColumns, setHiddenColumns] = useState<Set<SortKey>>(new Set())
 	const [columnsMenuOpen, setColumnsMenuOpen] = useState(false)
+	const [columnWidths, setColumnWidths] = useState<Record<SortKey, number>>(
+		DEFAULT_COLUMN_WIDTHS
+	)
+	const colResizeStartRef = useRef<{
+		x: number
+		key: SortKey
+		startWidth: number
+	} | null>(null)
+
+	useEffect(() => {
+		try {
+			const stored = window.localStorage.getItem(COLUMN_WIDTHS_STORAGE_KEY)
+			if (!stored) return
+			const parsed = JSON.parse(stored) as Partial<Record<SortKey, number>>
+			setColumnWidths(prev => {
+				const next = { ...prev }
+				for (const k of Object.keys(parsed) as SortKey[]) {
+					const v = parsed[k]
+					if (typeof v === 'number' && Number.isFinite(v)) {
+						next[k] = Math.min(MAX_COL_WIDTH, Math.max(MIN_COL_WIDTH, v))
+					}
+				}
+				return next
+			})
+		} catch {}
+	}, [])
+
+	const persistColumnWidths = (widths: Record<SortKey, number>) => {
+		try {
+			window.localStorage.setItem(COLUMN_WIDTHS_STORAGE_KEY, JSON.stringify(widths))
+		} catch {}
+	}
+
+	const handleColResizeStart = (key: SortKey) => (e: React.PointerEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		e.stopPropagation()
+		e.currentTarget.setPointerCapture(e.pointerId)
+		colResizeStartRef.current = {
+			x: e.clientX,
+			key,
+			startWidth: columnWidths[key] ?? DEFAULT_COLUMN_WIDTHS[key],
+		}
+		document.body.style.cursor = 'col-resize'
+		document.body.style.userSelect = 'none'
+	}
+
+	const handleColResizeMove = (e: React.PointerEvent<HTMLDivElement>) => {
+		const start = colResizeStartRef.current
+		if (!start) return
+		const delta = e.clientX - start.x
+		const next = Math.min(MAX_COL_WIDTH, Math.max(MIN_COL_WIDTH, start.startWidth + delta))
+		setColumnWidths(prev => {
+			if (prev[start.key] === next) return prev
+			return { ...prev, [start.key]: next }
+		})
+	}
+
+	const handleColResizeEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!colResizeStartRef.current) return
+		colResizeStartRef.current = null
+		try {
+			e.currentTarget.releasePointerCapture(e.pointerId)
+		} catch {}
+		document.body.style.cursor = ''
+		document.body.style.userSelect = ''
+		setColumnWidths(prev => {
+			persistColumnWidths(prev)
+			return prev
+		})
+	}
 
 	const toggleColumn = (key: SortKey) => {
 		setHiddenColumns(prev => {
@@ -136,18 +224,27 @@ const AssetsTable: React.FC = () => {
 	return (
 		<div className='bg-[#161a22] border border-[#262b38] rounded-2xl overflow-hidden'>
 			<div className='overflow-x-auto'>
-				<table className='w-full'>
+				<table className='w-full' style={{ tableLayout: 'fixed' }}>
+					<colgroup>
+						{visibleColumns.map(col => (
+							<col
+								key={col.key}
+								style={{ width: `${columnWidths[col.key] ?? DEFAULT_COLUMN_WIDTHS[col.key]}px` }}
+							/>
+						))}
+						<col style={{ width: `${ACTIONS_COL_WIDTH}px` }} />
+					</colgroup>
 					<thead className='bg-[#1d212c]'>
 						<tr>
 							{visibleColumns.map(col => (
 								<th
 									key={col.key}
 									onClick={() => setSort(col.key)}
-									className={`px-3 py-3 text-xs font-semibold text-[#D2D2FF] cursor-pointer select-none ${
+									className={`relative px-3 py-3 text-xs font-semibold text-[#D2D2FF] cursor-pointer select-none overflow-hidden ${
 										col.align === 'right' ? 'text-right' : 'text-left'
-									}${col.key === 'pair' ? ' w-px whitespace-nowrap' : ''}`}
+									}`}
 								>
-									<span className='inline-flex items-center gap-1'>
+									<span className='inline-flex items-center gap-1 truncate max-w-full align-middle'>
 										{col.label}
 										{sortKey === col.key &&
 											(sortDir === 'asc' ? (
@@ -156,9 +253,23 @@ const AssetsTable: React.FC = () => {
 												<ArrowDown size={12} />
 											))}
 									</span>
+									<div
+										onPointerDown={handleColResizeStart(col.key)}
+										onPointerMove={handleColResizeMove}
+										onPointerUp={handleColResizeEnd}
+										onPointerCancel={handleColResizeEnd}
+										onClick={e => e.stopPropagation()}
+										role='separator'
+										aria-orientation='vertical'
+										aria-label={`Resize ${col.label} column`}
+										title='Drag to resize column'
+										className='group absolute top-0 bottom-0 right-0 w-4 flex items-center justify-end cursor-col-resize touch-none z-10'
+									>
+										<div className='w-1 h-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />
+									</div>
 								</th>
 							))}
-							<th className='w-8 relative'>
+							<th className='relative'>
 								<button
 									onClick={() => setColumnsMenuOpen(v => !v)}
 									className='p-1 rounded hover:bg-[#2F2F40] text-[#98A0B3] hover:text-[#D2D2FF] transition-colors'
