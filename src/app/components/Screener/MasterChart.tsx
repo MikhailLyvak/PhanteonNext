@@ -74,6 +74,10 @@ const COMMON_CHART_OPTIONS = {
 	autoSize: true,
 } as const
 
+// Class for the top-left indicator title overlays we inject into each pane,
+// used so we can find and clear them on rebuild.
+const PANE_LABEL_CLASS = 'pane-indicator-label'
+
 const MasterChart: React.FC<Props> = ({
 	pair,
 	height,
@@ -308,6 +312,39 @@ const MasterChart: React.FC<Props> = ({
 			}
 		})
 
+		// Sync the vertical crosshair (the dotted time line) between the two
+		// charts so hovering one draws the same dotted line on the other at the
+		// matching time. The hovered point's own value is passed as the price —
+		// the price and indicator scales differ wildly, so the horizontal line
+		// lands off-scale and only the vertical time line shows through, which is
+		// exactly the line we want duplicated.
+		const firstIndicatorSeries = (): ISeriesApi<'Line' | 'Histogram'> | null => {
+			const r = indicatorRefs.current
+			return r.volume || r.cvd || r.funding || r.oi || r.liqBuy || r.liqSell
+		}
+		priceChart.subscribeCrosshairMove(param => {
+			const target = firstIndicatorSeries()
+			if (!target) return
+			if (param.time === undefined) {
+				indicatorsChart.clearCrosshairPosition()
+				return
+			}
+			const c = param.seriesData.get(candle) as { close?: number } | undefined
+			indicatorsChart.setCrosshairPosition(c?.close ?? 0, param.time, target)
+		})
+		indicatorsChart.subscribeCrosshairMove(param => {
+			if (param.time === undefined) {
+				priceChart.clearCrosshairPosition()
+				return
+			}
+			let value = 0
+			param.seriesData.forEach(d => {
+				const v = (d as { value?: number }).value
+				if (v !== undefined) value = v
+			})
+			priceChart.setCrosshairPosition(value, param.time, candle)
+		})
+
 		const handleResize = () => {
 			priceChart.timeScale().fitContent()
 		}
@@ -322,20 +359,37 @@ const MasterChart: React.FC<Props> = ({
 		// uses 5m bins which may extend further back than the candle series on
 		// the price chart), so the same logical index doesn't necessarily map
 		// to the same time. Time is absolute and consistent between charts.
+		//
+		// Exception: when the source is scrolled past its latest bar into empty
+		// space on the right, getVisibleRange() clamps to actual data and drops
+		// that whitespace, which would snap the other pane back to its last bar.
+		// In that case we instead copy the zoom (barSpacing) and the scroll
+		// offset directly, so both panes pan freely into the empty area on the
+		// right and stay aligned there.
+		const mirrorView = (source: IChartApi | null, target: IChartApi | null) => {
+			if (!source || !target) return
+			const sourceTs = source.timeScale()
+			const targetTs = target.timeScale()
+			const scrollPos = sourceTs.scrollPosition()
+			if (scrollPos > 0.5) {
+				targetTs.applyOptions({ barSpacing: sourceTs.options().barSpacing })
+				targetTs.scrollToPosition(scrollPos, false)
+				return
+			}
+			const timeRange = sourceTs.getVisibleRange()
+			if (timeRange) targetTs.setVisibleRange(timeRange)
+		}
 		const onPriceRangeChange = (range: LogicalRange | null) => {
 			if (
 				initialPaintReadyRef.current &&
 				!syncingRangeRef.current &&
 				hasIndicatorSeriesRef.current
 			) {
-				const timeRange = priceChartRef.current?.timeScale().getVisibleRange() ?? null
-				if (timeRange) {
-					syncingRangeRef.current = true
-					try {
-						indicatorsChartRef.current?.timeScale().setVisibleRange(timeRange)
-					} finally {
-						syncingRangeRef.current = false
-					}
+				syncingRangeRef.current = true
+				try {
+					mirrorView(priceChartRef.current, indicatorsChartRef.current)
+				} finally {
+					syncingRangeRef.current = false
 				}
 			}
 			if (!range || loadingOlderRef.current || allLoadedRef.current) return
@@ -347,11 +401,9 @@ const MasterChart: React.FC<Props> = ({
 		}
 		const onIndicatorsRangeChange = () => {
 			if (!initialPaintReadyRef.current || syncingRangeRef.current) return
-			const timeRange = indicatorsChartRef.current?.timeScale().getVisibleRange() ?? null
-			if (!timeRange) return
 			syncingRangeRef.current = true
 			try {
-				priceChartRef.current?.timeScale().setVisibleRange(timeRange)
+				mirrorView(indicatorsChartRef.current, priceChartRef.current)
 			} finally {
 				syncingRangeRef.current = false
 			}
@@ -693,6 +745,13 @@ const MasterChart: React.FC<Props> = ({
 		const chart = indicatorsChartRef.current
 		if (!chart) return
 
+		// Remove any pane labels left over from the previous build. Most panes are
+		// destroyed (and their DOM with them) on rebuild, but pane 0 is reused —
+		// its label would otherwise stack up on every indicator toggle.
+		indicatorsContainerRef.current
+			?.querySelectorAll(`.${PANE_LABEL_CLASS}`)
+			.forEach(el => el.remove())
+
 		const refs = indicatorRefs.current
 		const existing: (ISeriesApi<'Line' | 'Histogram'> | null)[] = [
 			refs.volume,
@@ -729,6 +788,12 @@ const MasterChart: React.FC<Props> = ({
 			return chart.panes().length - 1
 		}
 
+		// Indicator titles are drawn as our own top-left overlay (injected below)
+		// instead of the lightweight-charts built-in series `title`, which renders
+		// on the right next to the last value. Collect (paneIdx, text, color) as
+		// each series is created, then anchor a label into each pane's element.
+		const paneLabels: { idx: number; text: string; color: string }[] = []
+
 		if (indicators.volume) {
 			const idx = nextPaneIdx()
 			refs.volume = chart.addSeries(
@@ -736,18 +801,19 @@ const MasterChart: React.FC<Props> = ({
 				{
 					priceFormat: { type: 'volume' },
 					priceLineVisible: false,
-					title: 'Volume',
 				},
 				idx
 			)
+			paneLabels.push({ idx, text: 'Volume', color: '#98A0B3' })
 		}
 		if (indicators.cvd) {
 			const idx = nextPaneIdx()
 			refs.cvd = chart.addSeries(
 				LineSeries,
-				{ color: '#8AA6FF', lineWidth: 2, priceLineVisible: false, title: 'CVD' },
+				{ color: '#8AA6FF', lineWidth: 2, priceLineVisible: false },
 				idx
 			)
+			paneLabels.push({ idx, text: 'CVD', color: '#8AA6FF' })
 		}
 		if (indicators.funding) {
 			const idx = nextPaneIdx()
@@ -759,10 +825,10 @@ const MasterChart: React.FC<Props> = ({
 					lineType: LineType.WithSteps,
 					priceFormat: { type: 'price', precision: 4, minMove: 0.0001 },
 					priceLineVisible: false,
-					title: 'Funding',
 				},
 				idx
 			)
+			paneLabels.push({ idx, text: 'Funding', color: '#FACC15' })
 			refs.funding.createPriceLine({
 				price: 0,
 				color: '#58587B',
@@ -780,11 +846,11 @@ const MasterChart: React.FC<Props> = ({
 					color: '#D2D2FF',
 					lineWidth: 2,
 					priceLineVisible: false,
-					title: 'OI',
 					priceFormat: { type: 'volume' },
 				},
 				idx
 			)
+			paneLabels.push({ idx, text: 'OI', color: '#D2D2FF' })
 		}
 		// Liq pane disabled for now — see INDICATOR_ORDER in useTerminalStore.
 		// Persisted state may still have `liq: true` from before the toggle was
@@ -798,7 +864,6 @@ const MasterChart: React.FC<Props> = ({
 					color: '#4ade80',
 					priceFormat: { type: 'volume' },
 					priceLineVisible: false,
-					title: 'Liq Buy',
 				},
 				idx
 			)
@@ -808,10 +873,10 @@ const MasterChart: React.FC<Props> = ({
 					color: '#f87171',
 					priceFormat: { type: 'volume' },
 					priceLineVisible: false,
-					title: 'Liq Sell',
 				},
 				idx
 			)
+			paneLabels.push({ idx, text: 'Liq', color: '#98A0B3' })
 		}
 
 		hasIndicatorSeriesRef.current =
@@ -821,6 +886,33 @@ const MasterChart: React.FC<Props> = ({
 			refs.liqSell !== null ||
 			refs.funding !== null ||
 			refs.oi !== null
+
+		// Anchor a title at the top-left of each indicator pane. Deferred a frame
+		// so lightweight-charts has laid out the freshly-created panes and their
+		// DOM elements are resolvable via getHTMLElement().
+		requestAnimationFrame(() => {
+			for (const { idx, text, color } of paneLabels) {
+				const paneEl = chart.panes()[idx]?.getHTMLElement()
+				if (!paneEl) continue
+				if (getComputedStyle(paneEl).position === 'static') {
+					paneEl.style.position = 'relative'
+				}
+				const label = document.createElement('div')
+				label.className = PANE_LABEL_CLASS
+				label.textContent = text
+				label.style.position = 'absolute'
+				label.style.top = '4px'
+				label.style.left = '8px'
+				label.style.zIndex = '3'
+				label.style.fontSize = '11px'
+				label.style.fontWeight = '600'
+				label.style.fontFamily = 'monospace'
+				label.style.color = color
+				label.style.pointerEvents = 'none'
+				label.style.userSelect = 'none'
+				paneEl.appendChild(label)
+			}
+		})
 
 		applyAllFromStore(false)
 

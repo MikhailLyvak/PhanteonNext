@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react';
-import { useGetVebinarsList } from '@/hooks/Vebinars/useGetVebinarsList';
-import VebinarCard from './VebinarCard';
+import { useGetWebinarsList } from '@/hooks/Webinars/useGetWebinarsList';
+import WebinarCard from './WebinarCard';
 import { Triangle } from 'react-loader-spinner';
 
-const VebinarsList = () => {
-  const { data: vebinars, isLoading, error } = useGetVebinarsList();
+const WebinarsList = () => {
+  const { data: webinars, isLoading, error } = useGetWebinarsList();
 
   if (isLoading) {
     return (
@@ -33,7 +33,7 @@ const VebinarsList = () => {
     );
   }
 
-  if (!vebinars || vebinars.length === 0) {
+  if (!webinars || webinars.length === 0) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-400 text-lg">Наразі немає доступних вебінарів</p>
@@ -46,17 +46,17 @@ const VebinarsList = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">Вебінари</h2>
         <div className="text-sm text-gray-400">
-          Всього: {vebinars.length}
+          Всього: {webinars.length}
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {vebinars.map((vebinar) => (
-          <VebinarCard 
-            key={vebinar.id} 
-            vebinar={vebinar} 
-            hasAccess={vebinar.has_access}
-            subscriptionTypes={vebinar.subscription_types}
+        {webinars.map((webinar) => (
+          <WebinarCard 
+            key={webinar.id} 
+            webinar={webinar} 
+            hasAccess={webinar.has_access}
+            subscriptionTypes={webinar.subscription_types}
           />
         ))}
       </div>
@@ -64,4 +64,4 @@ const VebinarsList = () => {
   );
 };
 
-export default VebinarsList;
+export default WebinarsList;

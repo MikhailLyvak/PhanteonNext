@@ -1,21 +1,21 @@
 'use client'
 
 import React from 'react';
-import { Vebinar } from '@/api/Vebinars/types';
+import { Webinar } from '@/api/Webinars/types';
 import { Calendar, Clock, ExternalLink, ShoppingCart } from 'lucide-react';
 import { Cookies } from 'react-cookie';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import axiosInterceptor from '@/interceptor/axiosClient';
 
-interface VebinarCardProps {
-  vebinar: Vebinar;
+interface WebinarCardProps {
+  webinar: Webinar;
   hasAccess?: boolean;
   subscriptionTypes?: string[];
   purchaseStatus?: string;
 }
 
-const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, subscriptionTypes = [], purchaseStatus }) => {
+const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, subscriptionTypes = [], purchaseStatus }) => {
   const { user } = useUserStore();
   const { toggleModal, setActiveTab } = useAuthModalStore();
   const formatDate = (dateString: string) => {
@@ -37,7 +37,7 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
 
   const handleWatchClick = async () => {
     if (hasAccess) {
-      window.open(vebinar.link, '_blank');
+      window.open(webinar.link, '_blank');
     } else {
       // If not logged in, open auth modal (register tab)
       if (!user) {
@@ -48,8 +48,8 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
 
       // Handle purchase logic
       try {
-        const { data } = await axiosInterceptor.post('/api/vebinar/purchase/', {
-          vebinar_id: vebinar.id,
+        const { data } = await axiosInterceptor.post('/api/webinar/purchase/', {
+          webinar_id: webinar.id,
         });
 
         if (data?.payment_url) {
@@ -68,8 +68,8 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
 
   const handleCancelPurchase = async () => {
     try {
-      await axiosInterceptor.post('/api/vebinar/cancel-purchase/', {
-        vebinar_id: vebinar.id,
+      await axiosInterceptor.post('/api/webinar/cancel-purchase/', {
+        webinar_id: webinar.id,
       });
       alert('Покупку скасовано успішно');
       window.location.reload();
@@ -107,10 +107,10 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
         {/* Header */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-white line-clamp-2">
-            {vebinar.name}
+            {webinar.name}
           </h3>
           <p className="text-gray-400 text-sm line-clamp-3">
-            {vebinar.description}
+            {webinar.description}
           </p>
         </div>
 
@@ -118,11 +118,11 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
         <div className="flex items-center gap-4 text-sm text-gray-400">
           <div className="flex items-center gap-2">
             <Calendar size={16} />
-            <span>{formatDate(vebinar.date)}</span>
+            <span>{formatDate(webinar.date)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock size={16} />
-            <span>{formatTime(vebinar.date)}</span>
+            <span>{formatTime(webinar.date)}</span>
           </div>
         </div>
 
@@ -130,11 +130,11 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-              vebinar.is_active 
+              webinar.is_active 
                 ? 'bg-green-500/20 text-green-400' 
                 : 'bg-red-500/20 text-red-400'
             }`}>
-              {vebinar.is_active ? 'Активний' : 'Неактивний'}
+              {webinar.is_active ? 'Активний' : 'Неактивний'}
             </div>
             {/* Subscription badges */}
             <div className="flex flex-wrap gap-1">
@@ -180,4 +180,4 @@ const VebinarCard: React.FC<VebinarCardProps> = ({ vebinar, hasAccess = false, s
   );
 };
 
-export default VebinarCard;
+export default WebinarCard;

@@ -8,11 +8,11 @@ import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
 import { LuInstagram } from 'react-icons/lu'
 import { PiTelegramLogo, PiYoutubeLogo } from 'react-icons/pi'
-import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar'
+import { useGetLastWebinar } from '@/hooks/Webinars/useGetLastWebinar'
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 
 const Footer = () => {
-	// const { data: lastVebinar, isLoading } = useGetLastVebinar()
+	// const { data: lastWebinar, isLoading } = useGetLastWebinar()
 	const user = useUserStore(state => state.user)
 	const [isTubeOpen, setIsTubeOpen] = useState(false);
   const [isInstOpen, setIsInstOpen] = useState(false);
@@ -60,7 +60,7 @@ const Footer = () => {
 								АІ-агенти
 							</Link> */}
               {/* <Link
-								href='/vebinars'
+								href='/webinars'
 								className='text-[#D2D2FF] hover:text-white transition-colors'
 							>
 								Вебінари
@@ -111,7 +111,7 @@ const Footer = () => {
               </Link>
               {user ? (
                 <Link
-                  href="http://pantheonx.club/interview"
+                  href="https://pantheonx.club/interview"
                   className="text-[#D2D2FF] hover:text-white transition-colors"
                 >
                   Навчання

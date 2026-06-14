@@ -115,7 +115,7 @@ const Drawer = () => {
 					icon={<Video size={20} />}
 					text='Вебінари'
 					closeDrawer={closeDrawer}
-					link='/vebinars'
+					link='/webinars'
 				/> */}
 				<NavItem
 					icon={<LuChartLine size={20} />}
@@ -145,7 +145,7 @@ const Drawer = () => {
 					icon={<Settings size={20} />}
 					text='Налаштування'
 					closeDrawer={closeDrawer}
-					link='/404page'
+					link='/myCabinet/settings'
 				/>
 			</nav>
 

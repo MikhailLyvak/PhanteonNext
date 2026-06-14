@@ -55,7 +55,7 @@ const HeaderNav: React.FC<Props> = ({ textColor = 'text-black' }) => {
 						АКАДЕМІЯ VB
 					</Link>
 					<Link
-						href='/vebinars'
+						href='/webinars'
 						className='font-bold text-sm xl:text-base hover:text-[#D2D2FF] transition-colors'
 					>
 						ВЕБІНАРИ
@@ -88,7 +88,7 @@ const HeaderNav: React.FC<Props> = ({ textColor = 'text-black' }) => {
 						</div>
 						<div className='text-gray-800 text-base font-normal flex-col space-y-3'>
 							<Link href='/customCources/EmotInt'>Емоційний інтелект</Link>
-							<Link href='/myCabinet/vebinars'>Вебінари</Link>
+							<Link href='/myCabinet/webinars'>Вебінари</Link>
 							<div>Кастомний курс</div>
 							<div>Кастомний курс</div>
 							<div>Кастомний курс</div>

@@ -3,9 +3,9 @@
 import MyCabinetBreadCrump from '../studyPlatform/components/BreadCrump';
 import Sidebar from '../components/Sidebar';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import VebinarsList from './components/VebinarsList';
+import WebinarsList from './components/WebinarsList';
 
-const VebinarsPage = () => {
+const WebinarsPage = () => {
   return (
     <ProtectedRoute>
       <div className="w-full">
@@ -22,7 +22,7 @@ const VebinarsPage = () => {
             </h6>
           </div>
 
-          {/* ✅ Third Row: Sidebar + Vebinars */}
+          {/* ✅ Third Row: Sidebar + Webinars */}
           <div className="flex w-full mt-8">
             {/* Sidebar - Fixed Width */}
             <div className="hidden xl:block w-[312px] shrink-0 sticky top-[140px]">
@@ -33,8 +33,8 @@ const VebinarsPage = () => {
 
             {/* Right Content */}
             <div className="flex flex-col w-full sm:ml-10">
-              {/* ✅ Vebinars List */}
-              <VebinarsList />
+              {/* ✅ Webinars List */}
+              <WebinarsList />
             </div>
           </div>
         </div>
@@ -43,4 +43,4 @@ const VebinarsPage = () => {
   );
 };
 
-export default VebinarsPage;
+export default WebinarsPage;

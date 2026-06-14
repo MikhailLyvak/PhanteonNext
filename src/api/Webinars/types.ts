@@ -1,4 +1,4 @@
-export type Vebinar = {
+export type Webinar = {
   id: number;
   name: string;
   description: string;

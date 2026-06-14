@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot, Radar } from "lucide-react";
 import { usePathname, useRouter } from 'next/navigation';
-import { LuChartLine } from 'react-icons/lu';
 import { useUserStore } from "@/store/UserData/useUserStore";
 import { useAlgonixSessionStore } from "@/store/TradingBots/useAlgonixSessionStore";
 import { Cookies } from "react-cookie";
@@ -64,20 +63,14 @@ const Sidebar = () => {
       <NavItem
         icon={<Video size={20} />}
         text="Вебінари"
-        href="/myCabinet/vebinars"
-        active={pathname.includes('/myCabinet/vebinars')}
-      />
-      <NavItem
-        icon={<LuChartLine size={20} />}
-        text="Графіки"
-        href="/dashboard"
-        active={pathname === '/dashboard'}
+        href="/myCabinet/webinars"
+        active={pathname.includes('/myCabinet/webinars')}
       />
       <NavItem
         icon={<Settings size={20} />}
         text="Налаштування"
-        href="/404page"
-        active={pathname === '/404page'}
+        href="/myCabinet/settings"
+        active={pathname === '/myCabinet/settings'}
       />
       <LogoutNavItem
         icon={<LogOut size={20} />}

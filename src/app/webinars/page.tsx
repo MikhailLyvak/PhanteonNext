@@ -3,12 +3,12 @@
 import React from 'react';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { Triangle } from 'react-loader-spinner';
-import { useGetVebinarsList } from '@/hooks/Vebinars/useGetVebinarsList';
-import VebinarCard from '../myCabinet/vebinars/components/VebinarCard';
+import { useGetWebinarsList } from '@/hooks/Webinars/useGetWebinarsList';
+import WebinarCard from '../myCabinet/webinars/components/WebinarCard';
 
-const VebinarsPage = () => {
+const WebinarsPage = () => {
   const { user } = useUserStore();
-  const { data: vebinars, isLoading, error } = useGetVebinarsList();
+  const { data: webinars, isLoading, error } = useGetWebinarsList();
 
 
   if (isLoading) {
@@ -38,7 +38,7 @@ const VebinarsPage = () => {
     );
   }
 
-  if (!vebinars || vebinars.length === 0) {
+  if (!webinars || webinars.length === 0) {
     return (
       <div className="min-h-screen bg-[#171723] flex items-center justify-center">
         <div className="text-center">
@@ -61,14 +61,14 @@ const VebinarsPage = () => {
           </p>
         </div>
 
-                 {/* Vebinars Grid */}
+                 {/* Webinars Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {vebinars.map((vebinar) => (
-             <VebinarCard 
-               key={vebinar.id} 
-               vebinar={vebinar} 
-               hasAccess={vebinar.has_access}
-               subscriptionTypes={vebinar.subscription_types}
+           {webinars.map((webinar) => (
+             <WebinarCard 
+               key={webinar.id} 
+               webinar={webinar} 
+               hasAccess={webinar.has_access}
+               subscriptionTypes={webinar.subscription_types}
              />
            ))}
          </div>
@@ -77,4 +77,4 @@ const VebinarsPage = () => {
   );
 };
 
-export default VebinarsPage;
+export default WebinarsPage;

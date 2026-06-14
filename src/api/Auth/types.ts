@@ -55,3 +55,38 @@ export const ProfileUpdateSchema = z.object({
 
 export type ProfileData = z.infer<typeof ProfileSchema>;
 export type ProfileUpdateData = z.infer<typeof ProfileUpdateSchema>;
+
+// ── Settings: change password ───────────────────────────────────────────────
+// confirm_new_password is validated on the client only; the backend receives
+// just { old_password, new_password }.
+export const ChangePasswordSchema = z
+  .object({
+    old_password: z.string().min(1, "Введіть поточний пароль"),
+    new_password: z.string().min(6, "Мінімум 6 символів"),
+    confirm_new_password: z.string().min(6, "Мінімум 6 символів"),
+  })
+  .refine((data) => data.new_password === data.confirm_new_password, {
+    message: "Паролі не співпадають",
+    path: ["confirm_new_password"],
+  });
+
+export type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
+export interface ChangePasswordPayload {
+  old_password: string;
+  new_password: string;
+}
+
+// ── Settings: change login (email) ──────────────────────────────────────────
+export const ChangeLoginSchema = z.object({
+  email: z.string().min(1, "Email обовʼязковий").email("Невірний формат email"),
+  password: z.string().min(1, "Введіть пароль для підтвердження"),
+});
+
+export type ChangeLoginData = z.infer<typeof ChangeLoginSchema>;
+
+// ── Settings: delete account ────────────────────────────────────────────────
+export const DeleteAccountSchema = z.object({
+  password: z.string().min(1, "Введіть пароль для підтвердження"),
+});
+
+export type DeleteAccountData = z.infer<typeof DeleteAccountSchema>;

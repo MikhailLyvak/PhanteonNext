@@ -92,7 +92,7 @@ const PersonalDataPage = () => {
 														{...field}
 														value={field.value ?? ''}
 														type='text'
-														placeholder='Імя'
+														placeholder="Ім'я"
 														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 													/>
 													{fieldState.error && (

@@ -1,13 +1,13 @@
 'use client'
 
 import React from 'react';
-import { useGetLastVebinar } from '@/hooks/Vebinars/useGetLastVebinar';
+import { useGetLastWebinar } from '@/hooks/Webinars/useGetLastWebinar';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import { Calendar, Clock, Play, ExternalLink } from 'lucide-react';
 
-const LatestVebinar = () => {
-  const { data: lastVebinar, isLoading } = useGetLastVebinar();
+const LatestWebinar = () => {
+  const { data: lastWebinar, isLoading } = useGetLastWebinar();
   const { user } = useUserStore();
   const { toggleModal } = useAuthModalStore();
 
@@ -17,8 +17,8 @@ const LatestVebinar = () => {
       return;
     }
     
-    if (lastVebinar?.link) {
-      window.open(lastVebinar.link, '_blank');
+    if (lastWebinar?.link) {
+      window.open(lastWebinar.link, '_blank');
     }
   };
 
@@ -27,7 +27,7 @@ const LatestVebinar = () => {
   }
 
   // Якщо вебінарів немає, не показуємо компонент
-  if (!lastVebinar) {
+  if (!lastWebinar) {
     return null;
   }
 
@@ -66,21 +66,21 @@ const LatestVebinar = () => {
             <div className="space-y-6">
               <div>
                 <h3 className="text-2xl font-bold text-white mb-3">
-                  {lastVebinar.name}
+                  {lastWebinar.name}
                 </h3>
                 <p className="text-gray-400 leading-relaxed">
-                  {lastVebinar.description}
+                  {lastWebinar.description}
                 </p>
               </div>
 
               <div className="flex items-center gap-6 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />
-                  <span>{formatDate(lastVebinar.date)}</span>
+                  <span>{formatDate(lastWebinar.date)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={16} />
-                  <span>{formatTime(lastVebinar.date)}</span>
+                  <span>{formatTime(lastWebinar.date)}</span>
                 </div>
               </div>
 
@@ -118,4 +118,4 @@ const LatestVebinar = () => {
   );
 };
 
-export default LatestVebinar;
+export default LatestWebinar;

@@ -1,9 +1,9 @@
 import { Cookies } from 'react-cookie';
 
-import { Vebinar } from './types';
+import { Webinar } from './types';
 import axiosInterceptor from '@/interceptor/axiosClient';
 
-export const getLastVebinar = async () => {
+export const getLastWebinar = async () => {
   try {
     const cookies = new Cookies();
     const token = cookies.get('local_access_token');
@@ -13,15 +13,15 @@ export const getLastVebinar = async () => {
       return null;
     }
     
-    const data = await axiosInterceptor.get('/api/vebinar/latest/', {
+    const data = await axiosInterceptor.get('/api/webinar/latest/', {
       headers: {
         Authorization: token,
       },
     });
 
-    return data.data as Vebinar;
+    return data.data as Webinar;
   } catch (error) {
-    console.error('Failed to fetch last vebinar:', error);
+    console.error('Failed to fetch last webinar:', error);
     return null;
   }
 }
