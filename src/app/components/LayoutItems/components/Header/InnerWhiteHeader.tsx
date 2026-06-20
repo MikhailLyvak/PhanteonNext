@@ -246,7 +246,7 @@ const InnerWhiteHeader = () => {
             </Link>
             {user ? (
               <Link
-                href="http://pantheonx.club/interview"
+                href="https://pantheonx.club/interview"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
                 Підтримка

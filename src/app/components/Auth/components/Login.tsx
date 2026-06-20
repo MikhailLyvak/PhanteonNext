@@ -1,5 +1,6 @@
 import { login } from "@/api/Auth/PostAuth";
 import React, { useCallback, useState } from "react";
+import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -166,9 +167,13 @@ const LoginModalFormComponent = () => {
         </div>
       )}
 
-      <p className="mt-4 text-center text-sm text-[#D2D2FF] cursor-pointer">
+      <Link
+        href="/forgotPassword"
+        onClick={closeModal}
+        className="mt-4 block text-center text-sm text-[#D2D2FF] hover:underline"
+      >
         Забули пароль?
-      </p>
+      </Link>
     </div>
   );
 };
