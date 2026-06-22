@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Controller, useForm, Control, FieldValues, Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Triangle } from 'react-loader-spinner'
+import Modal from 'react-modal'
 import { useRouter } from 'next/navigation'
 import { Cookies } from 'react-cookie'
 import { useQueryClient } from '@tanstack/react-query'
@@ -47,6 +48,25 @@ const extractError = (error: any, fallback: string): string => {
 		pickFirst(data.non_field_errors) ??
 		fallback
 	)
+}
+
+// The backend returns validation messages in English; translate the known ones
+// to Ukrainian to match the rest of the UI. Unknown strings pass through as-is.
+const SERVER_MESSAGE_UK: Record<string, string> = {
+	'Old password is incorrect': 'Невірний старий пароль',
+	'Password is incorrect': 'Невірний пароль',
+	'New passwords do not match': 'Паролі не співпадають',
+	'New password must differ from the old password':
+		'Новий пароль має відрізнятися від поточного',
+}
+
+const translateServerError = (msg: string): string => {
+	const trimmed = msg.trim()
+	if (SERVER_MESSAGE_UK[trimmed]) return SERVER_MESSAGE_UK[trimmed]
+	// DRF min-length message, e.g. "Ensure this field has at least 6 characters."
+	const minLen = trimmed.match(/at least (\d+) characters/i)
+	if (minLen) return `Мінімум ${minLen[1]} символів`
+	return msg
 }
 
 const inputClass =
@@ -151,26 +171,55 @@ const SettingsPage = () => {
 		defaultValues: {
 			old_password: '',
 			new_password: '',
-			confirm_new_password: '',
+			new_password_confirm: '',
 		},
 	})
 
 	const onChangePassword = (values: ChangePasswordData) => {
 		setPasswordMsg(null)
-		changePassword(
-			{ old_password: values.old_password, new_password: values.new_password },
-			{
-				onSuccess: () => {
-					setPasswordMsg({ type: 'success', text: 'Пароль успішно змінено' })
-					passwordForm.reset()
-				},
-				onError: (error: any) =>
+		changePassword(values, {
+			onSuccess: () => {
+				setPasswordMsg({ type: 'success', text: 'Пароль успішно змінено' })
+				passwordForm.reset()
+			},
+			onError: (error: any) => {
+				// Map DRF field-keyed errors back onto the matching inputs; anything
+				// left over (non_field_errors / unknown keys) becomes a general message.
+				const data = error?.response?.data
+				const pickFirst = (v: unknown): string | null =>
+					Array.isArray(v) ? String(v[0]) : typeof v === 'string' ? v : null
+
+				const fieldKeys: (keyof ChangePasswordData)[] = [
+					'old_password',
+					'new_password',
+					'new_password_confirm',
+				]
+				let mappedField = false
+
+				if (data && typeof data === 'object') {
+					for (const key of fieldKeys) {
+						const msg = pickFirst(data[key])
+						if (msg) {
+							passwordForm.setError(key, {
+								type: 'server',
+								message: translateServerError(msg),
+							})
+							mappedField = true
+						}
+					}
+				}
+
+				const general = pickFirst(data?.non_field_errors)
+				if (general) {
+					setPasswordMsg({ type: 'error', text: translateServerError(general) })
+				} else if (!mappedField) {
 					setPasswordMsg({
 						type: 'error',
 						text: extractError(error, 'Не вдалося змінити пароль'),
-					}),
-			}
-		)
+					})
+				}
+			},
+		})
 	}
 
 	// ── Change login (email) ─────────────────────────────────────────────────
@@ -206,13 +255,20 @@ const SettingsPage = () => {
 
 	// ── Delete account ───────────────────────────────────────────────────────
 	const { mutate: removeAccount, isPending: deleting } = useDeleteAccount()
-	const [confirmingDelete, setConfirmingDelete] = useState(false)
+	const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 	const [deleteMsg, setDeleteMsg] = useState<string | null>(null)
 
 	const deleteForm = useForm<DeleteAccountData>({
 		resolver: zodResolver(DeleteAccountSchema),
 		defaultValues: { password: '' },
 	})
+
+	const closeDeleteModal = () => {
+		if (deleting) return // don't allow dismissing mid-request
+		setDeleteModalOpen(false)
+		setDeleteMsg(null)
+		deleteForm.reset()
+	}
 
 	const onDeleteAccount = (values: DeleteAccountData) => {
 		setDeleteMsg(null)
@@ -221,12 +277,36 @@ const SettingsPage = () => {
 				// Tear down the session, mirroring the sidebar logout, then leave.
 				const cookies = new Cookies()
 				cookies.remove('local_access_token', { path: '/' })
+				localStorage.removeItem('user-store')
 				clearUser()
 				useAlgonixSessionStore.getState().clearSession()
-				router.push('/')
+				// Land on the public login page (not "/", which bounces into a
+				// protected route); the flag shows a brief deletion confirmation.
+				router.replace('/login?account_deleted=1')
 			},
-			onError: (error: any) =>
-				setDeleteMsg(extractError(error, 'Не вдалося видалити акаунт')),
+			onError: (error: any) => {
+				// Keep the modal open so the user can retry. Map a field-keyed
+				// `password` error onto the input; surface non_field_errors (or any
+				// other shape) as a general message.
+				const data = error?.response?.data
+				const pickFirst = (v: unknown): string | null =>
+					Array.isArray(v) ? String(v[0]) : typeof v === 'string' ? v : null
+
+				const fieldMsg = pickFirst(data?.password)
+				if (fieldMsg) {
+					deleteForm.setError('password', {
+						type: 'server',
+						message: translateServerError(fieldMsg),
+					})
+				}
+
+				const general = pickFirst(data?.non_field_errors)
+				if (general) {
+					setDeleteMsg(translateServerError(general))
+				} else if (!fieldMsg) {
+					setDeleteMsg(extractError(error, 'Не вдалося видалити акаунт'))
+				}
+			},
 		})
 	}
 
@@ -271,7 +351,7 @@ const SettingsPage = () => {
 									/>
 									<PasswordField
 										control={passwordForm.control}
-										name="confirm_new_password"
+										name="new_password_confirm"
 										placeholder="Повторіть новий пароль"
 									/>
 									<SubmitButton pending={changingPassword} label="Змінити пароль" />
@@ -343,64 +423,76 @@ const SettingsPage = () => {
 									неможливо скасувати.
 								</p>
 
-								{!confirmingDelete ? (
-									<button
-										type="button"
-										onClick={() => {
-											setDeleteMsg(null)
-											setConfirmingDelete(true)
-										}}
-										className="w-full mt-4 bg-red-600 text-white p-3 rounded-3xl hover:bg-red-700 transition-colors"
-									>
-										Видалити акаунт
-									</button>
-								) : (
-									<form
-										onSubmit={deleteForm.handleSubmit(onDeleteAccount)}
-										className="mt-4"
-									>
-										<PasswordField
-											control={deleteForm.control}
-											name="password"
-											placeholder="Введіть пароль для підтвердження"
-										/>
-										<div className="flex gap-3 mt-4">
-											<button
-												type="button"
-												onClick={() => {
-													setConfirmingDelete(false)
-													deleteForm.reset()
-													setDeleteMsg(null)
-												}}
-												className="flex-1 bg-[#2F2F40] text-[#D2D2FF] p-3 rounded-3xl hover:bg-[#3a3a4d] transition-colors"
-											>
-												Скасувати
-											</button>
-											<button
-												type="submit"
-												disabled={deleting}
-												className="flex-1 bg-red-600 text-white p-3 rounded-3xl hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-											>
-												{deleting && (
-													<Triangle
-														visible={true}
-														height={16}
-														width={16}
-														color="#fff"
-														ariaLabel="triangle-loading"
-													/>
-												)}
-												Підтвердити видалення
-											</button>
-										</div>
-										{deleteMsg && (
-											<p className="mt-2 text-center text-sm text-red-500">
-												{deleteMsg}
-											</p>
-										)}
-									</form>
-								)}
+								<button
+									type="button"
+									onClick={() => {
+										setDeleteMsg(null)
+										deleteForm.reset()
+										setDeleteModalOpen(true)
+									}}
+									className="w-full mt-4 bg-red-600 text-white p-3 rounded-3xl hover:bg-red-700 transition-colors"
+								>
+									Видалити акаунт
+								</button>
 							</div>
+
+							{/* Confirmation dialog — re-enter password to delete */}
+							<Modal
+								isOpen={deleteModalOpen}
+								onRequestClose={closeDeleteModal}
+								className="bg-[#242433] p-8 rounded-2xl max-w-md w-[calc(100%-2rem)] mx-auto mt-32 text-white border border-red-500/40 outline-none"
+								overlayClassName="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-start z-50"
+								ariaHideApp={false}
+							>
+								<h6 className="text-red-400 text-xl font-semibold">
+									Видалити акаунт?
+								</h6>
+								<p className="text-[#98A0B3] text-sm mt-2">
+									Цю дію <span className="font-semibold text-red-400">неможливо
+									скасувати</span>. Ваш акаунт і всі пов’язані з ним дані буде
+									видалено назавжди. Введіть поточний пароль, щоб підтвердити.
+								</p>
+
+								<form
+									onSubmit={deleteForm.handleSubmit(onDeleteAccount)}
+									className="mt-4"
+								>
+									<PasswordField
+										control={deleteForm.control}
+										name="password"
+										placeholder="Введіть пароль для підтвердження"
+									/>
+									{deleteMsg && (
+										<p className="mt-2 text-sm text-red-500">{deleteMsg}</p>
+									)}
+									<div className="flex gap-3 mt-6">
+										<button
+											type="button"
+											onClick={closeDeleteModal}
+											disabled={deleting}
+											className="flex-1 bg-[#2F2F40] text-[#D2D2FF] p-3 rounded-3xl hover:bg-[#3a3a4d] transition-colors disabled:opacity-60"
+										>
+											Скасувати
+										</button>
+										<button
+											type="submit"
+											disabled={deleting}
+											className="flex-1 bg-red-600 text-white p-3 rounded-3xl hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+										>
+											{deleting && (
+												<Triangle
+													visible={true}
+													height={16}
+													width={16}
+													color="#fff"
+													ariaLabel="triangle-loading"
+												/>
+											)}
+											Видалити назавжди
+										</button>
+									</div>
+								</form>
+							</Modal>
 						</div>
 					</div>
 				</div>
