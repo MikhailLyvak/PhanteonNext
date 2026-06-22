@@ -4,20 +4,21 @@ export interface ForgotPasswordPayload {
 	email: string
 }
 
-// Frontend stub. Backend endpoint not implemented yet — when it is, point this
-// at the real route (likely POST /auth/api/password-reset/) and remove the
-// simulated success below.
+// POST /auth/api/password-reset/ — the backend emails a reset link via Resend.
+// Anti-enumeration: we never disclose whether an email is registered, so a 400
+// { error: "User not found" } is treated exactly like a 200 and the UI always
+// shows the same "check your email" screen. Only genuine failures (network /
+// 5xx) propagate so the form can surface a real error.
 export const requestPasswordReset = async (
 	payload: ForgotPasswordPayload
 ): Promise<{ ok: true }> => {
 	try {
 		await axiosInterceptor.post('/auth/api/password-reset/', payload)
 	} catch (error: any) {
-		// 404 / network errors are expected until the backend ships. Swallow them
-		// so the UX matches the eventual "we sent you a link if the email exists"
-		// flow and we never disclose whether an email is registered.
 		const status = error?.response?.status
-		if (status && status !== 404 && status !== 405) {
+		// 400 (user not found / invalid email) and 404/405 (route variations) are
+		// swallowed to avoid leaking account existence; anything else is real.
+		if (status && ![400, 404, 405].includes(status)) {
 			throw error
 		}
 	}

@@ -11,12 +11,22 @@ const axiosInterceptor = axios.create({
 	},
 })
 
+// Public auth endpoints: they need no token, and (critically) must never trigger
+// the global 401 → /login redirect below. The password-reset confirm endpoint
+// legitimately returns 401 for an expired/invalid link, which the reset page
+// handles itself — redirecting away would break that flow.
+const isPublicAuthEndpoint = (url?: string): boolean =>
+	!!url &&
+	(url.includes('/auth/api/login/') ||
+		url.includes('/auth/api/register/') ||
+		url.includes('/auth/api/password-reset/') ||
+		url.includes('/auth/api/password-reset-confirm/') ||
+		url.includes('/auth/api/set-new-password/'))
+
 axiosInterceptor.interceptors.request.use(
 	(config: InternalAxiosRequestConfig) => {
-		// Skip token for login and register endpoints
-		const isAuthEndpoint =
-			config.url?.includes('/auth/api/login/') ||
-			config.url?.includes('/auth/api/register/')
+		// Skip token for public auth endpoints (login / register / password reset)
+		const isAuthEndpoint = isPublicAuthEndpoint(config.url)
 
 		if (!isAuthEndpoint) {
 			const cookies = new Cookies()
@@ -49,8 +59,7 @@ axiosInterceptor.interceptors.response.use(
 		const url = error?.config?.url ?? ''
 
 		if (status === 401) {
-			const isAuthEndpoint =
-				url.includes('/auth/api/login/') || url.includes('/auth/api/register/')
+			const isAuthEndpoint = isPublicAuthEndpoint(url)
 
 			if (!isAuthEndpoint && !isLoggingOut) {
 				const onLoginPage =
