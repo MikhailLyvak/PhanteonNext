@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import LoginModalFormComponent from '../components/Auth/components/Login'
 import Register from '../components/Auth/components/Register'
@@ -7,9 +8,29 @@ import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 
 export default function LoginPage() {
 	const { activeTab, setActiveTab } = useAuthModalStore()
+	// Read one-off flags client-side (mirrors AuthModal) to avoid the
+	// useSearchParams() Suspense requirement and any hydration mismatch.
+	const [accountDeleted, setAccountDeleted] = useState(false)
+	const [passwordReset, setPasswordReset] = useState(false)
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search)
+		setAccountDeleted(params.get('account_deleted') === '1')
+		setPasswordReset(params.get('reset') === '1')
+	}, [])
 
 	return (
 		<div className='min-h-screen flex flex-col items-center justify-center bg-[#171723] gap-6'>
+			{accountDeleted && (
+				<p className='text-sm text-green-400 font-medium text-center max-w-[500px] bg-green-400/10 border border-green-400/30 rounded-xl px-4 py-3'>
+					Ваш акаунт видалено.
+				</p>
+			)}
+			{passwordReset && (
+				<p className='text-sm text-green-400 font-medium text-center max-w-[500px] bg-green-400/10 border border-green-400/30 rounded-xl px-4 py-3'>
+					Пароль успішно змінено. Увійдіть з новим паролем.
+				</p>
+			)}
 			<p className='mt-6 text-lg text-[#fff] font-bold text-center max-w-[500px]'>
 				<span className='text-xl font-bold uppercase text-[#e0b75e]'>
 					Скрінер

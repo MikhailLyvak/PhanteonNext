@@ -57,23 +57,61 @@ export type ProfileData = z.infer<typeof ProfileSchema>;
 export type ProfileUpdateData = z.infer<typeof ProfileUpdateSchema>;
 
 // ── Settings: change password ───────────────────────────────────────────────
-// confirm_new_password is validated on the client only; the backend receives
-// just { old_password, new_password }.
+// All three fields are sent to the backend; the rules below mirror the
+// server-side validation so the user gets immediate feedback.
 export const ChangePasswordSchema = z
   .object({
     old_password: z.string().min(1, "Введіть поточний пароль"),
     new_password: z.string().min(6, "Мінімум 6 символів"),
-    confirm_new_password: z.string().min(6, "Мінімум 6 символів"),
+    new_password_confirm: z.string().min(6, "Мінімум 6 символів"),
   })
-  .refine((data) => data.new_password === data.confirm_new_password, {
+  .refine((data) => data.new_password === data.new_password_confirm, {
     message: "Паролі не співпадають",
-    path: ["confirm_new_password"],
+    path: ["new_password_confirm"],
+  })
+  .refine((data) => data.new_password !== data.old_password, {
+    message: "Новий пароль має відрізнятися від поточного",
+    path: ["new_password"],
   });
 
 export type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
-export interface ChangePasswordPayload {
-  old_password: string;
-  new_password: string;
+export type ChangePasswordPayload = ChangePasswordData;
+
+// ── Forgot password: request a reset link ───────────────────────────────────
+export const ForgotPasswordSchema = z.object({
+  email: z.string().min(1, "Email обовʼязковий").email("Невірний формат email"),
+});
+
+export type ForgotPasswordData = z.infer<typeof ForgotPasswordSchema>;
+
+// ── Forgot password: set a new password via the emailed link ────────────────
+// Only `password` is validated by the backend (min length 6); `password_confirm`
+// is a client-only check so the user can't typo their new password.
+export const SetNewPasswordSchema = z
+  .object({
+    password: z.string().min(6, "Мінімум 6 символів"),
+    password_confirm: z.string().min(6, "Мінімум 6 символів"),
+  })
+  .refine((data) => data.password === data.password_confirm, {
+    message: "Паролі не співпадають",
+    path: ["password_confirm"],
+  });
+
+export type SetNewPasswordData = z.infer<typeof SetNewPasswordSchema>;
+
+// Sent to PATCH /auth/api/set-new-password/. uidb64/token are forwarded
+// verbatim from the reset link URL.
+export interface SetNewPasswordPayload {
+  password: string;
+  uidb64: string;
+  token: string;
+}
+
+// 200 response of GET /auth/api/password-reset-confirm/{uidb64}/{token}/
+export interface PasswordResetConfirmResponse {
+  success: boolean;
+  uidb64: string;
+  token: string;
 }
 
 // ── Settings: change login (email) ──────────────────────────────────────────
