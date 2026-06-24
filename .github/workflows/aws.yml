@@ -11,7 +11,7 @@ env:
   AWS_ACCOUNT_ID: '816988559151'
   ROLE_TO_ASSUME: arn:aws:iam::816988559151:role/pantheonx-ecr-backend-access-role
   TARGET_GROUP_ARN: arn:aws:elasticloadbalancing:eu-central-1:816988559151:targetgroup/PANTHEONX-PRODUCTION/e5eb5d894808cb37
-  ECR_REPOSITORY: pantheonx
+  ECR_REPOSITORY: frontend
   IMAGE_TAG: latest
   APP_DIR: /home/ec2-user/app
   URL: https://pantheonx.club
@@ -211,7 +211,7 @@ jobs:
               --parameters 'commands=[
                 "docker ps",
                 "sleep 5",
-                "curl -f http://localhost:8080/healthz || echo \"Health check failed\""
+                "curl -f http://localhost:80/ || exit 1"
               ]' \
               --region $AWS_REGION \
               --query "Command.CommandId" \
@@ -235,7 +235,7 @@ jobs:
               --comment "Cleanup old Docker images" \
               --parameters 'commands=[
                 "docker image prune -f",
-                "docker images | grep monika-backend | grep \"<none>\" | awk \"{print \\$3}\" | xargs -r docker rmi -f || echo \"No dangling monika-backend images\"",
+                "docker images | grep '$APP_NAME' | grep \"<none>\" | awk \"{print \\$3}\" | xargs -r docker rmi -f || echo \"No dangling $APP_NAME images\"",
                 "docker volume prune -f",
                 "docker images"
               ]' \
