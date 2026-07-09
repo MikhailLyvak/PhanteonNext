@@ -15,12 +15,18 @@ import {
 	aggregateFunding,
 	aggregateOI,
 	computeCVDFromCandles,
+	fetchCurrentOI,
 	fetchFundingHistory,
 	fetchOIHistory,
 	pickOIPeriod,
 } from '@/api/Screener/getBinanceIndicators'
 
 const LIVE_TAIL_INTERVAL_MS = 1000
+// openInterestHist lags several minutes behind real time, so the newest candle
+// never gets an OI point from history alone — the OI pane would stall one
+// candle behind price. A realtime /openInterest poll fills that gap; 10s is
+// plenty for a value Binance refreshes sub-minute.
+const OI_LIVE_INTERVAL_MS = 10_000
 
 export type IndicatorKey = 'volume' | 'cvd' | 'liq' | 'funding' | 'oi'
 
@@ -138,6 +144,7 @@ export const useTerminalStore = create<TerminalState>()(
 
 					let cancelled = false
 					let pollInterval: ReturnType<typeof setInterval> | null = null
+					let oiInterval: ReturnType<typeof setInterval> | null = null
 
 					;(async () => {
 						try {
@@ -214,6 +221,31 @@ export const useTerminalStore = create<TerminalState>()(
 								fundingRaw: fundingRes,
 								oiPeriod,
 							})
+
+							// 4. Live OI tail: upsert the realtime value onto the newest
+							//    candle bucket so the OI pane tracks the current candle
+							//    instead of ending at the last (lagging) history point.
+							//    Started after step 3 so the history set() above can't
+							//    overwrite an already-delivered live point.
+							let oiInFlight = false
+							const oiTick = async () => {
+								if (cancelled || get().currentPair !== pair || oiInFlight) return
+								oiInFlight = true
+								try {
+									const { oi } = await fetchCurrentOI(pair)
+									if (cancelled || get().currentPair !== pair) return
+									const s = get()
+									if (s.candles.length === 0) return
+									const bucket = s.candles[s.candles.length - 1].time
+									set({ oi: upsertLastByTime(s.oi, { time: bucket, value: oi }) })
+								} catch {
+									// Transient Binance error — next interval retries.
+								} finally {
+									oiInFlight = false
+								}
+							}
+							void oiTick()
+							oiInterval = setInterval(oiTick, OI_LIVE_INTERVAL_MS)
 						} catch (err) {
 							// eslint-disable-next-line no-console
 							console.error('[screener] chart init failed:', err)
@@ -226,6 +258,7 @@ export const useTerminalStore = create<TerminalState>()(
 					return () => {
 						cancelled = true
 						if (pollInterval) clearInterval(pollInterval)
+						if (oiInterval) clearInterval(oiInterval)
 						if (get().currentPair === pair) {
 							set({ ...EMPTY_DATA })
 						}
