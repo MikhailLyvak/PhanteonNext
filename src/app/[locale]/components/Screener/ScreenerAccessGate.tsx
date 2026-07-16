@@ -5,6 +5,8 @@ import { useRouter } from '@/i18n/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { getSubscriptions } from '@/api/Subscriptions/getSubscriptions'
 import { useUserStore } from '@/store/UserData/useUserStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	children: React.ReactNode
@@ -13,6 +15,7 @@ interface Props {
 const ScreenerAccessGate: React.FC<Props> = ({ children }) => {
 	const router = useRouter()
 	const user = useUserStore(s => s.user)
+	const { t } = useCustomTranslations(TKeys.screener)
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['subscriptions', user?.id ?? 'anon'],
@@ -36,7 +39,7 @@ const ScreenerAccessGate: React.FC<Props> = ({ children }) => {
 	if (!user || isLoading) {
 		return (
 			<div className='w-full flex items-center justify-center py-24 text-[#98A0B3] text-sm'>
-				Завантаження…
+				{t.loading}
 			</div>
 		)
 	}

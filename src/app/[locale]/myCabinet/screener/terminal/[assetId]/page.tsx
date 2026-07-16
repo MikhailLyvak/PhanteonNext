@@ -13,6 +13,8 @@ import LivePrice from '@components/Screener/LivePrice'
 import TerminalSkeleton from '@components/Screener/TerminalSkeleton'
 import { extractPairs, getDashboard } from '@/api/Screener/client'
 import { AssetPair } from '@/lib/screener/types'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const CHART_HEIGHT_STORAGE_KEY = 'screener.terminal.chartHeight'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'screener.terminal.sidebarWidth'
@@ -26,6 +28,7 @@ const DEFAULT_SIDEBAR_WIDTH = 320
 const TerminalPage = () => {
 	const params = useParams<{ assetId: string }>()
 	const router = useRouter()
+	const { t } = useCustomTranslations(TKeys.screener)
 	const assetId = (params?.assetId ?? '').toUpperCase()
 	const [pair, setPair] = useState<AssetPair | null | undefined>(undefined)
 	const [chartHeight, setChartHeight] = useState<number>(DEFAULT_CHART_HEIGHT)
@@ -89,7 +92,7 @@ const TerminalPage = () => {
 			<div className='w-full pb-24'>
 				<div className='max-w-8xl mx-auto px-4 md:px-6'>
 					<div className='mt-6'>
-						<MyCabinetBreadCrump currentPageTitle={pair ? `${pair.coin}/USDT` : 'Термінал'} />
+						<MyCabinetBreadCrump currentPageTitle={pair ? `${pair.coin}/USDT` : t.terminal} />
 					</div>
 					<div className='mt-6 flex items-center justify-between gap-3 flex-wrap'>
 						<div className='flex items-center gap-4'>
@@ -98,7 +101,7 @@ const TerminalPage = () => {
 								className='inline-flex items-center gap-2 px-3 py-2 text-sm text-[#98A0B3] hover:text-[#D2D2FF] bg-[#1A1A28] border border-[#262b38] rounded-lg transition-colors'
 							>
 								<ArrowLeft size={16} />
-								Назад до скрінера
+								{t.backToScreener}
 							</button>
 							{pair && <LivePrice pair={pair} />}
 						</div>
@@ -108,7 +111,7 @@ const TerminalPage = () => {
 						<TerminalSkeleton />
 					) : !pair ? (
 						<div className='mt-12 text-center text-[#98A0B3]'>
-							Пара не знайдена: {assetId}
+							{t.pairNotFound({ assetId })}
 						</div>
 					) : (
 						<div

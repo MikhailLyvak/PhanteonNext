@@ -6,24 +6,14 @@ import { useScreenerStore, SortKey } from '@/store/Screener/useScreenerStore'
 import { DashboardAssetData } from '@/lib/screener/types'
 import TableRow from './TableRow'
 import Pagination from './Pagination'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Column {
 	key: SortKey
 	label: string
 	align?: 'left' | 'right'
 }
-
-const COLUMNS: Column[] = [
-	{ key: 'pair', label: 'Пара', align: 'left' },
-	{ key: 'price', label: 'Ціна / 24h%', align: 'right' },
-	{ key: 'oi_1h', label: 'OI 1h', align: 'right' },
-	{ key: 'oi_4h', label: 'OI 4h', align: 'right' },
-	{ key: 'oi_24h', label: 'OI 24h', align: 'right' },
-	{ key: 'cvd_1h', label: 'CVD 1h', align: 'right' },
-	{ key: 'cvd_4h', label: 'CVD 4h', align: 'right' },
-	{ key: 'liq_total_1h', label: 'Liq 1h', align: 'right' },
-	{ key: 'funding', label: 'Funding', align: 'right' },
-]
 
 const DEFAULT_COLUMN_WIDTHS: Record<SortKey, number> = {
 	pair: 120,
@@ -52,6 +42,23 @@ const AssetsTable: React.FC = () => {
 	const currentPage = useScreenerStore(s => s.currentPage)
 	const pageSize = useScreenerStore(s => s.pageSize)
 	const setPage = useScreenerStore(s => s.setPage)
+
+	const { t } = useCustomTranslations(TKeys.screener)
+
+	const COLUMNS: Column[] = useMemo(
+		() => [
+			{ key: 'pair', label: t.table.pair, align: 'left' },
+			{ key: 'price', label: t.table.priceAndChange, align: 'right' },
+			{ key: 'oi_1h', label: 'OI 1h', align: 'right' },
+			{ key: 'oi_4h', label: 'OI 4h', align: 'right' },
+			{ key: 'oi_24h', label: 'OI 24h', align: 'right' },
+			{ key: 'cvd_1h', label: 'CVD 1h', align: 'right' },
+			{ key: 'cvd_4h', label: 'CVD 4h', align: 'right' },
+			{ key: 'liq_total_1h', label: 'Liq 1h', align: 'right' },
+			{ key: 'funding', label: 'Funding', align: 'right' },
+		],
+		[t]
+	)
 
 	const [hiddenColumns, setHiddenColumns] = useState<Set<SortKey>>(new Set())
 	const [columnsMenuOpen, setColumnsMenuOpen] = useState(false)
@@ -137,7 +144,7 @@ const AssetsTable: React.FC = () => {
 
 	const visibleColumns = useMemo(
 		() => COLUMNS.filter(c => !hiddenColumns.has(c.key)),
-		[hiddenColumns]
+		[COLUMNS, hiddenColumns]
 	)
 
 	const pairs = useScreenerStore(s => s.pairs)
@@ -338,7 +345,7 @@ const AssetsTable: React.FC = () => {
 						{!loading && display.totalCount === 0 && (
 							<tr>
 								<td colSpan={totalColumns} className='py-10 text-center text-sm text-[#98A0B3]'>
-									Пар не знайдено
+									{t.table.noPairs}
 								</td>
 							</tr>
 						)}
