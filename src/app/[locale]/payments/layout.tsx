@@ -1,6 +1,7 @@
 // app/myCabinet/layout.tsx
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
+import { redirect } from '@/i18n/navigation';
 
 export default async function ProtectedLayout({
   children,
@@ -12,7 +13,8 @@ export default async function ProtectedLayout({
   const isValid = token && token.value.startsWith('Token ');
 
   if (!isValid) {
-    redirect('/login');
+    const locale = await getLocale()
+    redirect({ href: '/login', locale })
   }
 
   return <>{children}</>;

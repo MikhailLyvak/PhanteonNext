@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import "./AcademInfo.scss";
 import BioHack from "./InnerComponents/BigGrid";
 import EmoInt from "./InnerComponents/EmoInt";

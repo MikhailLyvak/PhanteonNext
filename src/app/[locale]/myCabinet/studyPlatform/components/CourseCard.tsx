@@ -1,7 +1,7 @@
 import { Course } from "@/api/StudyPlatform/types";
 import React from "react";
 import { LuCheck } from "react-icons/lu";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 
 const CourseCard = ({ course }: { course: Course }) => {

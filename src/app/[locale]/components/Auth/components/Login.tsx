@@ -1,6 +1,6 @@
 import { login } from "@/api/Auth/PostAuth";
 import React, { useCallback, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

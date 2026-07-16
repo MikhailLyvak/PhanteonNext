@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image"; // ✅ If you need inline images
 import { LuUserRound, LuShoppingCart } from "react-icons/lu";
 
