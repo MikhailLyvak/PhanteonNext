@@ -10,9 +10,13 @@ import { LuInstagram } from 'react-icons/lu'
 import { PiTelegramLogo, PiYoutubeLogo } from 'react-icons/pi'
 import { useGetLastWebinar } from '@/hooks/Webinars/useGetLastWebinar'
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const Footer = () => {
 	// const { data: lastWebinar, isLoading } = useGetLastWebinar()
+	const { t: tNav } = useCustomTranslations(TKeys.nav)
+	const { t: tCommon } = useCustomTranslations(TKeys.common)
 	const user = useUserStore(state => state.user)
 	const [isTubeOpen, setIsTubeOpen] = useState(false);
   const [isInstOpen, setIsInstOpen] = useState(false);
@@ -78,14 +82,14 @@ const Footer = () => {
                   href="/myCabinet/screener"
                   className="text-[#D2D2FF] hover:text-white transition-colors"
                 >
-                  Скрінер
+                  {tNav.screener}
                 </Link>
               ) : (
                 <button
                   onClick={handleAcademyClick}
                   className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Скрінер
+                  {tNav.screener}
                 </button>
               )}
               {user ? (
@@ -93,35 +97,35 @@ const Footer = () => {
                 href="/Trading-Chat"
                 className="text-[#D2D2FF] hover:text-white transition-colors"
               >
-                Трейдинг-чат
+                {tNav.tradingChat}
               </Link>
               ) : (
                 <button
                 onClick={handleAcademyClick}
                 className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
               >
-                Трейдинг-чат
+                {tNav.tradingChat}
               </button>
               )}
               <Link
                 href="/Blog"
                 className="text-[#D2D2FF] hover:text-white transition-colors"
               >
-                Блог
+                {tNav.blog}
               </Link>
               {user ? (
                 <Link
                   href="https://pantheonx.club/interview"
                   className="text-[#D2D2FF] hover:text-white transition-colors"
                 >
-                  Навчання
+                  {tNav.education}
                 </Link>
               ) : (
                 <button
                   onClick={handleAcademyClick}
                   className="text-[#D2D2FF] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Навчання
+                  {tNav.education}
                 </button>
               )}
             </div>
@@ -249,13 +253,13 @@ const Footer = () => {
       <div className="bg-[#13131B]">
         <div className="max-w-8xl mx-auto px-4 py-4">
           <div className="flex max-md:flex-col justify-between items-center text-sm text-[#58587B]">
-            <div>Copyright © 2026 PantheonX. Всі права захищено.</div>
+            <div>{tCommon.copyright}</div>
             <div>
               <Link
                 href="/privacy"
                 className="hover:text-[#D2D2FF] transition-colors"
               >
-                Політика конфіденційності
+                {tNav.privacyPolicy}
               </Link>
             </div>
           </div>

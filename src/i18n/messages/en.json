@@ -1,6 +1,17 @@
 {
 	"common": {
-		"loading": "Loading…"
+		"loading": "Loading…",
+		"user": "User",
+		"copyright": "Copyright © 2026 PantheonX. All rights reserved.",
+		"addToCart": "Add to Cart",
+		"samplePrice": "880.00 UAH",
+		"latestWebinarTitle": "Latest Webinar",
+		"latestWebinarSubtitle": "Discover our latest webinar and level up your knowledge",
+		"watchWebinar": "Watch Webinar",
+		"signInToWatch": "Sign In to Watch",
+		"webinarLabel": "Webinar",
+		"vbHeroTitle": "FIND HARMONY <br></br> OF BODY, MIND AND SPIRIT",
+		"vbHeroSubtitle": "Welcome to the world of <b>smart supplements</b> (dietary supplements), the <b>VB Academy</b> education platform, and innovative microcurrent technologies — a space for taking care of body, mind, and spirit"
 	},
 	"meta": {
 		"title": "PantheonX",
@@ -87,5 +98,39 @@
 	"errors": {
 		"invalidCredentials": "Invalid credentials",
 		"userNotActive": "Account is not active"
+	},
+	"nav": {
+		"personalData": "Personal Data",
+		"algoTrading": "Algo Trading",
+		"screener": "Screener",
+		"tradingChat": "Trading Chat",
+		"blog": "Blog",
+		"education": "Education",
+		"settings": "Settings",
+		"logout": "Log Out",
+		"support": "Support",
+		"academy": "Academy",
+		"privacyPolicy": "Privacy Policy",
+		"shopUpper": "SHOP",
+		"academyVbUpper": "VB ACADEMY",
+		"webinarsUpper": "WEBINARS",
+		"aboutUsUpper": "ABOUT US",
+		"blogUpper": "BLOG",
+		"menuSets": "Bundles",
+		"menuVitaminComplexes": "Vitamin complexes",
+		"menuMineralComplexes": "Mineral complexes",
+		"menuImmunityAntioxidants": "Immunity & Antioxidants",
+		"menuSoundSleep": "Restful sleep",
+		"menuEmotionalIntelligence": "Emotional intelligence",
+		"menuWebinars": "Webinars",
+		"menuCustomCourse": "Custom course",
+		"menuTeam": "Team",
+		"menuSocialResponsibility": "Social responsibility",
+		"menuContacts": "Contacts"
+	},
+	"blog": {
+		"categoryBody": "Body",
+		"readMore": "Read More ...",
+		"sampleDate": "January 30, 2025"
 	}
 }

@@ -5,11 +5,14 @@ import { useGetLastWebinar } from '@/hooks/Webinars/useGetLastWebinar';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import { Calendar, Clock, Play, ExternalLink } from 'lucide-react';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context';
+import { TKeys } from '@/i18n/t-keys';
 
 const LatestWebinar = () => {
   const { data: lastWebinar, isLoading } = useGetLastWebinar();
   const { user } = useUserStore();
   const { toggleModal } = useAuthModalStore();
+  const { t: tCommon } = useCustomTranslations(TKeys.common);
 
   const handleWatchClick = () => {
     if (!user) {
@@ -53,10 +56,10 @@ const LatestWebinar = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Останній вебінар
+            {tCommon.latestWebinarTitle}
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Дізнайтеся про наш найновіший вебінар та покращуйте свої знання
+            {tCommon.latestWebinarSubtitle}
           </p>
         </div>
 
@@ -91,12 +94,12 @@ const LatestWebinar = () => {
                 {user ? (
                   <>
                     <ExternalLink size={16} />
-                    Дивитися вебінар
+                    {tCommon.watchWebinar}
                   </>
                 ) : (
                   <>
                     <Play size={16} />
-                    Увійти для перегляду
+                    {tCommon.signInToWatch}
                   </>
                 )}
               </button>
@@ -107,7 +110,7 @@ const LatestWebinar = () => {
               <div className="relative w-64 h-48 bg-gradient-to-br from-[#D2D2FF] to-[#6A56E4] rounded-2xl flex items-center justify-center">
                 <div className="text-center text-white">
                   <Play size={48} className="mx-auto mb-2" />
-                  <p className="text-sm font-medium">Вебінар</p>
+                  <p className="text-sm font-medium">{tCommon.webinarLabel}</p>
                 </div>
               </div>
             </div>

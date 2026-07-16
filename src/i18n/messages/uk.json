@@ -1,6 +1,17 @@
 {
 	"common": {
-		"loading": "Завантаження…"
+		"loading": "Завантаження…",
+		"user": "Користувач",
+		"copyright": "Copyright © 2026 PantheonX. Всі права захищено.",
+		"addToCart": "У кошик",
+		"samplePrice": "880.00 грн.",
+		"latestWebinarTitle": "Останній вебінар",
+		"latestWebinarSubtitle": "Дізнайтеся про наш найновіший вебінар та покращуйте свої знання",
+		"watchWebinar": "Дивитися вебінар",
+		"signInToWatch": "Увійти для перегляду",
+		"webinarLabel": "Вебінар",
+		"vbHeroTitle": "ЗНАЙДИ ГАРМОНІЮ <br></br> ТІЛА, РОЗУМУ ТА ДУХУ",
+		"vbHeroSubtitle": "Запрошуємо вас у світ <b>розумних саплементів</b> (дієтичних добавок), освітньої платформи <b>VB Academy</b> та інноваційних мікрострумових технологій — простору для турботи про тіло, розум і дух"
 	},
 	"meta": {
 		"title": "PantheonX",
@@ -87,5 +98,39 @@
 	"errors": {
 		"invalidCredentials": "Невірні облікові дані",
 		"userNotActive": "Обліковий запис не активний"
+	},
+	"nav": {
+		"personalData": "Персональні дані",
+		"algoTrading": "Алготрейдинг",
+		"screener": "Скрінер",
+		"tradingChat": "Трейдинг-чат",
+		"blog": "Блог",
+		"education": "Навчання",
+		"settings": "Налаштування",
+		"logout": "Вихід",
+		"support": "Підтримка",
+		"academy": "Академія",
+		"privacyPolicy": "Політика конфіденційності",
+		"shopUpper": "МАГАЗИН",
+		"academyVbUpper": "АКАДЕМІЯ VB",
+		"webinarsUpper": "ВЕБІНАРИ",
+		"aboutUsUpper": "ПРО НАС",
+		"blogUpper": "БЛОГ",
+		"menuSets": "Набори",
+		"menuVitaminComplexes": "Вітамінні комлекси",
+		"menuMineralComplexes": "Мінеральні комплекси",
+		"menuImmunityAntioxidants": "Імунутет та Антикосиданти",
+		"menuSoundSleep": "Міцний сон",
+		"menuEmotionalIntelligence": "Емоційний інтелект",
+		"menuWebinars": "Вебінари",
+		"menuCustomCourse": "Кастомний курс",
+		"menuTeam": "Команда",
+		"menuSocialResponsibility": "Соціальна відповідальність",
+		"menuContacts": "Контакти"
+	},
+	"blog": {
+		"categoryBody": "Тіло",
+		"readMore": "Читати ...",
+		"sampleDate": "30 січня 2025"
 	}
 }

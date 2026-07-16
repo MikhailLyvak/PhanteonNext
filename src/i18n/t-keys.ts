@@ -22,11 +22,24 @@ export const TKeys = {
 	},
 	validation: 'validation',
 	errors: 'errors',
+	nav: 'nav',
+	blog: 'blog',
 } as const
 
 export interface MessageShapes {
 	'common': {
 		loading: string
+		user: string
+		copyright: string
+		addToCart: string
+		samplePrice: string
+		latestWebinarTitle: string
+		latestWebinarSubtitle: string
+		watchWebinar: string
+		signInToWatch: string
+		webinarLabel: string
+		vbHeroTitle: (values: RichValues) => ReactNode
+		vbHeroSubtitle: (values: RichValues) => ReactNode
 	}
 	'meta': {
 		title: string
@@ -111,6 +124,40 @@ export interface MessageShapes {
 	'errors': {
 		invalidCredentials: string
 		userNotActive: string
+	}
+	'nav': {
+		personalData: string
+		algoTrading: string
+		screener: string
+		tradingChat: string
+		blog: string
+		education: string
+		settings: string
+		logout: string
+		support: string
+		academy: string
+		privacyPolicy: string
+		shopUpper: string
+		academyVbUpper: string
+		webinarsUpper: string
+		aboutUsUpper: string
+		blogUpper: string
+		menuSets: string
+		menuVitaminComplexes: string
+		menuMineralComplexes: string
+		menuImmunityAntioxidants: string
+		menuSoundSleep: string
+		menuEmotionalIntelligence: string
+		menuWebinars: string
+		menuCustomCourse: string
+		menuTeam: string
+		menuSocialResponsibility: string
+		menuContacts: string
+	}
+	'blog': {
+		categoryBody: string
+		readMore: string
+		sampleDate: string
 	}
 }
 

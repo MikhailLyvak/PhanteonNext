@@ -11,8 +11,11 @@ import { useUserStore } from "@/store/UserData/useUserStore";
 import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 
 import { useGetUserSubscriptions } from "@/hooks/Subscriptions/useGetUserSubscriptions";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const InnerWhiteHeader = () => {
+  const { t: tNav } = useCustomTranslations(TKeys.nav);
   const user = useUserStore((state) => state.user);
   const { toggleModal } = useAuthModalStore();
   const [copied, setCopied] = useState(false);
@@ -199,14 +202,14 @@ const InnerWhiteHeader = () => {
                 href="/myCabinet/tradingBots"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Алготрейдинг
+                {tNav.algoTrading}
               </Link>
             ) : (
               <button
                 onClick={handleAcademyClick}
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Алготрейдинг
+                {tNav.algoTrading}
               </button>
             )}
             {user ? (
@@ -214,14 +217,14 @@ const InnerWhiteHeader = () => {
                 href="/myCabinet/screener"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Скрінер
+                {tNav.screener}
               </Link>
             ) : (
               <button
                 onClick={handleAcademyClick}
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Скрінер
+                {tNav.screener}
               </button>
             )}
             {user ? (
@@ -229,28 +232,28 @@ const InnerWhiteHeader = () => {
                 href="/Trading-Chat"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Трейдинг-чат
+                {tNav.tradingChat}
               </Link>
             ) : (
               <button
                 onClick={handleAcademyClick}
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Трейдинг-чат
+                {tNav.tradingChat}
               </button>
             )}
             <Link
               href="/Blog"
               className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
             >
-              Блог
+              {tNav.blog}
             </Link>
             {user ? (
               <Link
                 href="https://pantheonx.club/interview"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Підтримка
+                {tNav.support}
               </Link>
             ) : (
               <button
@@ -263,7 +266,7 @@ const InnerWhiteHeader = () => {
                   cursor: "pointer",
                 }}
               >
-                Підтримка
+                {tNav.support}
               </button>
             )}
             {user ? (
@@ -271,7 +274,7 @@ const InnerWhiteHeader = () => {
                 href="/myCabinet/studyPlatform"
                 className="font-bold text-sm text-[#D2D2FFAB] xl:text-base"
               >
-                Академія
+                {tNav.academy}
               </Link>
             ) : (
               <button
@@ -284,7 +287,7 @@ const InnerWhiteHeader = () => {
                   cursor: "pointer",
                 }}
               >
-                Академія
+                {tNav.academy}
               </button>
             )}
             {/* <Link
