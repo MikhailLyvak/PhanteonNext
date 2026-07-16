@@ -6,7 +6,11 @@
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"generate-t-keys": "node scripts/generate-t-keys.mjs",
+		"test:scripts": "node --test scripts/__tests__/*.mjs",
+		"validate-i18n": "node scripts/validate-i18n.mjs",
+		"validate-i18n:full": "node scripts/validate-i18n.mjs --cyrillic"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
