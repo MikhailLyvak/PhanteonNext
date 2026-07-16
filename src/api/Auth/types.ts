@@ -1,4 +1,7 @@
 import { z } from "zod";
+import type { MessageShapes } from '@/i18n/t-keys'
+
+type ValidationT = MessageShapes['validation']
 
 export interface LoginResponse {
   token: string;
@@ -34,12 +37,13 @@ export interface MyContactData {
   "solana_wallet": "string",
 }
 
-export const ProfileSchema = z.object({
-  first_name: z.string().min(1, "Ім'я обов'язкове").optional().nullable(),
-  last_name: z.string().min(1, "Прізвище обов'язкове").optional().nullable(),
-  phone: z.string().min(10, "Невірний формат телефону").optional().nullable(),
-  solana_wallet: z.string().min(32, "Невірний формат Solana адреси").optional().nullable(),
-});
+// ProfileSchema → factory
+export const createProfileSchema = (t: ValidationT) => z.object({
+  first_name: z.string().min(1, t.firstNameRequired).optional().nullable(),
+  last_name: z.string().min(1, t.lastNameRequired).optional().nullable(),
+  phone: z.string().min(10, t.phoneInvalid).optional().nullable(),
+  solana_wallet: z.string().min(32, t.solanaInvalid).optional().nullable(),
+})
 
 const OptionalString = z
   .string()
@@ -53,51 +57,45 @@ export const ProfileUpdateSchema = z.object({
   solana_wallet: OptionalString,
 });
 
-export type ProfileData = z.infer<typeof ProfileSchema>;
+export type ProfileData = z.infer<ReturnType<typeof createProfileSchema>>;
 export type ProfileUpdateData = z.infer<typeof ProfileUpdateSchema>;
 
 // ── Settings: change password ───────────────────────────────────────────────
-// All three fields are sent to the backend; the rules below mirror the
-// server-side validation so the user gets immediate feedback.
-export const ChangePasswordSchema = z
-  .object({
-    old_password: z.string().min(1, "Введіть поточний пароль"),
-    new_password: z.string().min(6, "Мінімум 6 символів"),
-    new_password_confirm: z.string().min(6, "Мінімум 6 символів"),
+export const createChangePasswordSchema = (t: ValidationT) =>
+  z.object({
+    old_password: z.string().min(1, t.currentPasswordRequired),
+    new_password: z.string().min(6, t.minChars({ count: 6 })),
+    new_password_confirm: z.string().min(6, t.minChars({ count: 6 })),
   })
   .refine((data) => data.new_password === data.new_password_confirm, {
-    message: "Паролі не співпадають",
-    path: ["new_password_confirm"],
+    message: t.passwordsMismatch,
+    path: ['new_password_confirm'],
   })
   .refine((data) => data.new_password !== data.old_password, {
-    message: "Новий пароль має відрізнятися від поточного",
-    path: ["new_password"],
-  });
+    message: t.newPasswordMustDiffer,
+    path: ['new_password'],
+  })
 
-export type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
-export type ChangePasswordPayload = ChangePasswordData;
+export type ChangePasswordData = z.infer<ReturnType<typeof createChangePasswordSchema>>
+export type ChangePasswordPayload = ChangePasswordData
 
 // ── Forgot password: request a reset link ───────────────────────────────────
-export const ForgotPasswordSchema = z.object({
-  email: z.string().min(1, "Email обовʼязковий").email("Невірний формат email"),
-});
-
-export type ForgotPasswordData = z.infer<typeof ForgotPasswordSchema>;
+export const createForgotPasswordSchema = (t: ValidationT) => z.object({
+  email: z.string().min(1, t.emailRequired).email(t.emailInvalid),
+})
+export type ForgotPasswordData = z.infer<ReturnType<typeof createForgotPasswordSchema>>
 
 // ── Forgot password: set a new password via the emailed link ────────────────
-// Only `password` is validated by the backend (min length 6); `password_confirm`
-// is a client-only check so the user can't typo their new password.
-export const SetNewPasswordSchema = z
-  .object({
-    password: z.string().min(6, "Мінімум 6 символів"),
-    password_confirm: z.string().min(6, "Мінімум 6 символів"),
+export const createSetNewPasswordSchema = (t: ValidationT) =>
+  z.object({
+    password: z.string().min(6, t.minChars({ count: 6 })),
+    password_confirm: z.string().min(6, t.minChars({ count: 6 })),
   })
   .refine((data) => data.password === data.password_confirm, {
-    message: "Паролі не співпадають",
-    path: ["password_confirm"],
-  });
-
-export type SetNewPasswordData = z.infer<typeof SetNewPasswordSchema>;
+    message: t.passwordsMismatch,
+    path: ['password_confirm'],
+  })
+export type SetNewPasswordData = z.infer<ReturnType<typeof createSetNewPasswordSchema>>
 
 // Sent to PATCH /auth/api/set-new-password/. uidb64/token are forwarded
 // verbatim from the reset link URL.
@@ -115,16 +113,14 @@ export interface PasswordResetConfirmResponse {
 }
 
 // ── Settings: change login (email) ──────────────────────────────────────────
-export const ChangeLoginSchema = z.object({
-  email: z.string().min(1, "Email обовʼязковий").email("Невірний формат email"),
-  password: z.string().min(1, "Введіть пароль для підтвердження"),
-});
-
-export type ChangeLoginData = z.infer<typeof ChangeLoginSchema>;
+export const createChangeLoginSchema = (t: ValidationT) => z.object({
+  email: z.string().min(1, t.emailRequired).email(t.emailInvalid),
+  password: z.string().min(1, t.passwordConfirmationRequired),
+})
+export type ChangeLoginData = z.infer<ReturnType<typeof createChangeLoginSchema>>
 
 // ── Settings: delete account ────────────────────────────────────────────────
-export const DeleteAccountSchema = z.object({
-  password: z.string().min(1, "Введіть пароль для підтвердження"),
-});
-
-export type DeleteAccountData = z.infer<typeof DeleteAccountSchema>;
+export const createDeleteAccountSchema = (t: ValidationT) => z.object({
+  password: z.string().min(1, t.passwordConfirmationRequired),
+})
+export type DeleteAccountData = z.infer<ReturnType<typeof createDeleteAccountSchema>>

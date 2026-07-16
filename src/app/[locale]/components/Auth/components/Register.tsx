@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
@@ -10,39 +10,18 @@ import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 import { useUserStore } from "@/store/UserData/useUserStore";
 import { register } from "@/api/Auth/PostRegister";
 import { useRouter } from "@/i18n/navigation";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
-// Password policy enforced both via zod (server-blocking) and the strength
-// indicator (user-facing). Keep the rules in one place.
-const passwordRules = [
-  { test: (v: string) => v.length >= 8, label: "Мінімум 8 символів" },
-  { test: (v: string) => /[A-ZА-ЯЁІЇЄҐ]/.test(v), label: "Велика літера" },
-  { test: (v: string) => /[a-zа-яёіїєґ]/.test(v), label: "Мала літера" },
-  { test: (v: string) => /\d/.test(v), label: "Цифра" },
-];
+// Password rule test functions (pure, no strings)
+const PASSWORD_RULE_TESTS = [
+  (v: string) => v.length >= 8,
+  (v: string) => /[A-ZА-ЯЁІЇЄҐ]/.test(v),
+  (v: string) => /[a-zа-яёіїєґ]/.test(v),
+  (v: string) => /\d/.test(v),
+]
 
-const passwordSchema = z
-  .string()
-  .min(8, "Мінімум 8 символів")
-  .refine((v) => /[A-ZА-ЯЁІЇЄҐ]/.test(v), "Має містити велику літеру")
-  .refine((v) => /[a-zа-яёіїєґ]/.test(v), "Має містити малу літеру")
-  .refine((v) => /\d/.test(v), "Має містити цифру");
-
-const schema = z
-  .object({
-    email: z
-      .string()
-      .min(1, "Email обовʼязковий")
-      .email("Невірний формат email"),
-    password: passwordSchema,
-    confirm_password: z.string().min(1, "Повторіть пароль"),
-    referalId: z.string().optional(),
-  })
-  .refine((data) => data.password === data.confirm_password, {
-    message: "Паролі не співпадають",
-    path: ["confirm_password"],
-  });
-
-type RegisterFormData = z.infer<typeof schema>;
+type RegisterFormData = { email: string; password: string; confirm_password: string; referalId?: string }
 
 const RegisterModalFormComponent = () => {
   const { setUser } = useUserStore();
@@ -50,6 +29,31 @@ const RegisterModalFormComponent = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+
+  const { t } = useCustomTranslations(TKeys.auth.register);
+  const { t: tValidation } = useCustomTranslations(TKeys.validation);
+  const { t: tErrors } = useCustomTranslations(TKeys.errors);
+
+  const passwordRules = useMemo(() => [
+    { test: PASSWORD_RULE_TESTS[0], label: tValidation.passwordMin8 },
+    { test: PASSWORD_RULE_TESTS[1], label: tValidation.passwordNeedsUppercase },
+    { test: PASSWORD_RULE_TESTS[2], label: tValidation.passwordNeedsLowercase },
+    { test: PASSWORD_RULE_TESTS[3], label: tValidation.passwordNeedsDigit },
+  ], [tValidation]);
+
+  const schema = useMemo(() => z.object({
+    email: z.string().min(1, tValidation.emailRequired).email(tValidation.emailInvalid),
+    password: z.string()
+      .min(8, tValidation.passwordMin8)
+      .refine((v) => /[A-ZА-ЯЁІЇЄҐ]/.test(v), tValidation.passwordNeedsUppercase)
+      .refine((v) => /[a-zа-яёіїєґ]/.test(v), tValidation.passwordNeedsLowercase)
+      .refine((v) => /\d/.test(v), tValidation.passwordNeedsDigit),
+    confirm_password: z.string().min(1, tValidation.repeatPassword),
+    referalId: z.string().optional(),
+  }).refine((data) => data.password === data.confirm_password, {
+    message: tValidation.passwordsMismatch,
+    path: ['confirm_password'],
+  }), [tValidation]);
 
   console.log(referral_id);
 
@@ -63,7 +67,7 @@ const RegisterModalFormComponent = () => {
     onError: (error: any) => {
       console.error("Registration error details:", error);
 
-      let errorMessage = "Сталася помилка при реєстрації";
+      let errorMessage = t.errorGeneral;
 
       if (error?.response?.data) {
         const responseData = error.response.data;
@@ -109,15 +113,15 @@ const RegisterModalFormComponent = () => {
         }
       }
 
-      // Translate common error messages to Ukrainian
+      // Translate common error messages
       if (errorMessage.includes("user with this email already exists")) {
-        errorMessage = "Користувач з таким email вже існує";
+        errorMessage = t.errorEmailExists;
       } else if (errorMessage.includes("This field may not be blank")) {
-        errorMessage = "Це поле не може бути порожнім";
+        errorMessage = t.errorFieldBlank;
       } else if (errorMessage.includes("This field is required")) {
-        errorMessage = "Це поле обов'язкове";
+        errorMessage = t.errorFieldRequired;
       } else if (errorMessage.includes("Ensure this field has at least")) {
-        errorMessage = "Це поле має містити мінімум символів";
+        errorMessage = t.errorFieldMinChars;
       }
 
       setErrorMessage(errorMessage);
@@ -153,8 +157,7 @@ const RegisterModalFormComponent = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <h3 className="mt-6 text-sm text-gray-500 font-medium text-center">
-        Скрінер - інструмент для системного аналізу ринку та відбору активів за
-        заданими параметрами. Доступний після реєстрації!
+        {t.screenerPromo}
       </h3>
       <Controller
         control={control}
@@ -186,7 +189,7 @@ const RegisterModalFormComponent = () => {
                 <input
                   {...field}
                   type={isVisible ? "text" : "password"}
-                  placeholder="Пароль"
+                  placeholder={t.passwordPlaceholder}
                   autoComplete="new-password"
                   className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
                 />
@@ -198,7 +201,7 @@ const RegisterModalFormComponent = () => {
                   {isVisible ? "👁️" : "👁️‍🗨️"}
                 </button>
               </div>
-              <ul className="mt-2 space-y-1" aria-label="Вимоги до пароля">
+              <ul className="mt-2 space-y-1" aria-label={t.passwordRequirementsLabel}>
                 {passwordRules.map((rule) => {
                   const ok = rule.test(value);
                   return (
@@ -231,7 +234,7 @@ const RegisterModalFormComponent = () => {
               <input
                 {...field}
                 type={isVisible ? "text" : "password"}
-                placeholder="Повторіть пароль"
+                placeholder={t.confirmPasswordPlaceholder}
                 className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
               />
               <button
@@ -263,7 +266,7 @@ const RegisterModalFormComponent = () => {
             ariaLabel="triangle-loading"
           />
         )}
-        <span>Реєстрація</span>
+        <span>{t.submit}</span>
       </button>
 
       {errorMessage && (
@@ -273,16 +276,16 @@ const RegisterModalFormComponent = () => {
       )}
 
       <p className="mt-4 text-xs text-gray-500 text-center">
-        Натискаючи «Реєстрація», ви погоджуєтесь з{" "}
+        {t.consent}{" "}
         <Link
           href="/privacy"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[#D2D2FF] underline hover:text-[#6A56E4]"
         >
-          Політикою конфіденційності
+          {t.privacyPolicy}
         </Link>{" "}
-        та надаєте згоду на обробку персональних даних.
+        {t.consentSuffix}
       </p>
     </form>
   );

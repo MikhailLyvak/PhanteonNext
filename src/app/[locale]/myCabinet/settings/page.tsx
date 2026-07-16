@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Controller, useForm, Control, FieldValues, Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Triangle } from 'react-loader-spinner'
@@ -18,13 +18,15 @@ import useChangeLogin from '@/hooks/Auth/useChangeLogin'
 import useDeleteAccount from '@/hooks/Auth/useDeleteAccount'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAlgonixSessionStore } from '@/store/TradingBots/useAlgonixSessionStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 import {
 	ChangePasswordData,
-	ChangePasswordSchema,
+	createChangePasswordSchema,
 	ChangeLoginData,
-	ChangeLoginSchema,
+	createChangeLoginSchema,
 	DeleteAccountData,
-	DeleteAccountSchema,
+	createDeleteAccountSchema,
 } from '@/api/Auth/types'
 
 // Pull a human-readable message out of a Django REST Framework error response,
@@ -48,25 +50,6 @@ const extractError = (error: any, fallback: string): string => {
 		pickFirst(data.non_field_errors) ??
 		fallback
 	)
-}
-
-// The backend returns validation messages in English; translate the known ones
-// to Ukrainian to match the rest of the UI. Unknown strings pass through as-is.
-const SERVER_MESSAGE_UK: Record<string, string> = {
-	'Old password is incorrect': 'Невірний старий пароль',
-	'Password is incorrect': 'Невірний пароль',
-	'New passwords do not match': 'Паролі не співпадають',
-	'New password must differ from the old password':
-		'Новий пароль має відрізнятися від поточного',
-}
-
-const translateServerError = (msg: string): string => {
-	const trimmed = msg.trim()
-	if (SERVER_MESSAGE_UK[trimmed]) return SERVER_MESSAGE_UK[trimmed]
-	// DRF min-length message, e.g. "Ensure this field has at least 6 characters."
-	const minLen = trimmed.match(/at least (\d+) characters/i)
-	if (minLen) return `Мінімум ${minLen[1]} символів`
-	return msg
 }
 
 const inputClass =
@@ -158,6 +141,27 @@ const SettingsPage = () => {
 	const { clearUser } = useUserStore()
 	const { data: profile } = useGetMyProfileData()
 
+	const { t: tValidation } = useCustomTranslations(TKeys.validation)
+	const { t: tErrors } = useCustomTranslations(TKeys.errors)
+
+	// The backend returns validation messages in English; resolve the known ones
+	// through the errors/validation namespaces so they follow the active locale.
+	const translateServerError = (msg: string): string => {
+		const trimmed = msg.trim()
+		if (trimmed === 'Old password is incorrect') return tErrors.oldPasswordIncorrect
+		if (trimmed === 'Password is incorrect') return tErrors.passwordIncorrect
+		if (trimmed === 'New passwords do not match') return tErrors.passwordsMismatch
+		if (trimmed === 'New password must differ from the old password') return tErrors.newPasswordMustDiffer
+		// DRF min-length message, e.g. "Ensure this field has at least 6 characters."
+		const minLen = trimmed.match(/at least (\d+) characters/i)
+		if (minLen) return tValidation.minChars({ count: Number(minLen[1]) })
+		return msg
+	}
+
+	const changePasswordSchema = useMemo(() => createChangePasswordSchema(tValidation), [tValidation])
+	const changeLoginSchema = useMemo(() => createChangeLoginSchema(tValidation), [tValidation])
+	const deleteAccountSchema = useMemo(() => createDeleteAccountSchema(tValidation), [tValidation])
+
 	// ── Change password ──────────────────────────────────────────────────────
 	const { mutate: changePassword, isPending: changingPassword } =
 		useChangePassword()
@@ -167,7 +171,7 @@ const SettingsPage = () => {
 	} | null>(null)
 
 	const passwordForm = useForm<ChangePasswordData>({
-		resolver: zodResolver(ChangePasswordSchema),
+		resolver: zodResolver(changePasswordSchema),
 		defaultValues: {
 			old_password: '',
 			new_password: '',
@@ -179,7 +183,7 @@ const SettingsPage = () => {
 		setPasswordMsg(null)
 		changePassword(values, {
 			onSuccess: () => {
-				setPasswordMsg({ type: 'success', text: 'Пароль успішно змінено' })
+				setPasswordMsg({ type: 'success', text: tErrors.passwordChangedSuccess })
 				passwordForm.reset()
 			},
 			onError: (error: any) => {
@@ -215,7 +219,7 @@ const SettingsPage = () => {
 				} else if (!mappedField) {
 					setPasswordMsg({
 						type: 'error',
-						text: extractError(error, 'Не вдалося змінити пароль'),
+						text: extractError(error, tErrors.changePasswordFailed),
 					})
 				}
 			},
@@ -230,7 +234,7 @@ const SettingsPage = () => {
 	} | null>(null)
 
 	const loginForm = useForm<ChangeLoginData>({
-		resolver: zodResolver(ChangeLoginSchema),
+		resolver: zodResolver(changeLoginSchema),
 		defaultValues: { email: '', password: '' },
 		values: profile?.email
 			? { email: String(profile.email), password: '' }
@@ -241,14 +245,14 @@ const SettingsPage = () => {
 		setLoginMsg(null)
 		changeLogin(values, {
 			onSuccess: () => {
-				setLoginMsg({ type: 'success', text: 'Email успішно змінено' })
+				setLoginMsg({ type: 'success', text: tErrors.emailChangedSuccess })
 				loginForm.resetField('password')
 				queryClient.invalidateQueries({ queryKey: ['my-profile-data'] })
 			},
 			onError: (error: any) =>
 				setLoginMsg({
 					type: 'error',
-					text: extractError(error, 'Не вдалося змінити email'),
+					text: extractError(error, tErrors.changeEmailFailed),
 				}),
 		})
 	}
@@ -259,7 +263,7 @@ const SettingsPage = () => {
 	const [deleteMsg, setDeleteMsg] = useState<string | null>(null)
 
 	const deleteForm = useForm<DeleteAccountData>({
-		resolver: zodResolver(DeleteAccountSchema),
+		resolver: zodResolver(deleteAccountSchema),
 		defaultValues: { password: '' },
 	})
 
@@ -304,7 +308,7 @@ const SettingsPage = () => {
 				if (general) {
 					setDeleteMsg(translateServerError(general))
 				} else if (!fieldMsg) {
-					setDeleteMsg(extractError(error, 'Не вдалося видалити акаунт'))
+					setDeleteMsg(extractError(error, tErrors.deleteAccountFailed))
 				}
 			},
 		})
@@ -419,7 +423,7 @@ const SettingsPage = () => {
 									Видалення акаунту
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
-									Це назавжди видалить ваш акаунт та всі пов’язані з ним дані. Дію
+									Це назавжди видалить ваш акаунт та всі пов'язані з ним дані. Дію
 									неможливо скасувати.
 								</p>
 
@@ -449,7 +453,7 @@ const SettingsPage = () => {
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
 									Цю дію <span className="font-semibold text-red-400">неможливо
-									скасувати</span>. Ваш акаунт і всі пов’язані з ним дані буде
+									скасувати</span>. Ваш акаунт і всі пов'язані з ним дані буде
 									видалено назавжди. Введіть поточний пароль, щоб підтвердити.
 								</p>
 

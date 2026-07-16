@@ -1,11 +1,19 @@
+"use client";
+
 import React from "react";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image"; // ✅ If you need inline images
 import { LuUserRound, LuShoppingCart } from "react-icons/lu";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 import "./MainInfo.scss";
 
 const MainInfo = () => {
+  const { t: tNav } = useCustomTranslations(TKeys.nav);
+  const { t: tCommon } = useCustomTranslations(TKeys.common);
+  const { t } = useCustomTranslations(TKeys.home);
+
   return (
     <section
       className="relative w-full h-screen bg-gray-800 flex flex-col items-center justify-center bg-cover bg-center"
@@ -22,11 +30,11 @@ const MainInfo = () => {
           />
         </div>
         <div className="flex gap-10">
-          <div className="font-bold">МАГАЗИН</div>
-          <div className="font-bold">E-BALANCE PRO</div>
-          <div className="font-bold">ПРО НАС</div>
-          <div className="font-bold">АКАДЕМІЯ VB</div>
-          <div className="font-bold">БЛОГ</div>
+          <div className="font-bold">{tNav.shopUpper}</div>
+          <div className="font-bold">{t.eBalanceProUpper}</div>
+          <div className="font-bold">{tNav.aboutUsUpper}</div>
+          <div className="font-bold">{tNav.academyVbUpper}</div>
+          <div className="font-bold">{tNav.blogUpper}</div>
         </div>
         <div className="flex gap-4">
           <div className="w-[103px] h-16 bg-white rounded-3xl flex items-center justify-center gap-4">
@@ -51,15 +59,10 @@ const MainInfo = () => {
       <div className="relative z-10 max-w-7xl w-full px-10 flex justify-between items-center mt-10">
         <div className="max-w-xl text-white">
           <h1 className="text-4xl font-bold uppercase leading-tight">
-            ЗНАЙДИ ГАРМОНІЮ <br /> ТІЛА, РОЗУМУ ТА ДУХУ
+            {tCommon.vbHeroTitle({ br: () => <br /> })}
           </h1>
           <p className="mt-4 text-lg text-gray-200">
-            Запрошуємо вас у світ{" "}
-            <span className="font-bold">розумних саплементів</span> (дієтичних
-            добавок), освітньої платформи{" "}
-            <span className="font-bold">VB Academy</span> та інноваційних
-            мікрострумових технологій — простору для турботи про тіло, розум і
-            дух
+            {tCommon.vbHeroSubtitle({ b: (chunks) => <span className="font-bold">{chunks}</span> })}
           </p>
 
           <div className="flex space-x-4 mt-6">

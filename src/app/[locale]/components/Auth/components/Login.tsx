@@ -1,5 +1,5 @@
 import { login } from "@/api/Auth/PostAuth";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
@@ -10,12 +10,10 @@ import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 import { getProfile } from "@/api/Auth/getProfile";
 import { Triangle } from "react-loader-spinner";
 import { useRouter } from "@/i18n/navigation";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
-const schema = z.object({
-  email: z.string().min(1, "required field"),
-  password: z.string().min(1, "required field"),
-});
-type LoginFormData = z.infer<typeof schema>;
+type LoginFormData = { email: string; password: string }
 
 const LoginModalFormComponent = () => {
   const { setUser } = useUserStore();
@@ -23,6 +21,15 @@ const LoginModalFormComponent = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+
+  const { t } = useCustomTranslations(TKeys.auth.login);
+  const { t: tValidation } = useCustomTranslations(TKeys.validation);
+  const { t: tErrors } = useCustomTranslations(TKeys.errors);
+
+  const schema = useMemo(() => z.object({
+    email: z.string().min(1, tValidation.emailRequired),
+    password: z.string().min(1, tValidation.passwordConfirmationRequired),
+  }), [tValidation]);
 
   const { mutate: handleLogin, isPending } = useMutation({
     mutationFn: login,
@@ -35,12 +42,11 @@ const LoginModalFormComponent = () => {
     onError: (error: any) => {
       console.error("Login error details:", error);
 
-      let errorMessage = "Невірні облікові дані";
+      let errorMessage = tErrors.invalidCredentials;
 
       if (error?.response?.data) {
         const responseData = error.response.data;
 
-        // Handle specific error messages
         if (responseData.error) {
           errorMessage = responseData.error;
         } else if (responseData.message) {
@@ -50,11 +56,10 @@ const LoginModalFormComponent = () => {
         }
       }
 
-      // Translate common error messages to Ukrainian
       if (errorMessage.includes("Invalid credentials")) {
-        errorMessage = "Невірні облікові дані";
+        errorMessage = tErrors.invalidCredentials;
       } else if (errorMessage.includes("User is not active")) {
-        errorMessage = "Обліковий запис не активний";
+        errorMessage = tErrors.userNotActive;
       }
 
       setErrorMessage(errorMessage);
@@ -114,7 +119,7 @@ const LoginModalFormComponent = () => {
                     setErrorMessage(null);
                   }}
                   type={isVisible ? "text" : "password"}
-                  placeholder="Пароль"
+                  placeholder={t.passwordPlaceholder}
                   autoComplete="current-password"
                   className="w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
                 />
@@ -135,8 +140,7 @@ const LoginModalFormComponent = () => {
           )}
         />
         <p className="mt-4 text-xs text-gray-500 text-center">
-          Продовжуючи, ви підтверджуєте, що згодні увійти до облікового запису
-          PantheonX та надаєте згоду на обробку персональних даних
+          {t.consent}
         </p>
 
         <button
@@ -154,7 +158,7 @@ const LoginModalFormComponent = () => {
               ariaLabel="triangle-loading"
             />
           )}
-          Продовжити
+          {t.submit}
         </button>
       </form>
 
@@ -172,7 +176,7 @@ const LoginModalFormComponent = () => {
         onClick={closeModal}
         className="mt-4 block text-center text-sm text-[#D2D2FF] hover:underline"
       >
-        Забули пароль?
+        {t.forgotPassword}
       </Link>
     </div>
   );

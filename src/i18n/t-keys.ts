@@ -14,11 +14,33 @@ export const TKeys = {
 	common: 'common',
 	meta: 'meta',
 	notFound: 'notFound',
+	auth: {
+		login: 'auth.login',
+		register: 'auth.register',
+		forgotPassword: 'auth.forgotPassword',
+		resetPassword: 'auth.resetPassword',
+	},
+	validation: 'validation',
+	errors: 'errors',
+	nav: 'nav',
+	blog: 'blog',
+	home: 'home',
 } as const
 
 export interface MessageShapes {
 	'common': {
 		loading: string
+		user: string
+		copyright: string
+		addToCart: string
+		samplePrice: string
+		latestWebinarTitle: string
+		latestWebinarSubtitle: string
+		watchWebinar: string
+		signInToWatch: string
+		webinarLabel: string
+		vbHeroTitle: (values: RichValues) => ReactNode
+		vbHeroSubtitle: (values: RichValues) => ReactNode
 	}
 	'meta': {
 		title: string
@@ -29,6 +51,161 @@ export interface MessageShapes {
 		description: string
 		goHome: string
 		myAccount: string
+	}
+	'auth.login': {
+		tabLabel: string
+		passwordPlaceholder: string
+		consent: string
+		submit: string
+		forgotPassword: string
+		screenerPromo: string
+		accountDeleted: string
+		passwordResetSuccess: string
+	}
+	'auth.register': {
+		tabLabel: string
+		screenerPromo: string
+		passwordPlaceholder: string
+		passwordRequirementsLabel: string
+		confirmPasswordPlaceholder: string
+		submit: string
+		consent: string
+		privacyPolicy: string
+		consentSuffix: string
+		errorGeneral: string
+		errorEmailExists: string
+		errorFieldBlank: string
+		errorFieldRequired: string
+		errorFieldMinChars: string
+	}
+	'auth.forgotPassword': {
+		title: string
+		instructions: string
+		backToLogin: string
+		description: string
+		submit: string
+		errorGeneral: string
+	}
+	'auth.resetPassword': {
+		title: string
+		validating: string
+		linkInvalid: string
+		requestNewLink: string
+		backToLogin: string
+		success: string
+		signIn: string
+		description: string
+		newPasswordPlaceholder: string
+		confirmPasswordPlaceholder: string
+		submit: string
+		errorGeneral: string
+		showPassword: string
+		hidePassword: string
+		serverErrorInvalidToken: string
+		serverErrorPasswordTooCommon: string
+	}
+	'validation': {
+		firstNameRequired: string
+		lastNameRequired: string
+		phoneInvalid: string
+		solanaInvalid: string
+		currentPasswordRequired: string
+		minChars: (values: TranslationValues) => string
+		passwordsMismatch: string
+		newPasswordMustDiffer: string
+		emailRequired: string
+		emailInvalid: string
+		passwordConfirmationRequired: string
+		passwordMin8: string
+		passwordNeedsUppercase: string
+		passwordNeedsLowercase: string
+		passwordNeedsDigit: string
+		repeatPassword: string
+	}
+	'errors': {
+		invalidCredentials: string
+		userNotActive: string
+		oldPasswordIncorrect: string
+		passwordIncorrect: string
+		passwordsMismatch: string
+		newPasswordMustDiffer: string
+		passwordChangedSuccess: string
+		emailChangedSuccess: string
+		changePasswordFailed: string
+		changeEmailFailed: string
+		deleteAccountFailed: string
+	}
+	'nav': {
+		personalData: string
+		algoTrading: string
+		screener: string
+		tradingChat: string
+		blog: string
+		education: string
+		settings: string
+		logout: string
+		support: string
+		academy: string
+		privacyPolicy: string
+		shopUpper: string
+		academyVbUpper: string
+		webinarsUpper: string
+		aboutUsUpper: string
+		blogUpper: string
+		menuSets: string
+		menuVitaminComplexes: string
+		menuMineralComplexes: string
+		menuImmunityAntioxidants: string
+		menuSoundSleep: string
+		menuEmotionalIntelligence: string
+		menuWebinars: string
+		menuCustomCourse: string
+		menuTeam: string
+		menuSocialResponsibility: string
+		menuContacts: string
+	}
+	'blog': {
+		categoryBody: string
+		readMore: string
+		sampleDate: string
+	}
+	'home': {
+		eBalanceProUpper: string
+		whatIsVb: string
+		whatIsVbDesc: string
+		bodyTitle: string
+		mindTitle: string
+		spiritTitle: string
+		readMore: string
+		supplementsTitle: string
+		catVitaminComplexes: string
+		catMineralComplexes: string
+		catImmunityAntioxidants: string
+		catEnergyActivity: string
+		catAntistress: string
+		catSoundSleep: string
+		catWomensHealth: string
+		catMensStrength: string
+		catGoldenAge: string
+		catSpecializedSupport: string
+		womensHealth: string
+		productsCount: (values: TranslationValues) => string
+		moreProducts: string
+		viewAll: string
+		allCourses: string
+		academyTitle: string
+		biohacking: string
+		vitaminsNutrition: string
+		emotionalIntelligence: string
+		balancedNutrition: string
+		retreatCenter: string
+		detailsShort: string
+		visitShopTitle: string
+		toShop: string
+		allReviews: string
+		volumeMl: string
+		inStock: string
+		getConsultation: string
 	}
 }
 

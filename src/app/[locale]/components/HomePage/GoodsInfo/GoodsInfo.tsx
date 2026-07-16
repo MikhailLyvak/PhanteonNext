@@ -9,8 +9,11 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Slider from "react-slick";
 import VitalisButton from "../../UI/VitalisButton";
 import Image from "next/image";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const GoodsInfo = () => {
+  const { t } = useCustomTranslations(TKeys.home);
   // Reference for controlling the slider
   const sliderRef = useRef<any | null>(null);
 
@@ -58,12 +61,12 @@ const GoodsInfo = () => {
         {/* ✅ Title + Navigation in One Row */}
         <div className="flex justify-between items-center pb-[41px]">
           <h6 className="text-gray-900 text-xl sm:text-2xl font-bold text-left pl-4">
-            Жіноче здоров’я
+            {t.womensHealth}
           </h6>
 
           {/* ✅ Buttons Positioned Here */}
           <div className="flex items-center">
-            <div className="text-gray-900 mx-3 hidden sm:flex">Продуктів ({cards.length})</div>
+            <div className="text-gray-900 mx-3 hidden sm:flex">{t.productsCount({ count: cards.length })}</div>
             <div className="flex gap-3 pr-4">
               <button
                 onClick={() => sliderRef.current?.slickPrev()} // ✅ Correctly reference slider
@@ -94,7 +97,7 @@ const GoodsInfo = () => {
         </div>
         <div className="flex flex-col-reverse sm:flex-row items-center sm:justify-between mt-4 sm:mt-[46px] ">
           {/* Button */}
-          <VitalisButton innerText="Більше продуктів" />
+          <VitalisButton innerText={t.moreProducts} />
 
           {/* Two-line text with ellipsis */}
           <p className="text-gray-900 leading-relaxed sm:max-w-[320px] text-sm line-clamp-2 overflow-hidden text-ellipsis text-center sm:text-right">

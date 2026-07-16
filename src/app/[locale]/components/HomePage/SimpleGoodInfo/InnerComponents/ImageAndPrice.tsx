@@ -1,8 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
 import { LuCircleCheck } from "react-icons/lu";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const ImageAndPrice = () => {
+  const { t } = useCustomTranslations(TKeys.home);
+  const { t: tCommon } = useCustomTranslations(TKeys.common);
+
   return (
     <div className="relative flex flex-col row-span-2 items-center h-auto">
       <div className="flex justify-center items-start relative z-10">
@@ -15,7 +22,7 @@ const ImageAndPrice = () => {
         />
       </div>
       <div className="flex lg:hidden mt-6 items-center gap-2 text-sm font-medium px-4 py-1 rounded-3xl w-fit">
-        Є в наявності
+        {t.inStock}
         <LuCircleCheck size={18} className="text-bold" />
       </div>
       <div className="flex justify-center lg:mt-10 xl:mt-[103px] relative z-10">
@@ -23,7 +30,7 @@ const ImageAndPrice = () => {
       </div>
       <div className="flex lg:hidden justify-center items-center gap-2">
         <button className="border-b text-white px-1 pt-2 font-semibold flex items-center hover:bg-white hover:text-black transition-all">
-          Отримати консультацію
+          {t.getConsultation}
         </button>
         <div className="pt-3">
           <div className="bg-opacity-25 bg-white h-6 w-6 rounded-full text-center">
@@ -43,7 +50,7 @@ const ImageAndPrice = () => {
             </button>
           </div>
           <button className="flex gap-2 px-5 py-3 bg-white rounded-full text-[#037F6A]">
-            <div>До кошика</div>
+            <div>{tCommon.addToCart}</div>
             <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-r rounded-full text-white text-2xl from-[#434343] to-[#007E6C]">+</div>
           </button>
         </div>

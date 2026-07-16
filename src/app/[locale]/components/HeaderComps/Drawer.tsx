@@ -25,10 +25,16 @@ import LoginButton from './LoginButton'
 import Image from 'next/image'
 import { useMainDrawerStore } from '@/store/Nav/useMainDrawerStore'
 import { LuChartLine } from 'react-icons/lu'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys, type MessageShapes } from '@/i18n/t-keys'
+
+type NavLabelKey = keyof MessageShapes['nav']
 
 const Drawer = () => {
 	const { isDrawerOpen, closeDrawer } = useDrawerStore()
 	const { toggleMainDrawer } = useMainDrawerStore()
+	const { t: tNav } = useCustomTranslations(TKeys.nav)
+	const { t: tCommon } = useCustomTranslations(TKeys.common)
 	const { user, clearUser } = useUserStore()
 	const router = useRouter()
 	const [mounted, setMounted] = useState(false)
@@ -79,7 +85,7 @@ const Drawer = () => {
 					{user?.email?.charAt(0).toUpperCase() || 'U'}
 				</div>
 				<h2 className='text-lg text-[#D2D2FF] font-semibold'>
-					{user?.email?.split('@')[0] || 'Користувач'}
+					{user?.email?.split('@')[0] || tCommon.user}
 				</h2>
 			</div>
 
@@ -87,13 +93,13 @@ const Drawer = () => {
 			<nav className='flex-grow px-3'>
 				<NavItem
 					icon={<User size={20} />}
-					text='Персональні дані'
+					labelKey='personalData'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/personalData'
 				/>
 				<NavItem
 					icon={<Bot size={20} />}
-					text='Алготрейдинг'
+					labelKey='algoTrading'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/tradingBots'
 				/>
@@ -118,31 +124,31 @@ const Drawer = () => {
 				/> */}
 				<NavItem
 					icon={<LuChartLine size={20} />}
-					text='Screener'
+					labelKey='screener'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/screener'
 				/>
 				<NavItem
 					icon={<MessageCircleMore size={20}/>}
-					text='Трейдинг-чат'
+					labelKey='tradingChat'
 					closeDrawer={closeDrawer}
 					link='/Trading-Chat'
 				/>
 				<NavItem
 					icon={<LuChartLine size={20} />}
-					text='Блог'
+					labelKey='blog'
 					closeDrawer={closeDrawer}
 					link='/Blog'
 				/>
 				<NavItem
 					icon={<GraduationCap size={20} />}
-					text='Навчання'
+					labelKey='education'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/studyPlatform'
 				/>
 				<NavItem
 					icon={<Settings size={20} />}
-					text='Налаштування'
+					labelKey='settings'
 					closeDrawer={closeDrawer}
 					link='/myCabinet/settings'
 				/>
@@ -157,7 +163,7 @@ const Drawer = () => {
 					<span className='w-10 h-10 flex items-center justify-center bg-[#a7a7ca] rounded-full text-white'>
 						<LogOut size={20} />
 					</span>
-					<span className='text-lg font-medium'>Вихід</span>
+					<span className='text-lg font-medium'>{tNav.logout}</span>
 				</button>
 			</div>
 		</div>
@@ -166,26 +172,29 @@ const Drawer = () => {
 
 const NavItem = ({
 	icon,
-	text,
+	labelKey,
 	link,
 	closeDrawer,
 }: {
 	icon: React.ReactNode
-	text: string
+	labelKey: NavLabelKey
 	link?: string
 	closeDrawer: () => void
-}) => (
-	<Link href={link || '#'} className='w-full'>
-		<button
-			className='w-full flex items-center space-x-2 text-[#D2D2FF]] py-3 rounded-lg hover:bg-[#2F2F40] transition'
-			onClick={() => closeDrawer()}
-		>
-			<span className='w-10 h-10 flex items-center justify-center rounded-full'>
-				{icon}
-			</span>
-			<span className='text-lg font-medium'>{text}</span>
-		</button>
-	</Link>
-)
+}) => {
+	const { t: tNav } = useCustomTranslations(TKeys.nav)
+	return (
+		<Link href={link || '#'} className='w-full'>
+			<button
+				className='w-full flex items-center space-x-2 text-[#D2D2FF]] py-3 rounded-lg hover:bg-[#2F2F40] transition'
+				onClick={() => closeDrawer()}
+			>
+				<span className='w-10 h-10 flex items-center justify-center rounded-full'>
+					{icon}
+				</span>
+				<span className='text-lg font-medium'>{tNav[labelKey]}</span>
+			</button>
+		</Link>
+	)
+}
 
 export default Drawer

@@ -5,10 +5,15 @@ import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import LoginModalFormComponent from './components/Login'
 import Register from './components/Register'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const LoginModal = () => {
 	const { isOpen, toggleModal, activeTab, setActiveTab, setReferralId } =
 		useAuthModalStore()
+
+	const { t: tLogin } = useCustomTranslations(TKeys.auth.login)
+	const { t: tRegister } = useCustomTranslations(TKeys.auth.register)
 
 	const params =
 		typeof window !== 'undefined'
@@ -29,11 +34,7 @@ const LoginModal = () => {
 	return (
 		<div className='fixed inset-0 flex flex-col gap-6 items-center justify-center bg-black/50 backdrop-blur-sm z-50'>
 			<p className='mt-6 text-lg text-[#fff] font-bold text-center max-w-[500px]'>
-				<span className='text-xl font-bold uppercase text-[#e0b75e]'>
-					Скрінер
-				</span>{' '}
-				- інструмент для системного аналізу ринку та відбору активів за заданими
-				параметрами. Доступний після реєстрації.
+				{tLogin.screenerPromo}
 			</p>
 			<motion.div
 				initial={{ opacity: 0, scale: 0.9 }}
@@ -57,7 +58,7 @@ const LoginModal = () => {
 						}`}
 						onClick={() => setActiveTab('login')}
 					>
-						Вхід
+						{tLogin.tabLabel}
 					</button>
 					<button
 						className={`text-lg pb-1 ${
@@ -67,7 +68,7 @@ const LoginModal = () => {
 						}`}
 						onClick={() => setActiveTab('register')}
 					>
-						Реєстрація
+						{tRegister.tabLabel}
 					</button>
 				</div>
 

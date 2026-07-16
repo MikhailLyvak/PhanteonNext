@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import "./Header.scss";
 import HeaderNav from "./components/Header/HeaderNav";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const Header = () => {
+  const { t: tCommon } = useCustomTranslations(TKeys.common);
   return (
     <header>
       <section className="relative w-full h-screen bg-gray-800 flex flex-col items-start justify-start sm:justify-center bg-cover bg-center sm:pt-0">
@@ -11,15 +16,12 @@ const Header = () => {
         <div className="relative z-10 max-w-7xl w-full lg:-mx-40 max-sm:px-10 flex justify-center items-center mt-36 sm:mt-0">
           <div className="max-w-xl text-white">
             <h1 className="text-xl xs:text-2xl md:text-4xl font-bold uppercase leading-tight">
-              ЗНАЙДИ ГАРМОНІЮ <br /> ТІЛА, РОЗУМУ ТА ДУХУ
+              {tCommon.vbHeroTitle({ br: () => <br /> })}
             </h1>
             <p className="mt-4 text-xs xs:text-sm md:text-lg text-gray-200">
-              Запрошуємо вас у світ{" "}
-              <span className="font-bold">розумних саплементів</span> (дієтичних
-              добавок), освітньої платформи{" "}
-              <span className="font-bold">VB Academy</span> та інноваційних
-              мікрострумових технологій — простору для турботи про тіло, розум і
-              дух
+              {tCommon.vbHeroSubtitle({
+                b: (chunks) => <span className="font-bold">{chunks}</span>,
+              })}
             </p>
 
             <div className="flex space-x-4 mt-6">

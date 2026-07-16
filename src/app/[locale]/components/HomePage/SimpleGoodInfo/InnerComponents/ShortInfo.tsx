@@ -1,7 +1,13 @@
+"use client";
+
 import React from "react";
 import { LuStar } from "react-icons/lu";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const ShortInfo = () => {
+  const { t } = useCustomTranslations(TKeys.home);
+
   return (
     <div className="flex lg:flex-col flex-col-reverse items-center lg:items-start mx-auto max-w-md">
       <div className="flex-col w-full lg:hidden items-center">
@@ -16,7 +22,7 @@ const ShortInfo = () => {
           <span className="text-sm lg:text-xlfont-semibold">(5.0)</span>
         </div>
         <div className="flex justify-center "><a href="#" className="underline text-sm">
-          Всі відгуки (56)
+          {t.allReviews}
         </a></div>
       </div>
       <div className="px-7 lg:px-0">
@@ -28,7 +34,7 @@ const ShortInfo = () => {
         </p>
       </div>
       <span className="bg-gray-200 bg-opacity-25 px-4 py-1 rounded-3xl text-xs lg:text-sm font-semibold w-fit">
-        30 мл
+        {t.volumeMl}
       </span>
     </div>
   );
