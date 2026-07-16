@@ -19,7 +19,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     const token = cookies.get('local_access_token');
     const isValid = token && token.startsWith('Token ');
-    const allowVisit = pathname.startsWith('/') || pathname.startsWith('/About') || pathname.startsWith('/dashboard') || pathname.startsWith('/404page');
+    const allowVisit = pathname.startsWith('/') || pathname.startsWith('/About') || pathname.startsWith('/dashboard');
 
     if (!isValid && !allowVisit) {
       router.push('/');

@@ -12,11 +12,18 @@ export type RichValues = Record<
 
 export const TKeys = {
 	common: 'common',
+	notFound: 'notFound',
 } as const
 
 export interface MessageShapes {
 	'common': {
 		loading: string
+	}
+	'notFound': {
+		title: string
+		description: string
+		goHome: string
+		myAccount: string
 	}
 }
 
