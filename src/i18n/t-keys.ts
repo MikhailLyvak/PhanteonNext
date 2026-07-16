@@ -24,6 +24,7 @@ export const TKeys = {
 	errors: 'errors',
 	nav: 'nav',
 	blog: 'blog',
+	home: 'home',
 } as const
 
 export interface MessageShapes {
@@ -158,6 +159,44 @@ export interface MessageShapes {
 		categoryBody: string
 		readMore: string
 		sampleDate: string
+	}
+	'home': {
+		eBalanceProUpper: string
+		whatIsVb: string
+		whatIsVbDesc: string
+		bodyTitle: string
+		mindTitle: string
+		spiritTitle: string
+		readMore: string
+		supplementsTitle: string
+		catVitaminComplexes: string
+		catMineralComplexes: string
+		catImmunityAntioxidants: string
+		catEnergyActivity: string
+		catAntistress: string
+		catSoundSleep: string
+		catWomensHealth: string
+		catMensStrength: string
+		catGoldenAge: string
+		catSpecializedSupport: string
+		womensHealth: string
+		productsCount: (values: TranslationValues) => string
+		moreProducts: string
+		viewAll: string
+		allCourses: string
+		academyTitle: string
+		biohacking: string
+		vitaminsNutrition: string
+		emotionalIntelligence: string
+		balancedNutrition: string
+		retreatCenter: string
+		detailsShort: string
+		visitShopTitle: string
+		toShop: string
+		allReviews: string
+		volumeMl: string
+		inStock: string
+		getConsultation: string
 	}
 }
 

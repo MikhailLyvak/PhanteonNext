@@ -1,12 +1,18 @@
+"use client";
+
 import Image from "next/image";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 export default function MindCard() {
+  const { t } = useCustomTranslations(TKeys.home);
+
   return (
     <div className="relative w-[314px] h-[362px] xxl:w-[415px] xxl:h-[462px] rounded-2xl shadow-lg flex flex-col items-center justify-end overflow-hidden p-6 transition-all duration-500 ease-in-out group bg-gradient-to-r to-gray-300 from-gray-100 hover:from-orange-200 hover:to-gray-200">
       <div className="absolute inset-0 right-10 -top-10 flex items-center justify-center transition-all -translate-y-5  group-hover:scale-105 duration-500 ease-in-out  group-hover:-translate-y-7">
         <Image
           src="/AnimatedCardsSvgs/Brain/Brain.svg"
-          alt="Розум"
+          alt={t.mindTitle}
           width={300}
           height={273}
           className="object-cover rounded-2xl w-[200px] h-[170px] xxl:w-[290px] xxl:h-[253px]"
@@ -24,11 +30,11 @@ export default function MindCard() {
       </div>
 
       <span className="absolute bottom-8 left-6 text-black text-xl font-bold">
-        Розум
+        {t.mindTitle}
       </span>
 
       <button className="absolute bottom-6 right-6 border-2 border-green-700 text-green-700 px-5 py-2 rounded-xl flex items-center gap-2 group-hover:border-black group-hover:text-black transition-all duration-300">
-        Детальніше ...
+        {t.readMore}
       </button>
     </div>
   );
