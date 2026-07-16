@@ -12,21 +12,8 @@ import usePresets from '@/hooks/TradingBots/usePresets'
 import useCreateRobot from '@/hooks/TradingBots/useCreateRobot'
 import useUserInfo from '@/hooks/TradingBots/useUserInfo'
 import { selectPreset } from '@/api/TradingBots/selectPreset'
-
-const formSchema = z.object({
-  title: z.string().min(3, 'Назва повинна містити мінімум 3 символи'),
-  deposit: z
-    .union([z.number(), z.null()])
-    .refine((v) => v !== null && Number.isFinite(v) && v > 0, {
-      message: 'Депозит повинен бути більше 0',
-    }),
-  reinvest: z.boolean(),
-  notifTrades: z.boolean(),
-  notifBalance: z.boolean(),
-  notifApi: z.boolean(),
-})
-
-type FormValues = z.infer<typeof formSchema>
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const formatBalance = (n: number): string => {
   if (!Number.isFinite(n)) return '—'
@@ -34,6 +21,15 @@ const formatBalance = (n: number): string => {
   return n
     .toFixed(2)
     .replace(/\.?0+$/, '')
+}
+
+type FormValues = {
+  title: string
+  deposit: number | null
+  reinvest: boolean
+  notifTrades: boolean
+  notifBalance: boolean
+  notifApi: boolean
 }
 
 const DEFAULT_VALUES: FormValues = {
@@ -55,6 +51,20 @@ export default function RobotCreationForm({
   exchange,
 }: RobotCreationFormProps) {
   const router = useRouter()
+  const { t } = useCustomTranslations(TKeys.tradingBots)
+
+  const formSchema = useMemo(() => z.object({
+    title: z.string().min(3, t.robotNameError),
+    deposit: z
+      .union([z.number(), z.null()])
+      .refine((v) => v !== null && Number.isFinite(v) && v > 0, {
+        message: t.depositError,
+      }),
+    reinvest: z.boolean(),
+    notifTrades: z.boolean(),
+    notifBalance: z.boolean(),
+    notifApi: z.boolean(),
+  }), [t])
 
   const validateMutation = useValidateApi()
   const presetsQuery = usePresets()
@@ -175,7 +185,7 @@ export default function RobotCreationForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Назва робота</label>
+      <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">{t.robotNameLabel}</label>
         <Controller
           control={control}
           name="title"
@@ -185,7 +195,7 @@ export default function RobotCreationForm({
                 {...field}
                 value={field.value ?? ''}
                 type="text"
-                placeholder="Мій робот"
+                placeholder={t.robotNamePlaceholder}
                 className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
               />
               {fieldState.error && (
@@ -198,7 +208,7 @@ export default function RobotCreationForm({
         <div className="mt-4 flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <label className="text-[#D2D2FF] text-sm font-medium block h-5">
-              Депозит
+              {t.depositLabel}
             </label>
             <Controller
               control={control}
@@ -238,7 +248,7 @@ export default function RobotCreationForm({
 
           <div className="shrink-0 w-[148px]">
             <span className="text-[#D2D2FF] text-sm font-medium block h-5">
-              Баланс
+              {t.balance}
             </span>
             <button
               type="button"
@@ -252,8 +262,8 @@ export default function RobotCreationForm({
               disabled={!apiId || validateMutation.isPending}
               title={
                 reinvest
-                  ? 'Оновити баланс'
-                  : 'Підставити баланс у депозит та оновити'
+                  ? t.updateBalance
+                  : t.updateBalanceAndFill
               }
               className="w-full mt-2 h-12 px-3 inline-flex items-center justify-center gap-2 rounded-lg ring-1 ring-white/10 bg-[#1D1D2A] hover:ring-[#6A56E4]/60 hover:bg-[#242433] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -282,14 +292,14 @@ export default function RobotCreationForm({
         </div>
         {depositBelowPreset && minOfAllPresets !== null && (
           <p className="text-red-500 text-sm">
-            Депозит занадто малий — мінімум для цієї біржі: {minOfAllPresets}
+            {t.depositTooSmall({ min: minOfAllPresets })}
           </p>
         )}
         {!presetsQuery.isLoading &&
           presetsForExchange.length === 0 &&
           exchange && (
             <p className="text-red-500 text-sm">
-              Для цієї біржі немає доступних пресетів.
+              {t.noPresets}
             </p>
           )}
 
@@ -303,18 +313,18 @@ export default function RobotCreationForm({
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
               />
-              <span>Реінвестувати весь баланс</span>
+              <span>{t.reinvest}</span>
             </label>
           )}
         />
 
         <div className="mt-6 flex items-center gap-2 flex-wrap">
           <h6 className="text-[#D2D2FF] text-base font-semibold">
-            Сповіщення
+            {t.notifications}
           </h6>
           {isTelegramConnected && (
             <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#242433] text-[#8c8ca0]">
-              Підключено: @{telegramUsername}
+              {t.telegramConnected({ username: telegramUsername })}
             </span>
           )}
         </div>
@@ -328,7 +338,7 @@ export default function RobotCreationForm({
               color="#6A56E4"
               ariaLabel="triangle-loading"
             />
-            <span>Завантаження…</span>
+            <span>{t.loadingTelegram}</span>
           </div>
         ) : isTelegramConnected ? (
           <>
@@ -342,7 +352,7 @@ export default function RobotCreationForm({
                     checked={!!field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
-                  <span>Сповіщення про торги</span>
+                  <span>{t.notifTrades}</span>
                 </label>
               )}
             />
@@ -356,7 +366,7 @@ export default function RobotCreationForm({
                     checked={!!field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
-                  <span>Сповіщення про баланс</span>
+                  <span>{t.notifBalance}</span>
                 </label>
               )}
             />
@@ -370,7 +380,7 @@ export default function RobotCreationForm({
                     checked={!!field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
-                  <span>Сповіщення про API</span>
+                  <span>{t.notifApi}</span>
                 </label>
               )}
             />
@@ -378,7 +388,7 @@ export default function RobotCreationForm({
         ) : (
           <div className="mt-2 p-4 rounded-xl bg-[#1D1D2A] ring-1 ring-white/5">
             <p className="text-[#D2D2FF] text-sm">
-              Щоб отримувати сповіщення про торги, баланс та API, підключіть Telegram-бот.
+              {t.connectTelegramDesc}
             </p>
             <div className="mt-3 flex items-center gap-3 flex-wrap">
               <a
@@ -392,7 +402,7 @@ export default function RobotCreationForm({
                     : 'opacity-50 cursor-not-allowed pointer-events-none'
                 }`}
               >
-                Підключити Telegram
+                {t.connectTelegram}
               </a>
               <button
                 type="button"
@@ -400,7 +410,7 @@ export default function RobotCreationForm({
                 disabled={userInfoQuery.isFetching}
                 className="text-[#8c8ca0] hover:text-[#D2D2FF] text-sm underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {userInfoQuery.isFetching ? 'Перевіряємо…' : 'Перевірити підключення'}
+                {userInfoQuery.isFetching ? t.checkingConnection : t.checkConnection}
               </button>
             </div>
           </div>
@@ -409,7 +419,7 @@ export default function RobotCreationForm({
         {createRobotMutation.error && (
           <p className="text-red-500 text-sm mt-4">
             {createRobotMutation.error.message ||
-              'Не вдалося створити робота. Спробуйте ще раз.'}
+              t.createRobotError}
           </p>
         )}
 
@@ -427,7 +437,7 @@ export default function RobotCreationForm({
               ariaLabel="triangle-loading"
             />
           )}
-        Створити робота
+        {t.createRobot}
       </button>
     </form>
   )

@@ -1,6 +1,8 @@
 'use client'
 
 import React from 'react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface RobotLimitModalProps {
   open: boolean
@@ -15,6 +17,8 @@ export default function RobotLimitModal({
   limit,
   onClose,
 }: RobotLimitModalProps) {
+  const { t } = useCustomTranslations(TKeys.tradingBots)
+
   if (!open) return null
 
   return (
@@ -27,22 +31,17 @@ export default function RobotLimitModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h6 className="text-[#D2D2FF] text-xl font-semibold">
-          Ліміт активних роботів
+          {t.robotLimitTitle}
         </h6>
         <p className="text-[#8c8ca0] text-sm mt-3">
-          Ви досягли ліміту активних роботів за вашим тарифом:{' '}
-          <span className="text-[#D2D2FF]">
-            {active} / {limit}
-          </span>
-          . Зупиніть або видаліть одного з активних роботів, або оновіть тариф,
-          щоб запустити цього.
+          {t.robotLimitDesc({ active, limit })}
         </p>
         <button
           type="button"
           onClick={onClose}
           className="w-full mt-6 bg-[#6A56E4] text-white p-3 rounded-3xl hover:shadow-xl"
         >
-          Зрозуміло
+          {t.understood}
         </button>
       </div>
     </div>

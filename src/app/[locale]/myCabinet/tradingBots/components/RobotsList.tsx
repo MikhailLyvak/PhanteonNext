@@ -13,6 +13,8 @@ import { Triangle } from 'react-loader-spinner'
 
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import type { UserRobotData } from '@/api/TradingBots/types'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const formatNumber = (n: number | null | undefined, digits = 2): string => {
   if (n === null || n === undefined || !Number.isFinite(n)) return '—'
@@ -24,28 +26,6 @@ const formatRoi = (roi: number | null | undefined): string => {
   return `${(roi * 100).toFixed(2)}%`
 }
 
-const statusPill = (r: UserRobotData) => {
-  if (r.paused) {
-    return (
-      <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#3a2a1a] text-[#F5A623]">
-        Пауза
-      </span>
-    )
-  }
-  if (r.active) {
-    return (
-      <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#1a3a2a] text-[#3DD68C]">
-        Активний
-      </span>
-    )
-  }
-  return (
-    <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#2a2a3a] text-[#8c8ca0]">
-      Зупинено
-    </span>
-  )
-}
-
 const statusBarColor = (r: UserRobotData) => {
   if (r.paused) return '#F5A623'
   if (r.active) return '#3DD68C'
@@ -55,6 +35,29 @@ const statusBarColor = (r: UserRobotData) => {
 export default function RobotsList() {
   const router = useRouter()
   const { data: entries, isLoading, error } = useUserRobots()
+  const { t } = useCustomTranslations(TKeys.tradingBots)
+
+  const statusPill = (r: UserRobotData) => {
+    if (r.paused) {
+      return (
+        <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#3a2a1a] text-[#F5A623]">
+          {t.statusPause}
+        </span>
+      )
+    }
+    if (r.active) {
+      return (
+        <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#1a3a2a] text-[#3DD68C]">
+          {t.statusActive}
+        </span>
+      )
+    }
+    return (
+      <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-[#2a2a3a] text-[#8c8ca0]">
+        {t.statusStopped}
+      </span>
+    )
+  }
 
   const goToDetail = (id: string) => {
     router.replace(`/myCabinet/tradingBots?step=detail&robotId=${id}`)
@@ -83,9 +86,9 @@ export default function RobotsList() {
   if (error) {
     return (
       <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
-        <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.myRobots}</h6>
         <p className="text-red-500 text-sm mt-2">
-          Не вдалося завантажити список роботів.
+          {t.loadRobotsError}
         </p>
       </div>
     )
@@ -97,16 +100,16 @@ export default function RobotsList() {
   if (list.length === 0) {
     return (
       <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
-        <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.myRobots}</h6>
         <p className="text-[#8c8ca0] text-sm mt-2">
-          Поки що немає створених роботів.
+          {t.noRobots}
         </p>
         <button
           type="button"
           onClick={goToCreateRobot}
           className="w-full mt-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors flex items-center justify-center gap-2"
         >
-          + Створити новий
+          {t.createNew}
         </button>
       </div>
     )
@@ -115,9 +118,9 @@ export default function RobotsList() {
   return (
     <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
       <div className="flex items-center justify-between gap-3">
-        <h6 className="text-[#D2D2FF] text-xl font-semibold">Мої роботи</h6>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.myRobots}</h6>
         <span className="text-[10px] uppercase tracking-[0.18em] text-[#8c8ca0]">
-          {activeCount} активних · {list.length} всього
+          {t.activeOf({ active: activeCount, total: list.length })}
         </span>
       </div>
 
@@ -176,19 +179,19 @@ export default function RobotsList() {
 
                 <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-3 gap-3">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">Депозит</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">{t.deposit}</p>
                     <p className="mt-0.5 text-sm font-semibold text-[#D2D2FF]">
                       {formatNumber(robot.deposit)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">PnL</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">{t.pnl}</p>
                     <p className={`mt-0.5 text-sm font-semibold ${pnlColor}`}>
                       {formatNumber(robot.pnl)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">ROI</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#58587B]">{t.roi}</p>
                     <p className={`mt-0.5 text-sm font-semibold ${pnlColor}`}>
                       {formatRoi(robot.roi)}
                     </p>

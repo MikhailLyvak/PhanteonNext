@@ -10,6 +10,8 @@ import QrCodeAddress from './QrCodeAddress'
 import AddressRow from './AddressRow'
 import SafetyNotice from './SafetyNotice'
 import WalletPendingState from './WalletPendingState'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	open: boolean
@@ -19,6 +21,7 @@ interface Props {
 const DepositModal = ({ open, onClose }: Props) => {
 	const wallets = useUserWallets(open)
 	const createWallet = useCreateUserWallet()
+	const { t } = useCustomTranslations(TKeys.tradingBots)
 
 	const createAttemptedRef = useRef(false)
 	const [createFailed, setCreateFailed] = useState(false)
@@ -74,7 +77,7 @@ const DepositModal = ({ open, onClose }: Props) => {
 			onClick={onClose}
 			role='dialog'
 			aria-modal='true'
-			aria-label='Депозит'
+			aria-label={t.depositTitle}
 		>
 			<div
 				className='relative w-full max-w-[38.4rem] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#242433] p-6 shadow-2xl'

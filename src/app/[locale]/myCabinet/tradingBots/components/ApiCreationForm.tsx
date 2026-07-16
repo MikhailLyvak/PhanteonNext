@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-react'
 import { Triangle } from 'react-loader-spinner'
+import { useMessages } from 'next-intl'
 import { SUPPORTED_EXCHANGES } from '@/api/TradingBots/constants'
 import useValidateApi from '@/hooks/TradingBots/useValidateApi'
 import useSaveApi from '@/hooks/TradingBots/useSaveApi'
@@ -15,121 +16,43 @@ import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import BackButton from './BackButton'
 import { EXCHANGE_META } from './exchangeMeta'
 import type { SupportedExchange } from '@/api/TradingBots/constants'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
-const EXCHANGE_INSTRUCTIONS: Record<SupportedExchange, { title: string; description: string; image: string }[]> = {
-  BYBIT: [
-    {
-      title: 'Крок 1: Відкрийте меню акаунта',
-      description: 'Авторизуйтесь на біржі Bybit. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «API». Як показано на зображенні.',
-      image: '/wiki/Bybit/bybit-account-menu-api-ukr.jpg',
-    },
-    {
-      title: 'Крок 2: Відкрийте керування API',
-      description: 'Натисніть Створити новий ключ.',
-      image: '/wiki/Bybit/bybit-api-management-list-ukr.jpg',
-    },
-    {
-      title: 'Крок 3: Створіть новий ключ API',
-      description: 'Натисніть Згенеровані системою ключі API.',
-      image: '/wiki/Bybit/bybit-choose-key-type-ukr.jpg',
-    },
-    {
-      title: 'Крок 4: Обмежте права доступу',
-      description: 'Додайте назву ключа API. Оберіть: Читання/запис, Обмежень по IP немає, Єдиний торговий акаунт, Ордери, Позиції. Натисніть Надіслати.',
-      image: '/wiki/Bybit/bybit-create-key-permissions-ukr.jpg',
-    },
-    {
-      title: 'Крок 5: Збережіть ключі',
-      description: 'Скопіюйте Ключ API та Секретний ключ API у надійне місце. Далі натисніть Зрозуміло.',
-      image: '/wiki/Bybit/bybit-api-key-added-ukr.jpg',
-    },
-    {
-      title: 'Крок 6: Додайте ключі в застосунок',
-      description: 'Поверніться на платформу та внесіть назву, Ключ API та Секретний ключ API. Натисніть Зберегти API. Надалі, ви зможете використовувати їх по назві для створення різних роботів.',
-      image: '/wiki/save-api-keys.png',
-    },
-  ],
-  BINANCE: [
-    {
-      title: 'Крок 1: Відкрийте меню акаунта',
-      description: 'Авторизуйтесь на біржі Binance. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «Акаунт». Як показано на зображенні.',
-      image: '/wiki/Binance/binance-account-menu-ukr.jpg',
-    },
-    {
-      title: 'Крок 2: Відкрийте Управління API',
-      description: 'Натисніть Управління API.',
-      image: '/wiki/Binance/binance-api-management-list-ukr.jpg',
-    },
-    {
-      title: 'Крок 3: Створіть API',
-      description: 'Приберіть галочку та натисніть Створити API.',
-      image: '/wiki/Binance/binance-api-management-ukr.jpg',
-    },
-    {
-      title: 'Крок 4: Згенеруйте ключі',
-      description: 'Натисніть Згенеровані системою та Далі.',
-      image: '/wiki/Binance/binance-choose-api-key-type-ukr.jpg',
-    },
-    {
-      title: 'Крок 5: Відредагуйте ключі',
-      description: 'Скопіюйте Ключ API та Секретний ключ у надійне місце. Далі натисніть Редагувати обмеження.',
-      image: '/wiki/Binance/binance-api-key-details-ukr.jpg',
-    },
-    {
-      title: 'Крок 6: Налаштуйте доступи',
-      description: 'Поставте галочки на опціях Увімкнути фʼючерси та Необмежений доступ по IP. Далі натисніть Зберегти.',
-      image: '/wiki/Binance/binance-api-key-edit-save-ukr.jpg',
-    },
-    {
-      title: 'Крок 7: Додайте ключі в застосунок',
-      description: 'Поверніться на платформу та внесіть назву, Ключ API та Секретний ключ API. Натисніть Зберегти API. Надалі, ви зможете використовувати їх по назві для створення різних роботів.',
-      image: '/wiki/save-api-keys.png',
-    },
-  ],
-  BINGX: [
-    {
-      title: 'Крок 1: Відкрийте керування API',
-      description: 'Увійдіть на BingX. У правому верхньому куті натисніть на іконку профілю та у випадаючому меню оберіть «Керування API».',
-      image: '/wiki/Bingx/account-menu.png',
-    },
-    {
-      title: 'Крок 2: Створіть API',
-      description: 'Натисніть «Створити API».',
-      image: '/wiki/Bingx/api-access-keys-app.png',
-    },
-    {
-      title: 'Крок 3: Налаштуйте дозволи',
-      description: 'Вкажіть назву API-ключа. Оберіть опції «Спот торгівля» та «Безстрокова фʼючерсна торгівля». Натисніть «Підтвердити». Введіть коди верифікації.',
-      image: '/wiki/Bingx/api-key-edit-restrictions.png',
-    },
-    {
-      title: 'Крок 4: Збережіть ключі',
-      description: 'Скопіюйте API ключ та Секретний ключ у безпечне місце.',
-      image: '/wiki/Bingx/api-key-details.png',
-    },
-    {
-      title: 'Крок 5: Додайте ключі на платформу',
-      description: 'Поверніться на платформу, введіть назву, Публічний ключ та Секретний ключ. Натисніть «Зберегти API». Тепер ви зможете використовувати збережені ключі за назвою для створення нових роботів.',
-      image: '/wiki/save-api-keys.png',
-    },
-  ],
+type InstructionStep = { title: string; description: string; image: string }
+
+const EXCHANGE_KEY: Record<SupportedExchange, string> = {
+  BYBIT: 'instructions_bybit',
+  BINANCE: 'instructions_binance',
+  BINGX: 'instructions_bingx',
 }
 
-const formSchema = z.object({
-  title: z
-    .string()
-    .optional()
-    .refine((v) => !v || v.length >= 3, {
-      message: 'Назва має містити щонайменше 3 символи',
-    }),
-  apiKey: z.string().min(1, 'API ключ обов\u2019язковий'),
-  secretKey: z.string().min(1, 'Секретний ключ обов\u2019язковий'),
-})
-
-type FormValues = z.infer<typeof formSchema>
+type FormValues = {
+  title?: string
+  apiKey: string
+  secretKey: string
+}
 
 export default function ApiCreationForm() {
   const router = useRouter()
+  const { t } = useCustomTranslations(TKeys.tradingBots)
+  const messages = useMessages()
+
+  const getInstructions = (exchange: SupportedExchange): InstructionStep[] => {
+    const tb = (messages as Record<string, unknown>)['tradingBots'] as Record<string, unknown>
+    return (tb?.[EXCHANGE_KEY[exchange]] as InstructionStep[]) ?? []
+  }
+
+  const formSchema = z.object({
+    title: z
+      .string()
+      .optional()
+      .refine((v) => !v || v.length >= 3, {
+        message: t.apiNameTooShort,
+      }),
+    apiKey: z.string().min(1, t.apiKeyRequired),
+    secretKey: z.string().min(1, t.secretKeyRequired),
+  })
 
   const validateApi = useValidateApi()
   const saveApi = useSaveApi()
@@ -157,7 +80,7 @@ export default function ApiCreationForm() {
         secret: values.secretKey,
       })
     } catch {
-      setSubmitError('З\u2019єднання не вдалося')
+      setSubmitError(t.connectFailed)
       return
     }
 
@@ -174,7 +97,7 @@ export default function ApiCreationForm() {
         message?: string
       }
       const backendMsg =
-        errAny?.response?.data?.message ?? errAny?.message ?? 'Не вдалося зберегти API'
+        errAny?.response?.data?.message ?? errAny?.message ?? t.saveFailed
       setSubmitError(backendMsg)
       return
     }
@@ -183,6 +106,7 @@ export default function ApiCreationForm() {
   }
 
   if (showInstructions) {
+    const steps = getInstructions(instructionExchange)
     return (
       <div className="w-full">
         <button
@@ -190,10 +114,10 @@ export default function ApiCreationForm() {
           onClick={() => setShowInstructions(false)}
           className="text-sm text-[#8c8ca0] hover:text-[#D2D2FF] focus:outline-none"
         >
-          &larr; Назад
+          &larr; {t.back.replace('← ', '')}
         </button>
         <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
-          Інструкції
+          {t.instructions}
         </h6>
 
         <div className="mt-[30px] inline-flex items-center gap-1 p-1 bg-[#1D1D2A] rounded-xl ring-1 ring-white/5">
@@ -220,7 +144,7 @@ export default function ApiCreationForm() {
 
         <div className="mt-4 py-6 bg-[#242433] rounded-2xl">
           <div className="space-y-6">
-            {EXCHANGE_INSTRUCTIONS[instructionExchange].map((step, idx) => (
+            {steps.map((step, idx) => (
               <div key={idx}>
                 <p className="text-[#D2D2FF] text-sm font-bold mb-1">{step.title}</p>
                 <p className="text-[#8c8ca0] text-sm mb-3">{step.description}</p>
@@ -243,7 +167,7 @@ export default function ApiCreationForm() {
     <div className="w-full">
       {hasRobots && <BackButton />}
       <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
-        Під&apos;єднати API
+        {t.connectApi}
       </h6>
 
       <div className="mt-[30px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -295,7 +219,7 @@ export default function ApiCreationForm() {
                       >
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
-                      Підтримується
+                      {t.supported}
                     </span>
                   </div>
                 </div>
@@ -310,10 +234,10 @@ export default function ApiCreationForm() {
           onClick={() => setShowInstructions(true)}
           className="w-full mb-4 bg-[#6A56E4] text-white p-3 rounded-3xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors flex items-center justify-center gap-2 text-sm font-medium"
         >
-          Інструкції
+          {t.instructions}
         </button>
 
-        <h6 className="text-[#D2D2FF] text-xl font-semibold">Дані API</h6>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.apiData}</h6>
         <form
           onSubmit={handleSubmit(onSubmit)}
           method="post"
@@ -324,14 +248,14 @@ export default function ApiCreationForm() {
             name="title"
             render={({ field, fieldState }) => (
               <>
-                <label className="text-[#D2D2FF] text-sm font-medium">Назва (необов&apos;язково)</label>
+                <label className="text-[#D2D2FF] text-sm font-medium">{t.apiNameLabel}</label>
                 <input
                   {...field}
                   name="bot-api-title"
                   value={field.value ?? ''}
                   type="text"
                   autoComplete="off"
-                  placeholder="Назва API"
+                  placeholder={t.apiNamePlaceholder}
                   className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
                 />
                 {fieldState.error && (
@@ -346,7 +270,7 @@ export default function ApiCreationForm() {
             name="apiKey"
             render={({ field, fieldState }) => (
               <>
-                <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">API ключ</label>
+                <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">{t.apiKeyLabel}</label>
                 <input
                   {...field}
                   name="bot-api-public-key"
@@ -370,7 +294,7 @@ export default function ApiCreationForm() {
             name="secretKey"
             render={({ field, fieldState }) => (
               <>
-                <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">Секретний ключ</label>
+                <label className="text-[#D2D2FF] text-sm font-medium mt-4 block">{t.secretKeyLabel}</label>
                 <div className="relative">
                   <input
                     {...field}
@@ -396,7 +320,7 @@ export default function ApiCreationForm() {
                     onClick={() => setShowSecret((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 mt-2 text-gray-600 hover:text-gray-800 focus:outline-none"
                     aria-label={
-                      showSecret ? 'Сховати секрет' : 'Показати секрет'
+                      showSecret ? t.hideSecret : t.showSecret
                     }
                   >
                     {showSecret ? (
@@ -429,7 +353,7 @@ export default function ApiCreationForm() {
                 ariaLabel="triangle-loading"
               />
             )}
-            Зберегти та продовжити
+            {t.saveAndContinue}
           </button>
         </form>
       </div>

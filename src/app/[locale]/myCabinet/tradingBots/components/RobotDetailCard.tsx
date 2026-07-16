@@ -13,6 +13,8 @@ import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import useUserInfo from '@/hooks/TradingBots/useUserInfo'
 import BackButton from './BackButton'
 import RobotLimitModal from './RobotLimitModal'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const formatNumber = (n: number | null | undefined, digits = 2): string => {
   if (n === null || n === undefined || !Number.isFinite(n)) return '—'
@@ -28,6 +30,8 @@ export default function RobotDetailCard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const robotId = searchParams.get('robotId') ?? ''
+  const { t } = useCustomTranslations(TKeys.tradingBots)
+  const { t: tErrors } = useCustomTranslations(TKeys.errors)
 
   const { data: entries, isLoading } = useUserRobots()
   const { data: userInfo } = useUserInfo()
@@ -96,16 +100,16 @@ export default function RobotDetailCard() {
   if (!entry) {
     return (
       <div className="mt-[30px] p-6 bg-[#242433] rounded-2xl">
-        <h6 className="text-[#D2D2FF] text-xl font-semibold">Робот не знайдений</h6>
+        <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.robotNotFound}</h6>
         <p className="text-[#8c8ca0] text-sm mt-2">
-          Цього робота немає в списку. Можливо, його зупинено.
+          {t.robotNotFoundDesc}
         </p>
         <button
           type="button"
           className="w-full mt-4 bg-[#1D1D2A] text-[#D2D2FF] p-3 rounded-3xl hover:shadow-xl flex items-center justify-center gap-2"
           onClick={() => router.replace('/myCabinet/tradingBots')}
         >
-          ← Повернутися до списку
+          {t.backToList}
         </button>
       </div>
     )
@@ -128,24 +132,34 @@ export default function RobotDetailCard() {
 
   const statusBadge = isRunning
     ? {
-        label: 'Активний',
+        label: t.statusActive,
         icon: null,
         className: 'bg-[#3DD68C]/15 text-[#3DD68C]',
         showPulse: true,
       }
     : isPaused
     ? {
-        label: 'Пауза',
+        label: t.statusPause,
         icon: <Pause size={12} fill="currentColor" />,
         className: 'bg-[#F5C842]/15 text-[#F5C842]',
         showPulse: false,
       }
     : {
-        label: 'Зупинено',
+        label: t.statusStopped,
         icon: <Square size={12} fill="currentColor" />,
         className: 'bg-[#FF6B6B]/15 text-[#FF6B6B]',
         showPulse: false,
       }
+
+  // Map error codes from useAlgonixSession; unknown errors pass through as-is
+  const known: Record<string, string> = {
+    userEmailNotFound: tErrors.userEmailNotFound,
+    platformSessionNotFound: tErrors.platformSessionNotFound,
+  }
+  const resolveError = (err: Error | null) => {
+    if (!err) return null
+    return known[err.message] ?? err.message
+  }
 
   const actionError =
     stopMutation.error || pauseMutation.error || resumeMutation.error
@@ -175,7 +189,7 @@ export default function RobotDetailCard() {
 
       <div className="mt-2">
         <div className={rowClass}>
-          <span className={labelMutedClass}>Статус</span>
+          <span className={labelMutedClass}>{t.status}</span>
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge.className}`}
           >
@@ -190,33 +204,32 @@ export default function RobotDetailCard() {
           </span>
         </div>
         <div className={rowClass}>
-          <span className={labelMutedClass}>Біржа</span>
+          <span className={labelMutedClass}>{t.exchange}</span>
           <span>{robot.api?.exchange ?? '—'}</span>
         </div>
         {robot.settings?.symbol && (
           <div className={rowClass}>
-            <span className={labelMutedClass}>Монета</span>
+            <span className={labelMutedClass}>{t.coin}</span>
             <span>{robot.settings.symbol}</span>
           </div>
         )}
         <div className={rowClass}>
-          <span className={labelMutedClass}>Депозит</span>
+          <span className={labelMutedClass}>{t.deposit}</span>
           <span>{formatNumber(robot.deposit)}</span>
         </div>
         <div className={rowClass}>
-          <span className={labelMutedClass}>PnL</span>
+          <span className={labelMutedClass}>{t.pnl}</span>
           <span className={pnlColor}>{formatNumber(robot.pnl)}</span>
         </div>
         <div className={rowClass}>
-          <span className={labelMutedClass}>ROI</span>
+          <span className={labelMutedClass}>{t.roi}</span>
           <span className={pnlColor}>{formatRoi(robot.roi)}</span>
         </div>
       </div>
 
       {actionError && (
         <p className="text-red-500 text-sm mt-4">
-          {actionError.message ||
-            'Не вдалося виконати дію. Спробуйте ще раз.'}
+          {resolveError(actionError) || t.actionError}
         </p>
       )}
 
@@ -229,7 +242,7 @@ export default function RobotDetailCard() {
             className={primaryClass}
           >
             {renderSpinner(stopMutation.isPending)}
-            Зупинити робота
+            {t.stopRobot}
           </button>
           <button
             type="button"
@@ -238,7 +251,7 @@ export default function RobotDetailCard() {
             className={secondaryClass}
           >
             {renderSpinner(pauseMutation.isPending)}
-            Пауза
+            {t.pause}
           </button>
         </>
       )}
@@ -252,7 +265,7 @@ export default function RobotDetailCard() {
             className={primaryClass}
           >
             {renderSpinner(resumeMutation.isPending)}
-            Відновити
+            {t.resume}
           </button>
           <button
             type="button"
@@ -261,7 +274,7 @@ export default function RobotDetailCard() {
             className={secondaryClass}
           >
             {renderSpinner(stopMutation.isPending)}
-            Зупинити робота
+            {t.stopRobot}
           </button>
         </>
       )}
@@ -274,7 +287,7 @@ export default function RobotDetailCard() {
           className={primaryClass}
         >
           {renderSpinner(resumeMutation.isPending)}
-          Запустити
+          {t.start}
         </button>
       )}
 

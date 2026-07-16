@@ -8,6 +8,8 @@ import RobotCreationFormWithSelector from './components/RobotCreationFormWithSel
 import RobotDetailCard from './components/RobotDetailCard'
 import TradingBotsLanding from './components/TradingBotsLanding'
 import BalanceCard from './components/balance/BalanceCard'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 type Step = 'api' | 'robot' | 'detail'
 
@@ -18,6 +20,7 @@ const TradingBotsPage = () => {
 	const searchParams = useSearchParams()
 	const rawStep = searchParams.get('step')
 	const step: Step | null = isStep(rawStep) ? rawStep : null
+	const { t } = useCustomTranslations(TKeys.tradingBots)
 
 	return (
 		<ProtectedRoute>
@@ -25,7 +28,7 @@ const TradingBotsPage = () => {
 				<div className='max-w-8xl mx-auto px-4 md:px-6'>
 					<div className='mt-6'>
 						<h6 className='text-[#D2D2FF] text-xl md:text-4xl font-bold'>
-							Алготрейдинг
+							{t.pageTitle}
 						</h6>
 					</div>
 

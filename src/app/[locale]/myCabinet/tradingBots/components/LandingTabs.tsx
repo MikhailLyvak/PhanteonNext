@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * LandingTabs — top-level switch between "Роботи" (default) and "API" lists.
+ * LandingTabs — top-level switch between "Robots" (default) and "API" lists.
  * Rendered on /myCabinet/tradingBots when the user has at least one created
  * robot. Local tab state — no URL coupling.
  */
@@ -11,6 +11,8 @@ import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
 import RobotsList from './RobotsList'
 import AllApisList from './AllApisList'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 type Tab = 'robots' | 'apis'
 
@@ -19,6 +21,7 @@ export default function LandingTabs() {
   const [activeTab, setActiveTab] = useState<Tab>('robots')
   const { data: robots } = useUserRobots()
   const { data: apis } = useUserApis()
+  const { t } = useCustomTranslations(TKeys.tradingBots)
 
   const robotsCount = robots?.length
   const apisCount = apis?.length
@@ -52,7 +55,7 @@ export default function LandingTabs() {
             onClick={() => setActiveTab('robots')}
             className={tabClasses('robots')}
           >
-            Роботи
+            {t.tabRobots}
             {countBadge(robotsCount, activeTab === 'robots')}
           </button>
           <button
@@ -60,7 +63,7 @@ export default function LandingTabs() {
             onClick={() => setActiveTab('apis')}
             className={tabClasses('apis')}
           >
-            API
+            {t.tabApis}
             {countBadge(apisCount, activeTab === 'apis')}
           </button>
         </div>
@@ -70,7 +73,7 @@ export default function LandingTabs() {
             onClick={() => router.replace('/myCabinet/tradingBots?step=robot')}
             className="bg-[#6A56E4] text-white px-4 py-2 rounded-2xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors text-sm font-medium"
           >
-            + Створити новий
+            {t.createNew}
           </button>
         )}
         {activeTab === 'apis' && (
@@ -79,7 +82,7 @@ export default function LandingTabs() {
             onClick={() => router.replace('/myCabinet/tradingBots?step=api')}
             className="bg-[#6A56E4] text-white px-4 py-2 rounded-2xl hover:bg-[#5A4BC4] hover:shadow-xl transition-colors text-sm font-medium"
           >
-            + Створити новий API
+            {t.createNewApi}
           </button>
         )}
       </div>

@@ -43,6 +43,7 @@ export const TKeys = {
 	screener: 'screener',
 	aiAgent: 'aiAgent',
 	tradingChat: 'tradingChat',
+	tradingBots: 'tradingBots',
 } as const
 
 export interface MessageShapes {
@@ -153,6 +154,8 @@ export interface MessageShapes {
 		changePasswordFailed: string
 		changeEmailFailed: string
 		deleteAccountFailed: string
+		userEmailNotFound: string
+		platformSessionNotFound: string
 	}
 	'nav': {
 		personalData: string
@@ -675,6 +678,199 @@ export interface MessageShapes {
 		result5: string
 		result6: string
 		supportChat: string
+	}
+	'tradingBots': {
+		pageTitle: string
+		back: string
+		tabRobots: string
+		tabApis: string
+		createNew: string
+		createNewApi: string
+		myRobots: string
+		loadRobotsError: string
+		noRobots: string
+		activeOf: (values: TranslationValues) => string
+		deposit: string
+		statusPause: string
+		statusActive: string
+		statusStopped: string
+		savedApis: string
+		keyCount: (values: TranslationValues) => string
+		noApis: string
+		deleteApi: string
+		deleteApiConfirm: string
+		yes: string
+		no: string
+		robotNotFound: string
+		robotNotFoundDesc: string
+		backToList: string
+		status: string
+		exchange: string
+		coin: string
+		pnl: string
+		roi: string
+		actionError: string
+		stopRobot: string
+		pause: string
+		resume: string
+		start: string
+		robotLimitTitle: string
+		robotLimitDesc: (values: TranslationValues) => string
+		understood: string
+		robotNameLabel: string
+		robotNamePlaceholder: string
+		robotNameError: string
+		depositLabel: string
+		depositError: string
+		balance: string
+		updateBalance: string
+		updateBalanceAndFill: string
+		depositTooSmall: (values: TranslationValues) => string
+		noPresets: string
+		reinvest: string
+		notifications: string
+		telegramConnected: (values: TranslationValues) => string
+		loadingTelegram: string
+		notifTrades: string
+		notifBalance: string
+		notifApi: string
+		connectTelegramDesc: string
+		connectTelegram: string
+		checkConnection: string
+		checkingConnection: string
+		createRobotError: string
+		createRobot: string
+		instructions: string
+		apiData: string
+		apiNameLabel: string
+		apiNamePlaceholder: string
+		apiKeyLabel: string
+		secretKeyLabel: string
+		showSecret: string
+		hideSecret: string
+		saveAndContinue: string
+		supported: string
+		connectApi: string
+		createRobotTitle: string
+		selectApi: string
+		connectFailed: string
+		saveFailed: string
+		apiNameTooShort: string
+		apiKeyRequired: string
+		secretKeyRequired: string
+		platformBalance: string
+		deposit_action: string
+		depositTitle: string
+		depositDesc: string
+		closeLabel: string
+		depositAddress: string
+		copied: string
+		copyAddress: string
+		network: string
+		asset: string
+		safetyNotice: (values: RichValues) => ReactNode
+		scanQr: string
+		walletPendingTitle: string
+		walletFailedTitle: string
+		walletPendingDesc: string
+		walletFailedDesc: string
+		refresh: string
+		instructions_bybit: {
+			'0': {
+				title: string
+				description: string
+				image: string
+			}
+			'1': {
+				title: string
+				description: string
+				image: string
+			}
+			'2': {
+				title: string
+				description: string
+				image: string
+			}
+			'3': {
+				title: string
+				description: string
+				image: string
+			}
+			'4': {
+				title: string
+				description: string
+				image: string
+			}
+			'5': {
+				title: string
+				description: string
+				image: string
+			}
+		}
+		instructions_binance: {
+			'0': {
+				title: string
+				description: string
+				image: string
+			}
+			'1': {
+				title: string
+				description: string
+				image: string
+			}
+			'2': {
+				title: string
+				description: string
+				image: string
+			}
+			'3': {
+				title: string
+				description: string
+				image: string
+			}
+			'4': {
+				title: string
+				description: string
+				image: string
+			}
+			'5': {
+				title: string
+				description: string
+				image: string
+			}
+			'6': {
+				title: string
+				description: string
+				image: string
+			}
+		}
+		instructions_bingx: {
+			'0': {
+				title: string
+				description: string
+				image: string
+			}
+			'1': {
+				title: string
+				description: string
+				image: string
+			}
+			'2': {
+				title: string
+				description: string
+				image: string
+			}
+			'3': {
+				title: string
+				description: string
+				image: string
+			}
+			'4': {
+				title: string
+				description: string
+				image: string
+			}
+		}
 	}
 }
 

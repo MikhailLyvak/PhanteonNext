@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { Loader2, RefreshCw } from 'lucide-react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	mode: 'pending' | 'failed'
@@ -10,14 +12,15 @@ interface Props {
 }
 
 const WalletPendingState = ({ mode, onRefresh, isRefreshing }: Props) => {
+	const { t } = useCustomTranslations(TKeys.tradingBots)
 	const title =
 		mode === 'failed'
-			? 'Не вдалося отримати адресу'
-			: 'Гаманець генерується'
+			? t.walletFailedTitle
+			: t.walletPendingTitle
 	const description =
 		mode === 'failed'
-			? 'Сервер не повернув адресу. Спробуйте ще раз або зверніться до підтримки.'
-			: 'Це може зайняти хвилину. Натисніть "Оновити", щоб перевірити статус.'
+			? t.walletFailedDesc
+			: t.walletPendingDesc
 
 	return (
 		<div className='mt-6 flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#1D1D2A] p-6 text-center'>
@@ -41,7 +44,7 @@ const WalletPendingState = ({ mode, onRefresh, isRefreshing }: Props) => {
 				<RefreshCw
 					className={isRefreshing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
 				/>
-				Оновити
+				{t.refresh}
 			</button>
 		</div>
 	)

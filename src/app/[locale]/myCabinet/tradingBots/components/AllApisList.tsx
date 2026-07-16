@@ -8,6 +8,8 @@ import { Triangle } from 'react-loader-spinner'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
 import useDeleteApi from '@/hooks/TradingBots/useDeleteApi'
 import { getExchangeMeta } from './exchangeMeta'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const truncate = (s: string, max = 12) =>
   s.length <= max ? s : `${s.slice(0, max)}…`
@@ -17,6 +19,7 @@ export default function AllApisList() {
   const { data: apis, isLoading } = useUserApis()
   const deleteApi = useDeleteApi()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { t } = useCustomTranslations(TKeys.tradingBots)
 
   const goToRobot = (apiId: string) => {
     router.replace(`/myCabinet/tradingBots?step=robot&apiId=${apiId}`)
@@ -37,10 +40,10 @@ export default function AllApisList() {
     <div className="w-full">
       <div className="mt-4 p-6 bg-[#242433] rounded-2xl">
         <div className="flex items-end justify-between gap-3">
-          <h6 className="text-[#D2D2FF] text-xl font-semibold">Збережені API</h6>
+          <h6 className="text-[#D2D2FF] text-xl font-semibold">{t.savedApis}</h6>
           {!isLoading && list.length > 0 && (
             <span className="text-[10px] uppercase tracking-[0.18em] text-[#8c8ca0]">
-              {list.length} {list.length === 1 ? 'ключ' : 'ключів'}
+              {t.keyCount({ count: list.length })}
             </span>
           )}
         </div>
@@ -59,7 +62,7 @@ export default function AllApisList() {
 
         {!isLoading && list.length === 0 && (
           <p className="text-gray-400 text-sm mt-4">
-            У вас ще немає збережених API.
+            {t.noApis}
           </p>
         )}
 
@@ -121,7 +124,7 @@ export default function AllApisList() {
                       onClick={(e) => handleDelete(e, api.id)}
                       disabled={deleteApi.isPending}
                       className="shrink-0 p-2 rounded-lg text-[#8c8ca0] hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                      aria-label="Видалити API"
+                      aria-label={t.deleteApi}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -130,7 +133,7 @@ export default function AllApisList() {
                   {deletingId === api.id && (
                     <div className="mt-2 flex items-center gap-3 p-3 rounded-lg bg-[#2F2F40] ring-1 ring-red-400/20">
                       <p className="text-sm text-[#D2D2FF] flex-1">
-                        Видалити цей API?
+                        {t.deleteApiConfirm}
                       </p>
                       <button
                         type="button"
@@ -141,7 +144,7 @@ export default function AllApisList() {
                         {deleteApi.isPending && (
                           <Triangle visible height={12} width={12} color="#fff" ariaLabel="deleting" />
                         )}
-                        Так
+                        {t.yes}
                       </button>
                       <button
                         type="button"
@@ -149,7 +152,7 @@ export default function AllApisList() {
                         disabled={deleteApi.isPending}
                         className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#1D1D2A] text-[#8c8ca0] hover:text-[#D2D2FF] transition-colors"
                       >
-                        Ні
+                        {t.no}
                       </button>
                     </div>
                   )}

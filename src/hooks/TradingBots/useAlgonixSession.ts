@@ -73,13 +73,13 @@ export const useAlgonixSession = (): UseAlgonixSessionResult => {
     if (typeof window === "undefined") return;
     setError(null);
     if (!email) {
-      setError(new Error("Email користувача не знайдено"));
+      setError(new Error("userEmailNotFound"));
       return;
     }
     const cookies = new Cookies();
     const raw = cookies.get(PLATFORM_TOKEN_COOKIE) as unknown;
     if (typeof raw !== "string" || raw.length === 0) {
-      setError(new Error("Сесія платформи не знайдена. Будь ласка, увійдіть знову."));
+      setError(new Error("platformSessionNotFound"));
       setToken(null);
       return;
     }

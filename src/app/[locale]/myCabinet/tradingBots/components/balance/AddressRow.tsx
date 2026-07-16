@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { NETWORK } from './constants'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	address: string
@@ -10,6 +12,7 @@ interface Props {
 
 const AddressRow = ({ address }: Props) => {
 	const [copied, setCopied] = useState(false)
+	const { t } = useCustomTranslations(TKeys.tradingBots)
 
 	const handleCopy = async () => {
 		try {
@@ -26,7 +29,7 @@ const AddressRow = ({ address }: Props) => {
 	return (
 		<div className='mt-5'>
 			<p className='mb-2 text-xs uppercase tracking-wide text-[#8c8ca0]'>
-				Адреса для поповнення
+				{t.depositAddress}
 			</p>
 			<div className='flex items-center gap-3 rounded-xl border border-white/10 bg-[#1D1D2A] p-3'>
 				<span className='shrink-0 rounded-md bg-[#6A56E4]/20 px-2 py-1 text-[10px] font-semibold tracking-wide text-[#A99CFF]'>
@@ -41,7 +44,7 @@ const AddressRow = ({ address }: Props) => {
 				<button
 					type='button'
 					onClick={handleCopy}
-					aria-label={copied ? 'Скопійовано' : 'Скопіювати адресу'}
+					aria-label={copied ? t.copied : t.copyAddress}
 					className='relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#6A56E4] text-white transition hover:shadow-xl'
 				>
 					{copied ? (
@@ -51,7 +54,7 @@ const AddressRow = ({ address }: Props) => {
 					)}
 					{copied && (
 						<span className='pointer-events-none absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap rounded-md bg-[#1D1D2A] px-2 py-1 text-[11px] text-[#D2D2FF] shadow-lg'>
-							Скопійовано
+							{t.copied}
 						</span>
 					)}
 				</button>

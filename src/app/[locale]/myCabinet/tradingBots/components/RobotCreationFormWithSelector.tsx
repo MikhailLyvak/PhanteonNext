@@ -6,6 +6,8 @@ import useUserApis from '@/hooks/TradingBots/useUserApis'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import BackButton from './BackButton'
 import RobotCreationForm from './RobotCreationForm'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const truncate = (s: string, max = 12) =>
   s.length <= max ? s : `${s.slice(0, max)}…`
@@ -13,6 +15,7 @@ const truncate = (s: string, max = 12) =>
 export default function RobotCreationFormWithSelector() {
   const searchParams = useSearchParams()
   const apiIdFromUrl = searchParams.get('apiId') ?? ''
+  const { t } = useCustomTranslations(TKeys.tradingBots)
 
   const { data: apis } = useUserApis()
   const apisList = apis ?? []
@@ -49,11 +52,11 @@ export default function RobotCreationFormWithSelector() {
     <div className="w-full">
       {hasRobots && <BackButton />}
       <h6 className="text-[#D2D2FF] text-xl font-semibold mt-[30px]">
-        Створення робота
+        {t.createRobotTitle}
       </h6>
       <div className="py-6 bg-[#242433] rounded-2xl">
         <label className="text-[#D2D2FF] text-sm font-medium block">
-          Виберіть API
+          {t.selectApi}
         </label>
         <select
           value={selectedApiId}
