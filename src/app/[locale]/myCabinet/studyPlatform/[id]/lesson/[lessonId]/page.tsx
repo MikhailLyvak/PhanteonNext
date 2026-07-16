@@ -8,6 +8,8 @@ import NavAccordion from './components/NavAccordion'
 import VitalisGreenButton from '@components/Buttons/VitalisGreenButton'
 import { Link } from '@/i18n/navigation'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 function getYouTubeId(url?: string): string {
 	const fallbackVideoId = ''
@@ -29,6 +31,7 @@ const LessonDetail = () => {
 	const id = Array.isArray(idParam) ? idParam[0] : idParam
 
 	const { data, isLoading, error } = useGetLessonDetail(id || '')
+	const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
 	//console.log(data)
 
 	return (
@@ -45,7 +48,7 @@ const LessonDetail = () => {
 											href='/'
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
-											Головна
+											{t.breadcrumbHome}
 										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
@@ -56,7 +59,7 @@ const LessonDetail = () => {
 											href='/myCabinet/studyPlatform/'
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
-											Академія
+											{t.breadcrumbAcademy}
 										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
@@ -67,7 +70,7 @@ const LessonDetail = () => {
 											href={`/myCabinet/studyPlatform/${courseId}`}
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
-											Курс
+											{t.breadcrumbCourse}
 										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
@@ -75,7 +78,7 @@ const LessonDetail = () => {
 									</li>
 									<li>
 										<span className='text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]'>
-											Урок
+											{t.breadcrumbLesson}
 										</span>
 									</li>
 								</ol>
@@ -86,7 +89,7 @@ const LessonDetail = () => {
 							onClick={() => setIsModalOpen(!isModalOpen)}
 							className={`max-lg:flex hidden justify-between mt-8 bg-[#242433] text-white text-base font-semibold items-center p-[10px] ${isModalOpen ? 'rounded-t-xl' : 'rounded-xl'}`}
 						>
-							<div>Теми уроків</div>
+							<div>{t.lessonTopics}</div>
 							<div className='border-2 rounded-xl h-9 w-9 flex items-center justify-center border-white text-white '>
 								<LuChevronDown
 									className={
@@ -111,7 +114,7 @@ const LessonDetail = () => {
 									{data?.video_url === null ? (
 										<div className='w-full aspect-video self-stretch rounded-3xl h-full shadow-xl bg-[#242433] flex justify-center items-center'>
 											<div className='text-white text-base lg:text-4xl font-semibold'>
-												Контент уроку в розробці
+												{t.contentInDev}
 											</div>
 										</div>
 									) : (
@@ -140,7 +143,7 @@ const LessonDetail = () => {
 								{data?.pdf_task && (
 									<div className='bg-[#242433] rounded-3xl lg:h-28 mt-6 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
 										<div className='text-lg lg:text-2xl font-semibold'>
-											Матеріал уроку у форматі .PDF
+											{t.pdfMaterial}
 										</div>
 										<div className='max-lg:mt-5'>
 											<VitalisGreenButton>
@@ -150,7 +153,7 @@ const LessonDetail = () => {
 													target='_black'
 													className='flex'
 												>
-													<div className='mr-[10px]'>Завантажити</div>
+													<div className='mr-[10px]'>{t.download}</div>
 													<LuArrowBigDown
 														className='w-6 h-6 text-white'
 														style={{ fill: 'currentColor', stroke: 'none' }}
@@ -163,7 +166,7 @@ const LessonDetail = () => {
 								{data?.doc_task && (
 									<div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
 										<div className='text-lg lg:text-2xl font-semibold'>
-											Матеріал уроку у форматі .DOC/.DOCX
+											{t.docMaterial}
 										</div>
 										<div className='max-lg:mt-5'>
 											<VitalisGreenButton>
@@ -173,7 +176,7 @@ const LessonDetail = () => {
 													target='_black'
 													className='flex'
 												>
-													<div className='mr-[10px]'>Завантажити</div>
+													<div className='mr-[10px]'>{t.download}</div>
 													<LuArrowBigDown
 														className='w-6 h-6 text-white'
 														style={{ fill: 'currentColor', stroke: 'none' }}
@@ -186,7 +189,7 @@ const LessonDetail = () => {
 								{data?.xlsx_task && (
 									<div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 text-white flex flex-col lg:flex-row justify-between items-center px-6 max-lg:py-6'>
 										<div className='text-lg lg:text-2xl font-semibold'>
-											Матеріал уроку у форматі .XLSX
+											{t.xlsxMaterial}
 										</div>
 										<div className='max-lg:mt-5'>
 											<VitalisGreenButton>
@@ -196,7 +199,7 @@ const LessonDetail = () => {
 													target='_black'
 													className='flex'
 												>
-													<div className='mr-[10px]'>Завантажити</div>
+													<div className='mr-[10px]'>{t.download}</div>
 													<LuArrowBigDown
 														className='w-6 h-6 text-white'
 														style={{ fill: 'currentColor', stroke: 'none' }}
@@ -209,7 +212,7 @@ const LessonDetail = () => {
 								{data?.quize && (
 									<div className='bg-[#242433] rounded-3xl lg:h-28 mt-8 mb-10 lg:mb-[100px] text-white flex flex-col lg:flex-row justify-between items-center px-5 max-lg:py-5 max-lg:text-center lg:px-6'>
 										<div className='text-lg lg:text-2xl font-semibold lg:w-8/12'>
-											Для завершення уроку виконайте задання з тесту
+											{t.completeWithQuiz}
 										</div>
 										<div className='max-lg:mt-5'>
 											<VitalisGreenButton>
@@ -217,7 +220,7 @@ const LessonDetail = () => {
 													href={`/myCabinet/studyPlatform/${courseId}/lesson/${id}/quiz/${data?.quize}`}
 													className=''
 												>
-													Пройти тест
+													{t.takeQuiz}
 												</Link>
 											</VitalisGreenButton>
 										</div>

@@ -9,6 +9,8 @@ import {
 	ChevronLeft,
 	ChevronsLeft,
 } from 'lucide-react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const ITEMS_PER_PAGE = 6 // Items per page
 
@@ -20,6 +22,7 @@ const CourseList = ({ filter }: Props) => {
 	const { data: courses, isLoading } = useGetCourses()
 	const [currentPage, setCurrentPage] = useState(1)
 	const [filteredCourses, setFilteredCourses] = useState(courses)
+	const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
 
 	useEffect(() => {
 		if (filter === 'mine') {
@@ -29,7 +32,7 @@ const CourseList = ({ filter }: Props) => {
 		}
 	}, [courses, filter])
 
-	if (isLoading) return <p>Завантаження курсів...</p>
+	if (isLoading) return <p>{t.loadingCourses}</p>
 
 	const totalPages = Math.ceil((filteredCourses?.length || 0) / ITEMS_PER_PAGE)
 	const paginatedCourses = filteredCourses?.slice(

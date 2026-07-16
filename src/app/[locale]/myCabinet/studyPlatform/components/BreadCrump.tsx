@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { Link } from '@/i18n/navigation'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	currentPageTitle: string
@@ -12,6 +14,7 @@ const MyCabinetBreadCrump: React.FC<Props> = ({
 	currentPageTitle,
 	textColor = 'text-[#D2D2FF]',
 }) => {
+	const { t } = useCustomTranslations(TKeys.common)
 	return (
 		<div className='my-8'>
 			<nav className='flex items-center' aria-label='Breadcrumb'>
@@ -21,7 +24,7 @@ const MyCabinetBreadCrump: React.FC<Props> = ({
 							href='/'
 							className={`text-xs sm:text-sm font-normal hover:font-semibold ${textColor}`}
 						>
-							Головна
+							{t.home}
 						</Link>
 					</li>
 					<li className={`text-lg font-extrabold pl-1 ${textColor}`}>•</li>

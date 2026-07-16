@@ -2,9 +2,12 @@ import { Course } from "@/api/StudyPlatform/types";
 import React from "react";
 import { LuCheck } from "react-icons/lu";
 import { Link } from "@/i18n/navigation";
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context';
+import { TKeys } from '@/i18n/t-keys';
 
 
 const CourseCard = ({ course }: { course: Course }) => {
+  const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
   return (
     <Link className="flex max-sm:flex-col bg-[#242433] rounded-3xl shadow-sm items-start w-full overflow-hidden" href={`/myCabinet/studyPlatform/${course.id}`}>
       <div className="w-60 max-sm:w-full h-60 p-4">
@@ -49,7 +52,7 @@ const CourseCard = ({ course }: { course: Course }) => {
             </div>
           </div>
 
-          <p className="text-white text-lg font-semibold mb-3">{course.lessons_amount} лекцій</p>
+          <p className="text-white text-lg font-semibold mb-3">{t.lectureCount({ count: course.lessons_amount })}</p>
 
           <p className="text-white text-sm line-clamp-5 sm:line-clamp-2 overflow-hidden text-ellipsis whitespace-pre-wrap">
             {course.description}
@@ -72,7 +75,7 @@ const CourseCard = ({ course }: { course: Course }) => {
           ) : (
             <div className="flex justify-between w-full">
               <button className="bg-[#6A56E4] text-white px-8 py-2 rounded-3xl text-base font-semibold">
-                Детальніше
+                {t.moreDetails}
               </button>
               <div className="flex sm:hidden ">
                 {course.is_discount ? (

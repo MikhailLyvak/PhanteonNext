@@ -240,7 +240,10 @@ export interface MessageShapes {
 		lectureCount: (values: TranslationValues) => string
 		moreDetails: string
 		loadingCourses: string
+		loading: string
+		breadcrumbHome: string
 		breadcrumbAcademy: string
+		breadcrumbAcademyVb: string
 		breadcrumbCourse: string
 		goalLabel: string
 		learningProgress: string

@@ -4,6 +4,8 @@ import { FaPlus, FaMinus } from 'react-icons/fa6'
 import React from 'react'
 import IconWithToolTip from './components/IconWithToolTip'
 import { Link } from '@/i18n/navigation'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	data: ModuleDetail
@@ -26,6 +28,7 @@ const ModuleAccordion: React.FC<Props> = ({
 	is_course_mine,
 	openBuyModal,
 }) => {
+	const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
 	return (
 		<div className='bg-[#242433] rounded-3xl px-6 pt-3 py-4 lg:py-7 my-3 lg:my-6'>
 			<div
@@ -57,7 +60,7 @@ const ModuleAccordion: React.FC<Props> = ({
 					)}
 				</div>
 				<div className='text-start text-sm lg:text-lg font-semibold text-[#D2D2FF] max-lg:mt-3'>
-					{data.lessons_count} лекції
+					{t.lessonsCount({ count: data.lessons_count })}
 				</div>
 				<div className='mt-3 text-sm lg:text-base font-normal text-[#D2D2FF] max-w-6xl'>
 					{data.description}
@@ -79,7 +82,7 @@ const ModuleAccordion: React.FC<Props> = ({
 						onClick={openBuyModal}
 						className='flex items-center gap-2 px-6 py-3 mt-2 lg:mt-4 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors'
 					>
-						<span>Придбати</span>
+						<span>{t.purchase}</span>
 						<LuPlus className='w-5 h-5' />
 					</button>
 				)}
@@ -118,19 +121,19 @@ const ModuleAccordion: React.FC<Props> = ({
 											{lesson.is_have_video && (
 												<IconWithToolTip
 													imgPath='/CourseDetail/MiniIcons/VideoIcon.svg'
-													title='Відео'
+													title={t.videoTooltip}
 												/>
 											)}
 											{lesson.is_have_presentation && (
 												<IconWithToolTip
 													imgPath='/CourseDetail/MiniIcons/PresentationIcon.svg'
-													title='Презентація'
+													title={t.presentationTooltip}
 												/>
 											)}
 											{lesson.is_have_test && (
 												<IconWithToolTip
 													imgPath='/CourseDetail/MiniIcons/QuizeIcon.svg'
-													title='Тест'
+													title={t.quizTooltip}
 												/>
 											)}
 										</div>
