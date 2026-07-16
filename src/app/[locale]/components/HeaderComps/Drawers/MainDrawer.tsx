@@ -9,6 +9,7 @@ import { useMainDrawerStore } from "@/store/Nav/useMainDrawerStore";
 import Image from "next/image";
 import LoginButton from "../LoginButton";
 import { Link } from "@/i18n/navigation";
+import LocaleSwitcher from "@components/LayoutItems/LocaleSwitcher";
 
 
 const MainDrawer = () => {
@@ -61,6 +62,9 @@ const MainDrawer = () => {
             </div>
           </div>
 
+          <div className="px-4 pt-4">
+            <LocaleSwitcher />
+          </div>
         </div>
       </aside>
     </>

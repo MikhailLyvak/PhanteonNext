@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Link, usePathname } from "@/i18n/navigation";
 import Image from "next/image";
+import LocaleSwitcher from '@/app/[locale]/components/LayoutItems/LocaleSwitcher';
 import React, { useEffect, useState } from "react";
 import AdaptiveButtons from "./AdaptiveButtons";
 import CryptoTicker from "./CryptoTicker"; // ✅ Import it
@@ -295,7 +296,10 @@ const InnerWhiteHeader = () => {
           </div>
 
           {/* ✅ Right - Buttons */}
-          <AdaptiveButtons textColor="text-[#D2D2FF]" />
+          <div className="flex items-center gap-3">
+            <LocaleSwitcher />
+            <AdaptiveButtons textColor="text-[#D2D2FF]" />
+          </div>
         </div>
       </div>
 
