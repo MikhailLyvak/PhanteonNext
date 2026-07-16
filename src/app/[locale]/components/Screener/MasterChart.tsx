@@ -32,6 +32,8 @@ import {
 } from './chartUtils'
 import { formatPrice } from '@/lib/screener/format'
 import { HeatmapDatum, HeatmapSeriesView } from './HeatmapPlugin'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	pair: AssetPair
@@ -188,6 +190,8 @@ const MasterChart: React.FC<Props> = ({
 	// indicators chart must gate on this — otherwise toggling off every
 	// indicator chip crashes the page on the next sync tick.
 	const hasIndicatorSeriesRef = useRef(false)
+
+	const { t } = useCustomTranslations(TKeys.screener)
 
 	const timeframe = useTerminalStore(s => s.timeframe)
 	const heatmapVisible = useTerminalStore(s => s.heatmapVisible)
@@ -977,7 +981,7 @@ const MasterChart: React.FC<Props> = ({
 								key={key}
 								onClick={() => toggleIndicator(key)}
 								className={`${chipBase} ${on ? chipOn : chipOff}`}
-								title={`Toggle ${INDICATOR_LABELS[key]}`}
+								title={t.tooltips.toggleIndicator({ indicator: INDICATOR_LABELS[key] })}
 							>
 								{INDICATOR_LABELS[key]}
 							</button>
@@ -1018,7 +1022,7 @@ const MasterChart: React.FC<Props> = ({
 					role='separator'
 					aria-orientation='horizontal'
 					aria-label='Resize chart height'
-					title='Drag to resize chart'
+					title={t.tooltips.dragResizeChart}
 					className='group absolute left-0 right-0 -bottom-1 h-3 flex items-center justify-center cursor-row-resize touch-none z-10'
 				>
 					<div className='h-1 w-16 rounded-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />
@@ -1033,7 +1037,7 @@ const MasterChart: React.FC<Props> = ({
 					role='separator'
 					aria-orientation='vertical'
 					aria-label='Resize chart width'
-					title='Drag to resize chart width'
+					title={t.tooltips.dragResizeChartWidth}
 					className='group absolute top-0 bottom-0 -right-1 w-3 flex items-center justify-center cursor-col-resize touch-none z-10'
 				>
 					<div className='w-1 h-16 rounded-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />

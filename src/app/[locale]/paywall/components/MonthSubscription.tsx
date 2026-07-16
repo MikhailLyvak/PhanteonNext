@@ -6,6 +6,8 @@ import { Triangle } from 'react-loader-spinner'
 import { SubscriptionPaymentResponse } from '@/api/Subscriptions'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const MonthSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'1' | '3'>('1')
@@ -13,7 +15,8 @@ const MonthSubscriptions = () => {
 	const { mutate: createPayment, isPending } = useCreateSubscriptionPayment()
   const { user } = useUserStore()
   const { toggleModal, setActiveTab } = useAuthModalStore()
-	
+	const { t } = useCustomTranslations(TKeys.paywall)
+
 
 	const handlePurchase = () => {
     if (!user) {
@@ -22,7 +25,7 @@ const MonthSubscriptions = () => {
       return
     }
 		const durationMonths = selectedMonth === '1' ? 1 : 3
-		
+
 		createPayment(
 			{
 				subscription_type: 'monthly',
@@ -33,24 +36,24 @@ const MonthSubscriptions = () => {
 					if (data.payment_url) {
 						window.location.href = data.payment_url
 					} else {
-						alert('Помилка: Не отримано URL для оплати. Спробуйте ще раз.')
+						alert(t.noPaymentUrl)
 						console.error('No payment URL in response')
 					}
 				},
 				onError: (error: any) => {
 					console.error('Payment request failed:', error)
-					
+
 					// Обробляємо різні типи помилок
 					if (error.response?.status === 400) {
-						const errorDetail = error.response.data?.detail || 'Помилка валідації даних'
-						alert(`Помилка: ${errorDetail}`)
+						const errorDetail = error.response.data?.detail || t.validationFallback
+						alert(t.paymentError({ detail: errorDetail }))
 					} else if (error.response?.status === 500) {
-						alert('Помилка сервера. Спробуйте пізніше або зверніться до підтримки.')
+						alert(t.serverError)
 					} else if (error.response?.data?.error === 'Payment gateway error') {
-						const detail = error.response.data.detail || 'Помилка платіжного шлюзу'
-						alert(`Помилка платіжного шлюзу: ${detail}`)
+						const detail = error.response.data.detail || t.gatewayFallback
+						alert(t.gatewayError({ detail }))
 					} else {
-						alert('Сталася неочікувана помилка. Спробуйте ще раз.')
+						alert(t.unexpectedError)
 					}
 				},
 			}
@@ -62,12 +65,12 @@ const MonthSubscriptions = () => {
 			<div className='mb-5'>
 				<div className='flex gap-2 items-start mb-1'>
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
-						$125/міс
+						{t.oldPriceMonth}
 					</div>
-					<div className='lg:text-4xl font-bold  text-2xl'>$50/міс </div>
+					<div className='lg:text-4xl font-bold  text-2xl'>{t.priceMonth} </div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
-					Лише до 01.11
+					{t.priceUntil}
 				</div>
 			</div>
 			<form className='flex items-start lg:gap-3 gap-6 mb-6'>
@@ -91,7 +94,7 @@ const MonthSubscriptions = () => {
 							}`}
 						/>
 					</label>
-					<div>1 місяць</div>
+					<div>{t.oneMonth}</div>
 				</div>
 				<div className='flex gap-2.5 items-center'>
 					<label
@@ -113,75 +116,75 @@ const MonthSubscriptions = () => {
 							}`}
 						/>
 					</label>
-					<div>3 місяці</div>
+					<div>{t.threeMonths}</div>
 				</div>
 			</form>
 			<div className=' flex-col gap-[36px] items-center justify-start w-full text-center font-bold hidden lg:flex'>
-				<div className=''>Всі</div>
-				<div className=''>За додаткову оплату</div>
+				<div className=''>{t.featureAll}</div>
+				<div className=''>{t.featureForPay}</div>
 				<div className=' xl:text-sm text-[10px]'>
-					В рамках місяця + запити попередніх зустрічей
+					{t.featureMonthMeetings}
 				</div>
-				<div className=''>Обмежена кількість запитів</div>
-				<div className=''>Безлім, на час підписки</div>
-				<div className=''>Безлім, на час підписки</div>
-				<div className=''>Безлім, на час підписки</div>
+				<div className=''>{t.featureLimitedRequests}</div>
+				<div className=''>{t.featureUnlimited}</div>
+				<div className=''>{t.featureUnlimited}</div>
+				<div className=''>{t.featureUnlimited}</div>
 			</div>
 			<div className='flex flex-col items-center justify-start mt-[22px] w-full px-5 text-center text-white lg:hidden'>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>Модулі</div>
-					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>Всі</div>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>{t.featureModules}</div>
+					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>{t.featureAll}</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Воркбук
+						{t.featureWorkbook}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						За додаткову оплату
-					</div>
-					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
-				</div>
-				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Воркшопи
-					</div>
-					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						В рамках місяця + запити попередніх зустрічей
+						{t.featureForPay}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Аі-агенти
+						{t.featureWorkshops}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Обмежена кількість запитів
+						{t.featureMonthMeetings}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Скрінер
+						{t.featureAiAgents}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Безлім, на час підписки
+						{t.featureLimitedRequests}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Авторські індекатори
+						{t.featureScreener}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Безлім, на час підписки
+						{t.featureUnlimited}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>Блог</div>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>
+						{t.featureIndicators}
+					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Безлім, на час підписки
+						{t.featureUnlimited}
+					</div>
+					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
+				</div>
+				<div className='mt-[8px] flex flex-col items-center w-full'>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>{t.featureBlog}</div>
+					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
+						{t.featureUnlimited}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
@@ -201,7 +204,7 @@ const MonthSubscriptions = () => {
 						ariaLabel="triangle-loading"
 					/>
 				)}
-				Придбати
+				{t.purchase}
 			</button>
 		</div>
 	)

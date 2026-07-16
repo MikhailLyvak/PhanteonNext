@@ -2,15 +2,18 @@
 import { Link } from '@/i18n/navigation'
 import { useGetBlogs } from '@/hooks/Blog/useGetBlogs'
 import { useUserStore } from '@/store/UserData/useUserStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 export default function BlogListPage() {
 	const { data, isLoading } = useGetBlogs()
 	const user = useUserStore(state => state.user)
+	const { t } = useCustomTranslations(TKeys.blog)
 
 	return (
 		<div className='max-w-6xl mx-auto px-4 py-10 text-white'>
-			<h1 className='text-3xl font-bold mb-6'>Блог</h1>
-			{isLoading && <div>Завантаження...</div>}
+			<h1 className='text-3xl font-bold mb-6'>{t.title}</h1>
+			{isLoading && <div>{t.loading}</div>}
 			<div className='grid gap-6 md:grid-cols-2'>
 				{data?.map(post => (
 					<Link

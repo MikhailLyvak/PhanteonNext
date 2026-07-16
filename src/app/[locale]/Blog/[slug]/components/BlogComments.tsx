@@ -4,6 +4,8 @@ import axiosClient from '@/interceptor/axiosClient'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useState } from 'react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const allowed = ['👍', '👎', '♥'] as const
 
@@ -16,6 +18,7 @@ const BlogComments = ({ blog, onRefresh }: BlogCommentsProps) => {
 	const user = useUserStore(s => s.user)
 	const { toggleModal } = useAuthModalStore()
 	const [comment, setComment] = useState('')
+	const { t } = useCustomTranslations(TKeys.blog)
 
 	const requireAuth = () => {
 		if (!user) {
@@ -51,7 +54,7 @@ const BlogComments = ({ blog, onRefresh }: BlogCommentsProps) => {
 					</button>
 				))}
 			</div>
-			<h2 className='text-2xl font-semibold mb-3'>Коментарі</h2>
+			<h2 className='text-2xl font-semibold mb-3'>{t.commentsTitle}</h2>
 			<div className='space-y-3'>
 				{blog.comments.map(c => (
 					<div key={c.id} className='bg-[#242433] rounded-lg p-3'>
@@ -66,14 +69,14 @@ const BlogComments = ({ blog, onRefresh }: BlogCommentsProps) => {
 				<input
 					value={comment}
 					onChange={e => setComment(e.target.value)}
-					placeholder='Ваш коментар...'
+					placeholder={t.commentPlaceholder}
 					className='flex-1 bg-[#242433] rounded-lg px-3 py-2 outline-none'
 				/>
 				<button
 					onClick={submitComment}
 					className='bg-[#5b5bd6] px-4 py-2 rounded-lg'
 				>
-					Надіслати
+					{t.send}
 				</button>
 			</div>
 		</section>

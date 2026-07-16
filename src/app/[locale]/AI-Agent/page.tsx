@@ -8,6 +8,8 @@ import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/github-dark.css'
 import MyCabinetBreadCrump from '../myCabinet/studyPlatform/components/BreadCrump'
 import ConfirmDeleteChat from './components/ConfirmDeleteChat'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Message {
 	text: string
@@ -57,6 +59,7 @@ const markdownComponents = {
 }
 
 export default function AIPage() {
+	const { t } = useCustomTranslations(TKeys.aiAgent)
 	const [message, setMessage] = useState('')
 	const [conversation, setConversation] = useState<Message[]>([])
 	const { sendMessage, isLoading, resetChat, isLimited } = useChatAgent()
@@ -89,7 +92,7 @@ export default function AIPage() {
 				setConversation([
 					{
 						sender: 'agent',
-						text: 'Привіт! Як я можу допомогти вам сьогодні у світі криптовалют та фінансової грамотності?',
+						text: t.greeting,
 						date: new Date().toISOString(),
 					},
 				])
@@ -107,7 +110,7 @@ export default function AIPage() {
 			setConversation([
 				{
 					sender: 'agent',
-					text: 'Привіт! Як я можу допомогти вам сьогодні у світі криптовалют та фінансової грамотності?',
+					text: t.greeting,
 					date: new Date().toISOString(),
 				},
 			])
@@ -150,7 +153,7 @@ export default function AIPage() {
 			if (error?.response?.status === 429) {
 				const limitMessage = {
 					sender: 'error',
-					text: 'Ви досягли денного ліміту у 10 запитів. Оформіть підписку для безлімітного доступу.',
+					text: t.limitError,
 					date: new Date().toISOString(),
 				} as Message
 				// Show only once
@@ -162,14 +165,14 @@ export default function AIPage() {
 			} else if (error?.response?.status) {
 				const errorMessage = {
 					sender: 'error',
-					text: `Виникла помилка ${error?.response?.status}, спробуйте будь ласка ще раз`,
+					text: t.requestError({ status: error?.response?.status ?? '' }),
 					date: new Date().toISOString(),
 				} as Message
 				setConversation(prev => [...prev, errorMessage])
 			} else {
 				const errorMessage = {
 					sender: 'error',
-					text: `Виникла неочікувана помилка, спробуйте будь ласка ще раз`,
+					text: t.unexpectedError,
 					date: new Date().toISOString(),
 				} as Message
 				setConversation(prev => [...prev, errorMessage])
@@ -183,15 +186,14 @@ export default function AIPage() {
 			className='max-md:!min-h-screen flex flex-col max-w-6xl mx-auto px-4 text-white'
 		>
 			<div className='mt-6'>
-				<MyCabinetBreadCrump currentPageTitle='Theon' />
+				<MyCabinetBreadCrump currentPageTitle={t.breadcrumb} />
 			</div>
 			<div className='flex flex-col flex-1'>
 				{conversation.length < 2 ? (
 					<div className='mx-auto lg:mt-[200px] mt-[100px]'>
-						<div className='text-5xl font-extrabold text-center'>Theon</div>
+						<div className='text-5xl font-extrabold text-center'>{t.breadcrumb}</div>
 						<p className='text-center mt-2.5 mb-10'>
-							Привіт! Як я можу допомогти вам сьогодні у світі криптовалют та
-							фінансової грамотності?
+							{t.greeting}
 						</p>
 					</div>
 				) : (
@@ -249,7 +251,7 @@ export default function AIPage() {
 						<input
 							type='text'
 							name='message'
-							placeholder='Запитайте будь що'
+							placeholder={t.inputPlaceholder}
 							autoComplete='off'
 							value={message}
 							onChange={e => setMessage(e.target.value)}
@@ -269,8 +271,7 @@ export default function AIPage() {
 					</div>
 					{isLimited && (
 						<p className='text-sm text-red-400 ml-2'>
-							Ви досягли денного ліміту у 10 запитів. Оформіть підписку для
-							безлімітного доступу.
+							{t.limitError}
 						</p>
 					)}
 					{conversation.length > 2 && (
@@ -291,7 +292,7 @@ export default function AIPage() {
                    group-hover:opacity-100 group-hover:scale-100
                    group-focus-within:opacity-100 group-focus-within:scale-100'
 							>
-								Видалити чат
+								{t.deleteChat}
 								{/* Arrow */}
 								<span
 									className='absolute left-1/2 top-full -translate-x-1/2

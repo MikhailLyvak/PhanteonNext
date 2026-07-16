@@ -2,10 +2,14 @@ import React from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { setRequestLocale } from 'next-intl/server'
+import { getCustomTranslations } from '@/lib/contexts/translations/translations-server'
+import { TKeys } from '@/i18n/t-keys'
 
 export default async function About({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
 	setRequestLocale(locale)
+	const { t } = await getCustomTranslations(TKeys.about)
+	const { t: tCommon } = await getCustomTranslations(TKeys.common, locale)
 	return (
 		<>
 			<div className='pb-20 max-w-[1320px] w-full mx-auto'>
@@ -17,7 +21,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 									href='/'
 									className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 								>
-									Головна
+									{tCommon.home}
 								</Link>
 							</li>
 							<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>•</li>
@@ -26,7 +30,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 									href='/About'
 									className='text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]'
 								>
-									Про нас
+									{t.breadcrumb}
 								</Link>
 							</li>
 						</ol>
@@ -47,40 +51,36 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 
 					<div className='max-w-[650px] text-left'>
 						<h1 className='text-[#D2D2FF] text-2xl md:text-5xl font-bold'>
-							Про мене
+							{t.igorTitle}
 						</h1>
 						<p className='text-white text-sm md:text-2xl mt-2'>
-							<span className='font-bold'>Я – Ігор Порох</span>, експерт із
-							фінансових ринків, трейдер і ментор із понад 10-річним досвідом.
+							{t.igorBio({ b: (chunks) => <span className='font-bold'>{chunks}</span> })}
 						</p>
 
 						<div className='bg-[#2A2A39] rounded-[15px] mt-6 p-5'>
 							<p className='text-white text-sm md:text-lg font-bold mb-3'>
-								Результати, які говорять за мене:
+								{t.resultsTitle}
 							</p>
 							<ul className='list-disc pl-5 space-y-2 text-white text-sm md:text-base'>
 								<li>
 									<span className='text-[#D2D2FF] font-bold'>
-										ТОП-3 трейдер
-									</span>{' '}
-									СНД за версією BTC Awards (2017).
+										{t.top3Trader}
+									</span>{t.top3TraderDesc}
 								</li>
 								<li>
 									<span className='text-[#D2D2FF] font-bold'>
-										+80% прибутку
-									</span>{' '}
-									за 2024 рік.
+										{t.profit80}
+									</span>{t.profit80Desc}
 								</li>
 								<li>
-									Запуск децентралізованого{' '}
-									<span className='text-[#D2D2FF] font-bold'>маркетплейсу</span>{' '}
-									з нуля.
+									{t.marketplacePre}
+									<span className='text-[#D2D2FF] font-bold'>{t.marketplace}</span>{' '}
+									{t.marketplaceDesc}
 								</li>
 								<li>
 									<span className='text-[#D2D2FF] font-bold'>
-										95% точних прогнозів
-									</span>{' '}
-									за 2023 року.
+										{t.accuracy95}
+									</span>{t.accuracy95Desc}
 								</li>
 							</ul>
 						</div>
@@ -94,15 +94,13 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 								className='w-[38px] h-[38px] md:w-[58px] md:h-[58px]'
 							/>
 							<p className='text-[#D2D2FF] text-sm md:text-2xl font-bold'>
-								Моя місія — допомогти вам стати
-								<br />
-								впевненими у своїх фінансах
+								{t.missionText}
 							</p>
 						</div>
 
 						<div className='mt-10'>
 							<p className='text-white text-xl md:text-2xl font-bold mb-3'>
-								Працюю з:
+								{t.workWithTitle}
 							</p>
 							<ul className='space-y-4'>
 								<li className='flex items-start gap-2 bg-[#1D1D2A] rounded-2xl py-4 pl-[10px]'>
@@ -113,7 +111,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 										height={24}
 									/>
 									<span className='text-white text-sm md:text-base'>
-										Новачками, які хочуть зрозуміти основи інвестування.
+										{t.workWith1}
 									</span>
 								</li>
 								<li className='flex items-start gap-2 bg-[#1D1D2A] rounded-2xl py-4 pl-[10px]'>
@@ -124,8 +122,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 										height={24}
 									/>
 									<span className='text-white text-sm md:text-base'>
-										Досвідченими інвесторами, які прагнуть стабільності й
-										зростання.
+										{t.workWith2}
 									</span>
 								</li>
 								<li className='flex items-start gap-2 bg-[#1D1D2A] rounded-2xl py-4 pl-[10px]'>
@@ -136,8 +133,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 										height={24}
 									/>
 									<span className='text-white text-sm md:text-base'>
-										Підприємцями, що бажають зберігати капітал і примножувати
-										його.
+										{t.workWith3}
 									</span>
 								</li>
 							</ul>
@@ -152,14 +148,14 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 					>
 						<div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
 							<p className='text-white text-base md:text-xl font-semibold'>
-								Не знаєш, з чого почати?{' '}
+								{t.dontKnowStart}{' '}
 								<span className='text-[#D2D2FF] font-bold'>
-									Наш AI допоможе обрати курс за кілька хвилин
+									{t.aiHelp}
 								</span>
 							</p>
 
 							<span className='inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#D2D2FF] text-[#171723] font-bold text-sm md:text-base'>
-								Перейти до AI-інтервʼю →
+								{t.goToInterview}
 							</span>
 						</div>
 					</Link>
@@ -181,70 +177,68 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 
 					<div className='max-w-[650px] text-left'>
 						<h2 className='text-[#D2D2FF] text-2xl md:text-5xl font-bold'>
-							Едуард Тяско
+							{t.eduardTitle}
 						</h2>
 
 						<p className='text-white text-sm md:text-lg mt-4'>
-							Мій трейдерський шлях почався у 2022-му.
+							{t.eduardPath1}
 						</p>
 
 						<p className='text-white text-sm md:text-lg mt-4'>
-							У голові було кіно: я з ноутом на пляжі, в одній руці коктейль, в
-							іншій — зелене PnL, а десь на фоні — океан і свобода.
+							{t.eduardPath2}
 						</p>
 
 						<div className='bg-[#2A2A39] rounded-[15px] mt-6 p-5'>
 							<p className='text-white text-sm md:text-lg font-bold mb-3'>
-								Реальність же така:
+								{t.eduardRealityTitle}
 							</p>
 							<ul className='list-disc pl-5 space-y-2 text-white text-sm md:text-base'>
-								<li>злив за зливом</li>
-								<li>постійне «ще один індикатор, і точно зайде»</li>
-								<li>марафон між відеоуроками, тестами та фейковими «гуру»</li>
-								<li>і фінальна стадія — повний релоад себе як трейдера</li>
+								<li>{t.realityItem1}</li>
+								<li>{t.realityItem2}</li>
+								<li>{t.realityItem3}</li>
+								<li>{t.realityItem4}</li>
 							</ul>
 						</div>
 
 						<p className='text-white text-sm md:text-lg mt-6'>
-							<span className='text-[#D2D2FF] font-bold'>Я не здався.</span>
+							<span className='text-[#D2D2FF] font-bold'>{t.eduardNotGiveUp}</span>
 						</p>
 
 						<p className='text-white text-sm md:text-lg mt-4'>
-							Я вивчив ринок, збив кулаки об флети, ламав голову над психологією
-							ціни — і в якийсь момент усе клацнуло.
+							{t.eduardStudied}
 						</p>
 
 						<p className='text-white text-sm md:text-lg mt-4'>
-							Тепер уже значний час мій трейдинг стабільно в плюсі, без істерик
-							і догонів.
+							{t.eduardNowStable}
 						</p>
 
 						<p className='text-white text-sm md:text-lg mt-4'>
-							І все це — стало основою для запуску проєкту{' '}
-							<span className='text-[#D2D2FF] font-bold'>PantheonX</span>.
+							{t.eduardFoundation1}
+							<span className='text-[#D2D2FF] font-bold'>PantheonX</span>
+							{t.eduardFoundation2}
 						</p>
 
 						<div className='bg-[#1D1D2A] rounded-2xl mt-6 p-5'>
 							<p className='text-[#D2D2FF] text-sm md:text-lg font-bold mb-3'>
-								PantheonX — це про:
+								{t.pantheonXTitle}
 							</p>
 							<ul className='space-y-2 text-white text-sm md:text-base'>
 								<li className='flex items-start gap-2'>
 									<span className='text-[#D2D2FF]'>🔹</span>
-									<span>системний підхід</span>
+									<span>{t.pantheonXItem1}</span>
 								</li>
 								<li className='flex items-start gap-2'>
 									<span className='text-[#D2D2FF]'>🔹</span>
-									<span>реальну логіку ринку</span>
+									<span>{t.pantheonXItem2}</span>
 								</li>
 								<li className='flex items-start gap-2'>
 									<span className='text-[#D2D2FF]'>🔹</span>
-									<span>інструменти, які використовують великі гравці</span>
+									<span>{t.pantheonXItem3}</span>
 								</li>
 								<li className='flex items-start gap-2'>
 									<span className='text-[#D2D2FF]'>🔹</span>
 									<span>
-										розбір маніпуляцій маркетмейкерів, щоб ти не був їх жертвою
+										{t.pantheonXItem4}
 									</span>
 								</li>
 							</ul>
@@ -252,11 +246,11 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 
 						<div className='mt-8 p-5 bg-gradient-to-r from-[#2A2A39] to-[#1D1D2A] rounded-[15px] border-l-4 border-[#D2D2FF]'>
 							<p className='text-white text-sm md:text-lg text-center'>
-								Тож, якщо ти теж втомився вгадувати —<br />
+								{t.finalCta1}<br />
 								<span className='text-[#D2D2FF] font-bold'>
-									пригальмуй та ставай частиною PantheonX
+									{t.finalCta2}
 								</span>
-								<br />і давай нарешті трейдити з головою, а не на емоціях
+								<br />{t.finalCta3}
 							</p>
 						</div>
 					</div>

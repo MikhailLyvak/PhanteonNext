@@ -6,6 +6,8 @@ import { Triangle } from 'react-loader-spinner'
 import { SubscriptionPaymentResponse } from '@/api/Subscriptions'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const YearSubscriptions = () => {
 	const [selectedMonth, setSelectedMonth] = useState<'6' | '12'>('6')
@@ -13,6 +15,7 @@ const YearSubscriptions = () => {
 	const { mutate: createPayment, isPending } = useCreateSubscriptionPayment()
 	const { user } = useUserStore()
 	const { toggleModal, setActiveTab } = useAuthModalStore()
+	const { t } = useCustomTranslations(TKeys.paywall)
 
 	const handlePurchase = () => {
 		if (!user) {
@@ -32,7 +35,7 @@ const YearSubscriptions = () => {
 					if (data.payment_url) {
 						window.location.href = data.payment_url
 					} else {
-						alert('Помилка: Не отримано URL для оплати. Спробуйте ще раз.')
+						alert(t.noPaymentUrl)
 						console.error('No payment URL in response')
 					}
 				},
@@ -42,18 +45,16 @@ const YearSubscriptions = () => {
 					// Обробляємо різні типи помилок
 					if (error.response?.status === 400) {
 						const errorDetail =
-							error.response.data?.detail || 'Помилка валідації даних'
-						alert(`Помилка: ${errorDetail}`)
+							error.response.data?.detail || t.validationFallback
+						alert(t.paymentError({ detail: errorDetail }))
 					} else if (error.response?.status === 500) {
-						alert(
-							'Помилка сервера. Спробуйте пізніше або зверніться до підтримки.'
-						)
+						alert(t.serverError)
 					} else if (error.response?.data?.error === 'Payment gateway error') {
 						const detail =
-							error.response.data.detail || 'Помилка платіжного шлюзу'
-						alert(`Помилка платіжного шлюзу: ${detail}`)
+							error.response.data.detail || t.gatewayFallback
+						alert(t.gatewayError({ detail }))
 					} else {
-						alert('Сталася неочікувана помилка. Спробуйте ще раз.')
+						alert(t.unexpectedError)
 					}
 				},
 			}
@@ -65,12 +66,12 @@ const YearSubscriptions = () => {
 			<div className='mb-5'>
 				<div className='flex gap-2 items-start mb-1'>
 					<div className='line-through lg:text-2xl text-xl text-gray-300'>
-						$1200/рік
+						{t.oldPrice}
 					</div>
-					<div className='lg:text-4xl font-bold  text-2xl'>$900/рік </div>
+					<div className='lg:text-4xl font-bold  text-2xl'>{t.price} </div>
 				</div>
 				<div className='text-sx text-gray-400 text-center mx-auto'>
-					Лише до 01.11
+					{t.priceUntil}
 				</div>
 			</div>
 			<form className='flex items-start gap-3 mb-6'>
@@ -94,7 +95,7 @@ const YearSubscriptions = () => {
 							}`}
 						/>
 					</label>
-					<div>6 місяців</div>
+					<div>{t.sixMonths}</div>
 				</div>
 				<div className='flex gap-2.5 items-center'>
 					<label
@@ -116,72 +117,72 @@ const YearSubscriptions = () => {
 							}`}
 						/>
 					</label>
-					<div>1 рік</div>
+					<div>{t.oneYear}</div>
 				</div>
 			</form>
 			<div className='flex-col gap-[36px] items-center justify-start w-full text-center font-bold hidden lg:flex'>
-				<div className=''>Всі</div>
-				<div className=''>Включений </div>
-				<div className=''>Всі живі зустрічі, в рамках року</div>
-				<div className=''>Необмежена кількість запитів</div>
-				<div className=''>Безлім, на час підписки</div>
-				<div className=''>Безлім, на час підписки</div>
-				<div className=''>Безлім</div>
+				<div className=''>{t.featureAll}</div>
+				<div className=''>{t.featureIncluded} </div>
+				<div className=''>{t.featureAllMeetings}</div>
+				<div className=''>{t.featureUnlimitedRequests}</div>
+				<div className=''>{t.featureUnlimited}</div>
+				<div className=''>{t.featureUnlimited}</div>
+				<div className=''>{t.featureBlogUnlim}</div>
 			</div>
 			<div className='flex flex-col items-center justify-start mt-[22px] w-full px-5 text-center text-white lg:hidden'>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>Модулі</div>
-					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>Всі</div>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>{t.featureModules}</div>
+					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>{t.featureAll}</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Воркбук
+						{t.featureWorkbook}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Включений
-					</div>
-					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
-				</div>
-				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Воркшопи
-					</div>
-					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Всі живі зустрічі, в рамках року
+						{t.featureIncluded}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Аі-агенти
+						{t.featureWorkshops}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Необмежена кількість запитів
+						{t.featureAllMeetings}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Скрінер
+						{t.featureAiAgents}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Безлім, на час підписки
+						{t.featureUnlimitedRequests}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
 					<div className='text-[13px] font-medium text-[#ffffff7c]'>
-						Авторські індекатори
+						{t.featureScreener}
 					</div>
 					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
-						Безлім, на час підписки
+						{t.featureUnlimited}
 					</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 				<div className='mt-[8px] flex flex-col items-center w-full'>
-					<div className='text-[13px] font-medium text-[#ffffff7c]'>Блог</div>
-					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>Безлім</div>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>
+						{t.featureIndicators}
+					</div>
+					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>
+						{t.featureUnlimited}
+					</div>
+					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
+				</div>
+				<div className='mt-[8px] flex flex-col items-center w-full'>
+					<div className='text-[13px] font-medium text-[#ffffff7c]'>{t.featureBlog}</div>
+					<div className='mt-[3px] mb-[11px] font-bold text-[13px]'>{t.featureBlogUnlim}</div>
 					<div className=' h-px rounded-full w-full bg-[#FFFFFF1A]' />
 				</div>
 			</div>
@@ -200,7 +201,7 @@ const YearSubscriptions = () => {
 						ariaLabel='triangle-loading'
 					/>
 				)}
-				Придбати
+				{t.purchase}
 			</button>
 		</div>
 	)

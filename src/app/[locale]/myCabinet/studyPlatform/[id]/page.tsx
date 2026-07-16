@@ -10,10 +10,13 @@ import { usePostPaymentPage } from '@/hooks/StudyPlatform/usePostPaymentPage'
 import Modal from 'react-modal'
 import { Triangle } from 'react-loader-spinner'
 import axiosInterceptor from '@/interceptor/axiosClient'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const CourseDetail = () => {
 	const params = useParams()
 	const idParam = params?.id
+	const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
 
 	const id = Array.isArray(idParam) ? idParam[0] : idParam
 
@@ -45,7 +48,7 @@ const CourseDetail = () => {
 				onSuccess: data => {
 					if (data.free_course) {
 						// Course is free - show message and update data
-						alert(data.message || 'Курс успішно додано завдяки промокоду!')
+						alert(data.message || t.courseAddedFree)
 						refetch() // Refresh course data
 						closeBuyModal() // Close modal window
 						// Redirect to course page
@@ -104,10 +107,10 @@ const CourseDetail = () => {
 					setPromoStep('checked')
 				}
 			} else {
-				setPromoError('Промокод недійсний')
+				setPromoError(t.promoInvalid)
 			}
 		} catch (e) {
-			setPromoError('Помилка перевірки промокоду')
+			setPromoError(t.promoCheckError)
 		} finally {
 			setPromoCheckLoading(false)
 		}
@@ -138,7 +141,7 @@ const CourseDetail = () => {
 				onSuccess: data => {
 					if (data.free_course) {
 						// Course is free - show message and update data
-						alert(data.message || 'Курс успішно додано завдяки промокоду!')
+						alert(data.message || t.courseAddedFree)
 						refetch() // Refresh course data
 						closeBuyModal() // Close modal window
 						// Redirect to course page
@@ -171,7 +174,7 @@ const CourseDetail = () => {
 										href='/'
 										className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 									>
-										Головна
+										{t.breadcrumbHome}
 									</a>
 								</li>
 								<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
@@ -182,7 +185,7 @@ const CourseDetail = () => {
 										href='/myCabinet/studyPlatform/'
 										className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 									>
-										Академія
+										{t.breadcrumbAcademy}
 									</a>
 								</li>
 								<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
@@ -190,7 +193,7 @@ const CourseDetail = () => {
 								</li>
 								<li>
 									<span className='text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]'>
-										Курс
+										{t.breadcrumbCourse}
 									</span>
 								</li>
 							</ol>
@@ -206,7 +209,7 @@ const CourseDetail = () => {
 							</h1>
 
 							<div className='mb-8'>
-								<h2 className='text-2xl text-white font-normal mb-2'>Мета:</h2>
+								<h2 className='text-2xl text-white font-normal mb-2'>{t.goalLabel}</h2>
 								<p className='text-xl font-bold lg:text-xl text-white'>
 									{data?.course_goal}
 								</p>
@@ -243,7 +246,7 @@ const CourseDetail = () => {
 												<div className='flex items-center gap-2 mt-6 md:mt-11 justify-between w-full'>
 													<div className='flex items-center gap-2 '>
 														<div className=' text-gray-200 text-base md:text-lg'>
-															Ваш прогрес навчання:{' '}
+															{t.learningProgress}{' '}
 														</div>
 														<div className='text-base text-gray-200 md:text-xl font-bold'>
 															{data?.course_progress}%
@@ -251,7 +254,7 @@ const CourseDetail = () => {
 													</div>
 													<div className='text-gray-200 text-base md:text-lg flex items-center gap-2'>
 														<LuCheck size={20} />
-														<div>Придбано</div>
+														<div>{t.purchased}</div>
 													</div>
 												</div>
 												<div className='relative w-full h-[14px] rounded-full bg-gray-700 overflow-hidden md:mx-0 mt-7'>
@@ -278,7 +281,7 @@ const CourseDetail = () => {
 														</span>
 													</div>
 													<p className='text-white text-lg font-medium'>
-														Вартість кусу
+														{t.courseCost}
 													</p>
 												</div>
 												<button
@@ -291,7 +294,7 @@ const CourseDetail = () => {
 													}
 													className='flex items-center gap-2 px-6 py-3 bg-[#6A56E4] rounded-full text-white font-semibold text-base hover:bg-[#5846c7] transition-colors'
 												>
-													<span>Придбати</span>
+													<span>{t.purchase}</span>
 													<LuPlus className='w-5 h-5' />
 												</button>
 												<Modal
@@ -304,20 +307,20 @@ const CourseDetail = () => {
 													{promoStep === 'ask' && (
 														<div className='flex flex-col gap-4'>
 															<div className='text-lg font-semibold'>
-																Чи маєте промокод для знижки?
+																{t.hasPromoCode}
 															</div>
 															<div className='flex gap-4 mt-2'>
 																<button
 																	className='bg-[#6A56E4] px-4 py-2 rounded text-white font-bold'
 																	onClick={() => setPromoStep('input')}
 																>
-																	Ввести промокод
+																	{t.enterPromoCode}
 																</button>
 																<button
 																	className='bg-gray-500 px-4 py-2 rounded text-white font-bold'
 																	onClick={proceedToPayment}
 																>
-																	Без промокоду
+																	{t.withoutPromoCode}
 																</button>
 															</div>
 														</div>
@@ -330,13 +333,13 @@ const CourseDetail = () => {
 																	onClick={() => setPromoStep('ask')}
 																	className='text-[#D2D2FF] hover:text-white text-sm'
 																>
-																	← Назад
+																	{t.back}
 																</button>
 																<button
 																	type='button'
 																	onClick={closeBuyModal}
 																	className='text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2'
-																	aria-label='Закрити'
+																	aria-label={t.closeLabel}
 																>
 																	×
 																</button>
@@ -344,13 +347,13 @@ const CourseDetail = () => {
 															{/* Title and close button in a row, with space between */}
 															<div className='flex flex-col gap-2 mb-4'>
 																<div className='text-lg text-center font-semibold'>
-																	Введіть промокод
+																	{t.enterPromoCodeTitle}
 																</div>
 																<input
 																	type='text'
 																	value={promocode}
 																	onChange={e => setPromocode(e.target.value)}
-																	placeholder='Промокод'
+																	placeholder={t.promoPlaceholder}
 																	className='px-4 py-2 rounded border border-gray-400 text-black'
 																/>
 																<button
@@ -359,8 +362,8 @@ const CourseDetail = () => {
 																	disabled={promoCheckLoading}
 																>
 																	{promoCheckLoading
-																		? 'Перевірка...'
-																		: 'Перевірити промокод'}
+																		? t.checking
+																		: t.checkPromoCode}
 																</button>
 																{promoError && (
 																	<div className='text-red-400'>
@@ -378,28 +381,27 @@ const CourseDetail = () => {
 																	onClick={() => setPromoStep('input')}
 																	className='text-[#D2D2FF] hover:text-white text-sm'
 																>
-																	← Змінити промокод
+																	{t.changePromoCode}
 																</button>
 																<button
 																	type='button'
 																	onClick={closeBuyModal}
 																	className='text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none px-2'
-																	aria-label='Закрити'
+																	aria-label={t.closeLabel}
 																>
 																	×
 																</button>
 															</div>
 															<div className='text-lg font-semibold text-green-400'>
-																Промокод дійсний! Знижка:{' '}
-																{promoResult.discount_percent}%
+																{t.promoValid({ percent: promoResult.discount_percent })}
 															</div>
 															{promoResult.discount_percent === 100 ? (
 																<div className='text-xl font-bold text-green-400'>
-																	Курс безкоштовний! 🎉
+																	{t.freeCourse}
 																</div>
 															) : (
 																<div>
-																	Нова ціна:{' '}
+																	{t.newPrice}{' '}
 																	<span className='font-bold'>
 																		{finalPrice} $
 																	</span>
@@ -420,8 +422,8 @@ const CourseDetail = () => {
 																	/>
 																)}
 																{promoResult.discount_percent === 100
-																	? 'Отримати безкоштовно'
-																	: 'Перейти до оплати'}
+																	? t.getFree
+																	: t.proceedToPay}
 															</button>
 														</div>
 													)}
@@ -433,7 +435,7 @@ const CourseDetail = () => {
 								{/* ✅ Modules Section */}
 								<div className='mt-16'>
 									<div className='text-[#D2D2FF] text-xl lg:text-4xl font-semibold text-start lg:text-center'>
-										Модулі курсу
+										{t.modulesList}
 									</div>
 									<div className='mt-5 lg:mt-12 mb-[103px]'>
 										{data?.modules?.map((module: ModuleDetail, index) => (

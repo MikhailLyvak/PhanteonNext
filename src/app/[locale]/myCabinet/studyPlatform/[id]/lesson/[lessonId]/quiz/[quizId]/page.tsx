@@ -10,6 +10,8 @@ import { useQuizSubmission } from '@/hooks/StudyPlatform/usePostQuizSubmission'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import VitalisGreenButton from '@components/Buttons/VitalisGreenButton'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const QuizPage = () => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({})
@@ -32,6 +34,7 @@ const QuizPage = () => {
 
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useCustomTranslations(TKeys.cabinet.studyPlatform)
   const { mutate, isPending, error } = useQuizSubmission()
 
   // Check if quiz was already passed
@@ -89,7 +92,7 @@ const QuizPage = () => {
     }
 
     if (hasAttempted) {
-      enqueueSnackbar("Ви вже спробували пройти тест. Перезавантажте сторінку для повторної спроби.", { variant: "warning" });
+      enqueueSnackbar(t.alreadyAttempted, { variant: "warning" });
       return;
     }
 
@@ -122,14 +125,14 @@ const QuizPage = () => {
 
     mutate(payload, {
       onSuccess: (data) => {
-        enqueueSnackbar("Урок пройдено, вітаємо!", { variant: "success" });
+        enqueueSnackbar(t.quizPassed, { variant: "success" });
         queryClient.invalidateQueries({ queryKey: ["quiz-detail", quizId] });
         queryClient.invalidateQueries({ queryKey: ["quiz-result", lessonId] });
         setIsSubmitted(true);
         setIsQuizPassed(true);
       },
       onError: (error) => {
-        enqueueSnackbar("Сталася помилка при відправленні тесту.", { variant: "error" });
+        enqueueSnackbar(t.quizError, { variant: "error" });
         console.error("Submission error:", error);
         // Reset attempt flag on error so user can try again
         setHasAttempted(false);
@@ -142,7 +145,7 @@ const QuizPage = () => {
     return (
       <div className="pt-[120px] max-w-7xl mx-auto">
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#D2D2FF] text-xl">Завантаження...</div>
+          <div className="text-[#D2D2FF] text-xl">{t.loading}</div>
         </div>
       </div>
     );
@@ -158,31 +161,31 @@ const QuizPage = () => {
               <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                 <li>
                   <a href="/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Головна
+                    {t.breadcrumbHome}
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <a href="/myCabinet/studyPlatform/" className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Академія
+                    {t.breadcrumbAcademy}
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <a href={`/myCabinet/studyPlatform/${courseId}`} className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Курс
+                    {t.breadcrumbCourse}
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <a href={`/myCabinet/studyPlatform/${courseId}/lesson/${lessonId}`} className="text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]">
-                    Урок
+                    {t.breadcrumbLesson}
                   </a>
                 </li>
                 <li className="text-lg font-extrabold pl-1 text-[#D2D2FF]">•</li>
                 <li>
                   <span className="text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]">
-                    Тест
+                    {t.breadcrumbQuiz}
                   </span>
                 </li>
               </ol>
@@ -193,10 +196,10 @@ const QuizPage = () => {
           {isQuizPassed && (
             <div className="mt-6 p-4 bg-green-900/20 border border-green-600 rounded-lg">
               <div className="text-green-400 text-lg font-semibold mb-2">
-                ✅ Тест вже пройдено
+                {t.quizAlreadyPassed}
               </div>
               <div className="text-[#D2D2FF] text-sm">
-                Нижче показані ваші відповіді на тест. Переходьте до наступного уроку. А на текстові відповіді ви можете подивитися коментар ментора коли їх розглянуть.
+                {t.quizPassedDesc}
               </div>
             </div>
           )}
@@ -210,7 +213,7 @@ const QuizPage = () => {
               ${isModalOpen ? 'rounded-t-xl' : 'rounded-xl'}
             `}
           >
-            <div>Теми уроків</div>
+            <div>{t.lessonTopics}</div>
             <div className="border-2 rounded-xl h-9 w-9 flex items-center justify-center border-white text-white">
 
               <LuChevronDown className={isModalOpen ? 'transition-transform -rotate-90' : 'transition-transform'} />
@@ -288,7 +291,7 @@ const QuizPage = () => {
                           <div className="px-2">
                             <textarea
                               className="w-full min-h-[120px] p-3 bg-[#171723] border border-gray-600 rounded-lg text-[#D2D2FF] placeholder-[#58587B] resize-none focus:outline-none focus:border-[#D2D2FF]"
-                              placeholder="Введіть вашу відповідь..."
+                              placeholder={t.textAnswerPlaceholder}
                               value={textAnswers[questionItem.id] || ''}
                               onChange={(e) => handleTextAnswerChange(questionItem.id, e.target.value)}
                               disabled={hasAttempted}
@@ -300,7 +303,7 @@ const QuizPage = () => {
                         {isQuizPassed && mentorComments[questionItem.id] && (
                           <div className="mt-4 p-3 bg-blue-900/20 border border-blue-600 rounded-lg">
                             <div className="text-blue-400 text-sm font-semibold mb-1">
-                              💬 Коментар ментора:
+                              {t.mentorComment}
                             </div>
                             <div className="text-[#D2D2FF] text-sm">
                               {mentorComments[questionItem.id]}
@@ -316,12 +319,12 @@ const QuizPage = () => {
                       isPending={isPending}
                       disabled={isPending || hasAttempted}
                     >
-                      {hasAttempted ? 'Тест вже пройдено' : 'Завершити тест'}
+                      {hasAttempted ? t.quizCompleted : t.finishQuiz}
                     </VitalisGreenButton>
                   </div>
                 </div>
               ) : (
-                <div>Немає питань</div>
+                <div>{t.noQuestions}</div>
               )}
             </div>
 

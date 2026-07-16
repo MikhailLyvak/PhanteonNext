@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { AssetPair, TradeEvent } from '@/lib/screener/types'
 import { openTradesStream } from '@/api/Screener/streams'
 import { formatPrice, formatUsdShort } from '@/lib/screener/format'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface Props {
 	pair: AssetPair
@@ -17,6 +19,7 @@ function formatTs(ts: number): string {
 const TradesFeed: React.FC<Props> = ({ pair }) => {
 	const [events, setEvents] = useState<TradeEvent[]>([])
 	const [seeded, setSeeded] = useState(false)
+	const { t } = useCustomTranslations(TKeys.screener)
 
 	useEffect(() => {
 		setEvents([])
@@ -40,9 +43,9 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 			<table className='w-full text-xs'>
 				<thead className='sticky top-0 bg-[#1d212c] text-[#7A7AA0]'>
 					<tr>
-						<th className='text-left py-1.5 px-1 font-normal'>Час</th>
-						<th className='text-right py-1.5 px-1 font-normal'>Ціна</th>
-						<th className='text-right py-1.5 px-1 font-normal'>Розмір</th>
+						<th className='text-left py-1.5 px-1 font-normal'>{t.feed.time}</th>
+						<th className='text-right py-1.5 px-1 font-normal'>{t.feed.price}</th>
+						<th className='text-right py-1.5 px-1 font-normal'>{t.feed.size}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -61,7 +64,7 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 											style={{ animationDelay: '0.3s' }}
 										/>
 									</div>
-									<span className='text-xs'>Завантаження угод…</span>
+									<span className='text-xs'>{t.feed.loadingTrades}</span>
 								</div>
 							</td>
 						</tr>
@@ -71,10 +74,10 @@ const TradesFeed: React.FC<Props> = ({ pair }) => {
 							<td colSpan={3} className='py-0'>
 								<div className='flex flex-col items-center justify-center gap-1 py-10 px-3 text-center'>
 									<span className='text-sm text-[#98A0B3]'>
-										Поки немає великих угод
+										{t.feed.noTrades}
 									</span>
 									<span className='text-[11px] text-[#58587B]'>
-										Очікуємо аномальні обʼєми
+										{t.feed.waitingVolumes}
 									</span>
 								</div>
 							</td>

@@ -1,205 +1,137 @@
 import { setRequestLocale } from 'next-intl/server'
+import { getCustomTranslations } from '@/lib/contexts/translations/translations-server'
+import { TKeys } from '@/i18n/t-keys'
 
 export default async function PrivacyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
+  const { t } = await getCustomTranslations(TKeys.privacy)
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#D2D2FF]">
-        Політика конфіденційності
+        {t.title}
       </h1>
       <p className="text-sm text-[#58587B] mb-8">
-        Останнє оновлення: 14 червня 2026 року
+        {t.lastUpdated}
       </p>
 
       <div className="prose max-w-none text-[#98A0B3] leading-relaxed space-y-6">
         <section>
-          <p>
-            Ця Політика конфіденційності описує, яким чином PantheonX
-            (далі — «Платформа», «ми», «нас» або «наш») збирає, використовує,
-            зберігає та захищає персональні дані користувачів (далі —
-            «Користувач», «ви») під час використання вебсайту, освітніх
-            сервісів, скрінера, торгових інструментів та інших послуг
-            Платформи. Користуючись Платформою, ви погоджуєтесь з умовами цієї
-            Політики.
-          </p>
+          <p>{t.intro}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            1. Які дані ми збираємо
+            {t.section1Title}
           </h2>
-          <p>Ми можемо збирати такі категорії даних:</p>
+          <p>{t.section1Intro}</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <strong className="text-[#D2D2FF]">Облікові дані:</strong> адреса
-              електронної пошти та пароль (у зашифрованому вигляді), які ви
-              надаєте під час реєстрації та входу.
+              <strong className="text-[#D2D2FF]">{t.section1Label1}</strong>{' '}
+              {t.section1Text1}
             </li>
             <li>
-              <strong className="text-[#D2D2FF]">Контактні та профільні
-              дані:</strong> ім’я, прізвище, номер телефону, адреса Solana
-              гаманця (за бажанням, для отримання NFT-сертифікатів).
+              <strong className="text-[#D2D2FF]">{t.section1Label2}</strong>{' '}
+              {t.section1Text2}
             </li>
             <li>
-              <strong className="text-[#D2D2FF]">Дані про підписки та
-              платежі:</strong> інформація про придбані підписки та статус
-              оплати. Реквізити платіжних карток обробляються виключно
-              платіжними провайдерами і нами не зберігаються.
+              <strong className="text-[#D2D2FF]">{t.section1Label3}</strong>{' '}
+              {t.section1Text3}
             </li>
             <li>
-              <strong className="text-[#D2D2FF]">Технічні дані:</strong> IP-адреса,
-              тип і версія браузера, операційна система, ідентифікатори
-              пристрою, дата й час доступу, а також дані про вашу взаємодію з
-              Платформою.
+              <strong className="text-[#D2D2FF]">{t.section1Label4}</strong>{' '}
+              {t.section1Text4}
             </li>
             <li>
-              <strong className="text-[#D2D2FF]">Дані про навчання:</strong> прогрес
-              у проходженні курсів, результати, отримані сертифікати та участь у
-              вебінарах.
+              <strong className="text-[#D2D2FF]">{t.section1Label5}</strong>{' '}
+              {t.section1Text5}
             </li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            2. Як ми використовуємо ваші дані
+            {t.section2Title}
           </h2>
-          <p>Зібрані дані використовуються для того, щоб:</p>
+          <p>{t.section2Intro}</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>створювати та обслуговувати ваш обліковий запис;</li>
-            <li>
-              надавати доступ до освітніх матеріалів, скрінера, торгових ботів
-              та інших функцій Платформи;
-            </li>
-            <li>обробляти підписки, платежі та видавати сертифікати;</li>
-            <li>
-              забезпечувати технічну підтримку та відповідати на ваші запити;
-            </li>
-            <li>
-              покращувати роботу Платформи, аналізувати її використання та
-              забезпечувати безпеку;
-            </li>
-            <li>
-              надсилати важливі сервісні повідомлення, а за вашою згодою —
-              інформаційні та маркетингові розсилки.
-            </li>
+            <li>{t.section2Item1}</li>
+            <li>{t.section2Item2}</li>
+            <li>{t.section2Item3}</li>
+            <li>{t.section2Item4}</li>
+            <li>{t.section2Item5}</li>
+            <li>{t.section2Item6}</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            3. Правові підстави обробки
+            {t.section3Title}
           </h2>
-          <p>
-            Ми обробляємо персональні дані на підставі: виконання договору
-            (надання послуг Платформи), вашої згоди (наприклад, для
-            маркетингових розсилок), дотримання правових зобов’язань, а також
-            наших законних інтересів щодо забезпечення безпеки та вдосконалення
-            сервісу.
-          </p>
+          <p>{t.section3Body}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            4. Файли cookie
+            {t.section4Title}
           </h2>
-          <p>
-            Платформа використовує файли cookie та подібні технології для
-            автентифікації, збереження ваших налаштувань, аналізу трафіку та
-            покращення зручності користування. Ви можете керувати файлами cookie
-            в налаштуваннях свого браузера, проте вимкнення окремих cookie може
-            обмежити функціональність Платформи.
-          </p>
+          <p>{t.section4Body}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            5. Передача даних третім сторонам
+            {t.section5Title}
           </h2>
-          <p>
-            Ми не продаємо ваші персональні дані. Дані можуть передаватися лише:
-          </p>
+          <p>{t.section5Intro}</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>
-              постачальникам послуг, які допомагають нам у роботі Платформи
-              (хостинг, аналітика, платіжні системи, email-розсилки), у межах,
-              необхідних для виконання їхніх функцій;
-            </li>
-            <li>
-              державним органам — у випадках, передбачених чинним
-              законодавством;
-            </li>
-            <li>
-              у разі реорганізації, злиття чи продажу бізнесу — правонаступнику
-              з дотриманням умов цієї Політики.
-            </li>
+            <li>{t.section5Item1}</li>
+            <li>{t.section5Item2}</li>
+            <li>{t.section5Item3}</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            6. Зберігання та захист даних
+            {t.section6Title}
           </h2>
-          <p>
-            Ми застосовуємо організаційні та технічні заходи захисту, зокрема
-            шифрування паролів, обмеження доступу та захищені канали передачі
-            даних. Персональні дані зберігаються протягом строку дії вашого
-            облікового запису та необхідного часу для виконання цілей, описаних
-            у цій Політиці, або згідно з вимогами законодавства. Жоден метод
-            передачі чи зберігання даних не є абсолютно безпечним, тому ми не
-            можемо гарантувати абсолютну безпеку.
-          </p>
+          <p>{t.section6Body}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            7. Ваші права
+            {t.section7Title}
           </h2>
-          <p>Ви маєте право:</p>
+          <p>{t.section7Intro}</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>отримати доступ до своїх персональних даних та їх копію;</li>
-            <li>виправити неточні або неповні дані;</li>
-            <li>
-              видалити свій обліковий запис і пов’язані з ним дані (через сторінку
-              «Налаштування» або звернувшись до підтримки);
-            </li>
-            <li>обмежити обробку або заперечити проти неї;</li>
-            <li>відкликати раніше надану згоду;</li>
-            <li>подати скаргу до наглядового органу із захисту даних.</li>
+            <li>{t.section7Item1}</li>
+            <li>{t.section7Item2}</li>
+            <li>{t.section7Item3}</li>
+            <li>{t.section7Item4}</li>
+            <li>{t.section7Item5}</li>
+            <li>{t.section7Item6}</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            8. Діти
+            {t.section8Title}
           </h2>
-          <p>
-            Платформа не призначена для осіб віком до 18 років. Ми свідомо не
-            збираємо дані неповнолітніх. Якщо ви вважаєте, що неповнолітній надав
-            нам свої дані, зверніться до нас для їх видалення.
-          </p>
+          <p>{t.section8Body}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            9. Зміни до Політики
+            {t.section9Title}
           </h2>
-          <p>
-            Ми можемо періодично оновлювати цю Політику конфіденційності.
-            Актуальна версія завжди доступна на цій сторінці із зазначенням дати
-            останнього оновлення. Продовжуючи користуватися Платформою після
-            внесення змін, ви приймаєте оновлену Політику.
-          </p>
+          <p>{t.section9Body}</p>
         </section>
 
         <section>
           <h2 className="text-xl md:text-2xl font-semibold text-[#D2D2FF] mb-3">
-            10. Контакти
+            {t.section10Title}
           </h2>
           <p>
-            З питань щодо обробки персональних даних або реалізації ваших прав ви
-            можете звернутися до нас за адресою:{' '}
+            {t.section10Body}{' '}
             <a
               href="mailto:support@pantheonx.club"
               className="text-[#6A56E4] hover:underline"

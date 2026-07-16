@@ -6,6 +6,8 @@ import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscri
 import MyCabinetBreadCrump from '../myCabinet/studyPlatform/components/BreadCrump'
 import MonthSubscriptions from './components/MonthSubscription'
 import YearSubscriptions from './components/YearSubscriptions'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const PaywallPage = () => {
 	const router = useRouter()
@@ -14,6 +16,7 @@ const PaywallPage = () => {
 		isLoading,
 		error,
 	} = useGetUserSubscriptions()
+	const { t } = useCustomTranslations(TKeys.paywall)
 
 	useEffect(() => {
 		if (!isLoading && subscriptionsData?.has_active_subscription) {
@@ -29,23 +32,23 @@ const PaywallPage = () => {
 		<div className='w-full mb-5'>
 			<div className='max-w-8xl mx-auto px-4 md:px-6'>
 				<div className='mt-6'>
-					<MyCabinetBreadCrump currentPageTitle='Придбати підписку' />
+					<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 				</div>
 
 				<div className='mt-6 mx-auto'>
 					<h6 className='text-white text-2xl md:text-4xl font-bold mx-auto text-center lg:text-left'>
-						Придбати підписку
+						{t.title}
 					</h6>
 				</div>
 				<div className='border-2 border-[#D2D2FF] rounded-[48px] bg-[#2424336B] mt-20 py-6 pl-4 pr-6 items-center w-full text-white gap-6 relative hidden lg:flex'>
 					<div className='flex flex-col items-start justify-center gap-[36px] flex-1 mt-[42px]'>
-						<div className='ml-6 font-medium'>Модулі</div>
-						<div className='ml-6 font-medium'>Воркбук</div>
-						<div className='ml-6 font-medium'>Воркшопи</div>
-						<div className='ml-6 font-medium'>Аі-агенти</div>
-						<div className='ml-6 font-medium'>Скрінер</div>
-						<div className='ml-6 font-medium'>Авторські індекатори</div>
-						<div className='ml-6 font-medium'>Блог</div>
+						<div className='ml-6 font-medium'>{t.featureModules}</div>
+						<div className='ml-6 font-medium'>{t.featureWorkbook}</div>
+						<div className='ml-6 font-medium'>{t.featureWorkshops}</div>
+						<div className='ml-6 font-medium'>{t.featureAiAgents}</div>
+						<div className='ml-6 font-medium'>{t.featureScreener}</div>
+						<div className='ml-6 font-medium'>{t.featureIndicators}</div>
+						<div className='ml-6 font-medium'>{t.featureBlog}</div>
 					</div>
 					{/* <MonthSubscriptions /> */}
 					<div className='flex flex-col gap-[58px] mt-[48px] absolute w-auto left-[15px] right-[40px]'>

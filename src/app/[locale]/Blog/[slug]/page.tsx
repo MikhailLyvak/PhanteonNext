@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import BlogDetail from './components/BlogDetails'
 import { BlogDetail as BlogDetailsType } from '@/api/Blog/getBlogDetail'
+import { getCustomTranslations } from '@/lib/contexts/translations/translations-server'
+import { TKeys } from '@/i18n/t-keys'
 
 async function getBlogForMeta(slug: string): Promise<BlogDetailsType | null> {
 	try {
@@ -24,12 +26,13 @@ export async function generateMetadata({
 	params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
 	const { locale, slug } = await params
+	const { t } = await getCustomTranslations(TKeys.blog, locale)
 	const blog = await getBlogForMeta(slug)
 
 	if (!blog) {
 		return {
-			title: 'Блог не знайдено',
-			description: 'Ця стаття блогу не знайдена або була видалена.',
+			title: t.notFound,
+			description: t.notFoundDesc,
 		}
 	}
 
