@@ -46,7 +46,7 @@ const BalanceCard = () => {
 					className='inline-flex items-center gap-2 rounded-3xl bg-[#6A56E4] px-5 py-2.5 text-sm font-medium text-white transition hover:shadow-xl'
 				>
 					<Plus className='h-4 w-4' />
-					{t.deposit_action}
+					{t.depositAction}
 				</button>
 			</div>
 			<DepositModal open={open} onClose={() => setOpen(false)} />

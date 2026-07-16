@@ -694,7 +694,8 @@
     "connectTelegram": "Connect Telegram",
     "checkConnection": "Check connection",
     "checkingConnection": "Checking…",
-    "createRobotError": "Failed to create robot. Please try again.",
+    "createRobotError": "Failed to create robot: {detail}",
+    "createRobotErrorGeneric": "Failed to create robot",
     "createRobot": "Create robot",
     "instructions": "Instructions",
     "apiData": "API Data",
@@ -715,7 +716,7 @@
     "apiKeyRequired": "API key is required",
     "secretKeyRequired": "Secret key is required",
     "platformBalance": "Platform Balance",
-    "deposit_action": "Deposit",
+    "depositAction": "Deposit",
     "depositTitle": "Deposit",
     "depositDesc": "Send USDT to your deposit address",
     "closeLabel": "Close",
@@ -731,7 +732,7 @@
     "walletPendingDesc": "This may take a minute. Click Refresh to check status.",
     "walletFailedDesc": "The server did not return an address. Please try again or contact support.",
     "refresh": "Refresh",
-    "instructions_bybit": [
+    "instructionsBybit": [
       {
         "title": "Step 1: Open the account menu",
         "description": "Log in to Bybit. In the upper right, click the profile icon and select «API» from the dropdown menu, as shown in the image.",
@@ -763,7 +764,7 @@
         "image": "/wiki/save-api-keys.png"
       }
     ],
-    "instructions_binance": [
+    "instructionsBinance": [
       {
         "title": "Step 1: Open the account menu",
         "description": "Log in to Binance. In the upper right, click the profile icon and select «Account» from the dropdown menu, as shown in the image.",
@@ -800,7 +801,7 @@
         "image": "/wiki/save-api-keys.png"
       }
     ],
-    "instructions_bingx": [
+    "instructionsBingx": [
       {
         "title": "Step 1: Open API management",
         "description": "Log in to BingX. In the upper right corner, click the profile icon and select «API Management» from the dropdown menu.",

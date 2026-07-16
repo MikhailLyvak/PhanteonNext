@@ -22,9 +22,9 @@ import { TKeys } from '@/i18n/t-keys'
 type InstructionStep = { title: string; description: string; image: string }
 
 const EXCHANGE_KEY: Record<SupportedExchange, string> = {
-  BYBIT: 'instructions_bybit',
-  BINANCE: 'instructions_binance',
-  BINGX: 'instructions_bingx',
+  BYBIT: 'instructionsBybit',
+  BINANCE: 'instructionsBinance',
+  BINGX: 'instructionsBingx',
 }
 
 type FormValues = {
@@ -38,6 +38,10 @@ export default function ApiCreationForm() {
   const { t } = useCustomTranslations(TKeys.tradingBots)
   const messages = useMessages()
 
+  // useMessages() is used here because the typed TKeys wrapper cannot express
+  // array-valued translation keys — only scalar strings and ICU callables are
+  // generated. The ?? [] guard ensures a missing key renders no steps rather
+  // than throwing.
   const getInstructions = (exchange: SupportedExchange): InstructionStep[] => {
     const tb = (messages as Record<string, unknown>)['tradingBots'] as Record<string, unknown>
     return (tb?.[EXCHANGE_KEY[exchange]] as InstructionStep[]) ?? []

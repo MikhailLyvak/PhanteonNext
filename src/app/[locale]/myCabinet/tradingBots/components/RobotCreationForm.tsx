@@ -418,8 +418,9 @@ export default function RobotCreationForm({
 
         {createRobotMutation.error && (
           <p className="text-red-500 text-sm mt-4">
-            {createRobotMutation.error.message ||
-              t.createRobotError}
+            {createRobotMutation.error.message
+              ? t.createRobotError({ detail: createRobotMutation.error.message })
+              : t.createRobotErrorGeneric}
           </p>
         )}
 

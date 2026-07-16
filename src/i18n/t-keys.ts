@@ -738,7 +738,8 @@ export interface MessageShapes {
 		connectTelegram: string
 		checkConnection: string
 		checkingConnection: string
-		createRobotError: string
+		createRobotError: (values: TranslationValues) => string
+		createRobotErrorGeneric: string
 		createRobot: string
 		instructions: string
 		apiData: string
@@ -759,7 +760,7 @@ export interface MessageShapes {
 		apiKeyRequired: string
 		secretKeyRequired: string
 		platformBalance: string
-		deposit_action: string
+		depositAction: string
 		depositTitle: string
 		depositDesc: string
 		closeLabel: string
@@ -775,7 +776,7 @@ export interface MessageShapes {
 		walletPendingDesc: string
 		walletFailedDesc: string
 		refresh: string
-		instructions_bybit: {
+		instructionsBybit: {
 			'0': {
 				title: string
 				description: string
@@ -807,7 +808,7 @@ export interface MessageShapes {
 				image: string
 			}
 		}
-		instructions_binance: {
+		instructionsBinance: {
 			'0': {
 				title: string
 				description: string
@@ -844,7 +845,7 @@ export interface MessageShapes {
 				image: string
 			}
 		}
-		instructions_bingx: {
+		instructionsBingx: {
 			'0': {
 				title: string
 				description: string

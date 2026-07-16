@@ -694,7 +694,8 @@
     "connectTelegram": "Підключити Telegram",
     "checkConnection": "Перевірити підключення",
     "checkingConnection": "Перевіряємо…",
-    "createRobotError": "Не вдалося створити робота. Спробуйте ще раз.",
+    "createRobotError": "Не вдалося створити робота: {detail}",
+    "createRobotErrorGeneric": "Не вдалося створити робота",
     "createRobot": "Створити робота",
     "instructions": "Інструкції",
     "apiData": "Дані API",
@@ -715,7 +716,7 @@
     "apiKeyRequired": "API ключ обов'язковий",
     "secretKeyRequired": "Секретний ключ обов'язковий",
     "platformBalance": "Баланс платформи",
-    "deposit_action": "Поповнити",
+    "depositAction": "Поповнити",
     "depositTitle": "Депозит",
     "depositDesc": "Надішліть USDT на свою депозитну адресу",
     "closeLabel": "Закрити",
@@ -731,7 +732,7 @@
     "walletPendingDesc": "Це може зайняти хвилину. Натисніть \"Оновити\", щоб перевірити статус.",
     "walletFailedDesc": "Сервер не повернув адресу. Спробуйте ще раз або зверніться до підтримки.",
     "refresh": "Оновити",
-    "instructions_bybit": [
+    "instructionsBybit": [
       {
         "title": "Крок 1: Відкрийте меню акаунта",
         "description": "Авторизуйтесь на біржі Bybit. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «API». Як показано на зображенні.",
@@ -763,7 +764,7 @@
         "image": "/wiki/save-api-keys.png"
       }
     ],
-    "instructions_binance": [
+    "instructionsBinance": [
       {
         "title": "Крок 1: Відкрийте меню акаунта",
         "description": "Авторизуйтесь на біржі Binance. Справа вгорі натисніть на іконку профілю та у випадаючому меню на поле «Акаунт». Як показано на зображенні.",
@@ -800,7 +801,7 @@
         "image": "/wiki/save-api-keys.png"
       }
     ],
-    "instructions_bingx": [
+    "instructionsBingx": [
       {
         "title": "Крок 1: Відкрийте керування API",
         "description": "Увійдіть на BingX. У правому верхньому куті натисніть на іконку профілю та у випадаючому меню оберіть «Керування API».",
