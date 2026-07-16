@@ -4,6 +4,7 @@ import axiosClient from '@/interceptor/axiosClient'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useState } from 'react'
+import { useFormatter } from 'next-intl'
 import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
 import { TKeys } from '@/i18n/t-keys'
 
@@ -19,6 +20,7 @@ const BlogComments = ({ blog, onRefresh }: BlogCommentsProps) => {
 	const { toggleModal } = useAuthModalStore()
 	const [comment, setComment] = useState('')
 	const { t } = useCustomTranslations(TKeys.blog)
+	const format = useFormatter()
 
 	const requireAuth = () => {
 		if (!user) {
@@ -59,7 +61,7 @@ const BlogComments = ({ blog, onRefresh }: BlogCommentsProps) => {
 				{blog.comments.map(c => (
 					<div key={c.id} className='bg-[#242433] rounded-lg p-3'>
 						<div className='text-sm text-[#9ea0c7]'>
-							{c.user_name} • {new Date(c.created_at).toLocaleString('uk-UA')}
+							{c.user_name} • {format.dateTime(new Date(c.created_at), { dateStyle: 'short', timeStyle: 'short' })}
 						</div>
 						<div className='mt-1'>{c.content}</div>
 					</div>

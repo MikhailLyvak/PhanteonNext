@@ -1,5 +1,6 @@
 'use client'
 import { Link } from '@/i18n/navigation'
+import { useFormatter } from 'next-intl'
 import { useGetBlogs } from '@/hooks/Blog/useGetBlogs'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
@@ -9,6 +10,7 @@ export default function BlogListPage() {
 	const { data, isLoading } = useGetBlogs()
 	const user = useUserStore(state => state.user)
 	const { t } = useCustomTranslations(TKeys.blog)
+	const format = useFormatter()
 
 	return (
 		<div className='max-w-6xl mx-auto px-4 py-10 text-white'>
@@ -34,7 +36,7 @@ export default function BlogListPage() {
 						<div className='p-4'>
 							<div className='text-xl font-semibold mb-2'>{post.title}</div>
 							<div className='text-sm text-[#9ea0c7]'>
-								{new Date(post.created_at).toLocaleDateString('uk-UA')}
+								{format.dateTime(new Date(post.created_at), { day: 'numeric', month: 'numeric', year: 'numeric' })}
 							</div>
 							<div className='mt-3 flex gap-4 text-lg'>
 								<span>👍 {post.reactions['👍']}</span>

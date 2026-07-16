@@ -5,6 +5,7 @@ import { useGetLastWebinar } from '@/hooks/Webinars/useGetLastWebinar';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import { Calendar, Clock, Play, ExternalLink } from 'lucide-react';
+import { useFormatter } from 'next-intl';
 import { useCustomTranslations } from '@/lib/contexts/translations/translations-context';
 import { TKeys } from '@/i18n/t-keys';
 
@@ -13,6 +14,7 @@ const LatestWebinar = () => {
   const { user } = useUserStore();
   const { toggleModal } = useAuthModalStore();
   const { t: tCommon } = useCustomTranslations(TKeys.common);
+  const format = useFormatter();
 
   const handleWatchClick = () => {
     if (!user) {
@@ -34,22 +36,11 @@ const LatestWebinar = () => {
     return null;
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('uk-UA', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (dateString: string) =>
+    format.dateTime(new Date(dateString), { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('uk-UA', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const formatTime = (dateString: string) =>
+    format.dateTime(new Date(dateString), { hour: '2-digit', minute: '2-digit' });
 
   return (
     <section className="py-16 bg-[#242433]">
