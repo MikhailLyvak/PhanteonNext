@@ -3,61 +3,25 @@
 import { CircleCheck } from "lucide-react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context';
+import { TKeys } from '@/i18n/t-keys';
 
 export default function TradingChats() {
+  const { t } = useCustomTranslations(TKeys.tradingChat);
   const features = [
-    {
-      id: 1,
-      text: "Жива торгівля та аналіз від нас з партнером (10+ років досвіду) та партнерів трейдерів і практиків",
-    },
-    {
-      id: 2,
-      text: "Розбір поточної ринкової ситуації без хайпу й емоцій",
-    },
-    {
-      id: 3,
-      text: "Інсайти по угодах, сценаріях і логіці дій",
-    },
-    {
-      id: 4,
-      text: "Навчання по актуальній торговій стратегії на 2026 (доступне тільки в чаті)",
-    },
-    {
-      id: 5,
-      text: "Можливість протестувати наш аналітичний скрінер першими",
-    },
+    { id: 1, text: t.feature1 },
+    { id: 2, text: t.feature2 },
+    { id: 3, text: t.feature3 },
+    { id: 4, text: t.feature4 },
+    { id: 5, text: t.feature5 },
   ];
   const results = [
-    {
-      id: 1,
-      text: "Менше невпевненості та метань від новин та чужих думок",
-      icon: "/TradingChat/save-money-white.png",
-    },
-    {
-      id: 2,
-      text: "Чіткіше розуміння, що відбувається на ринку зараз",
-      icon: "/TradingChat/save-money-white.png",
-    },
-    {
-      id: 3,
-      text: "Вміння бачити різні сценарії",
-      icon: "/TradingChat/save-money-white.png",
-    },
-    {
-      id: 4,
-      text: "Спокійніші рішення: коли діяти, коли чекати, коли не входити",
-      icon: "/TradingChat/save-money-white.png",
-    },
-    {
-      id: 5,
-      text: "Дисципліна в діях: менше імпульсивних угод, більше контрольованих кроків",
-      icon: "/TradingChat/save-money-white.png",
-    },
-    {
-      id: 6,
-      text: "Стабільніша система роботи: аналіз → план → дія → розбір",
-      icon: "/TradingChat/save-money-white.png",
-    },
+    { id: 1, text: t.result1, icon: "/TradingChat/save-money-white.png" },
+    { id: 2, text: t.result2, icon: "/TradingChat/save-money-white.png" },
+    { id: 3, text: t.result3, icon: "/TradingChat/save-money-white.png" },
+    { id: 4, text: t.result4, icon: "/TradingChat/save-money-white.png" },
+    { id: 5, text: t.result5, icon: "/TradingChat/save-money-white.png" },
+    { id: 6, text: t.result6, icon: "/TradingChat/save-money-white.png" },
   ];
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 text-white">
@@ -65,19 +29,17 @@ export default function TradingChats() {
         <div className="w-full md:w-[40%] mb-4 rounded-lg p-[1px] bg-gradient-to-r from-[#6b6f8a] to-[#554e8f]">
           <div className="h-full w-full rounded-lg bg-gradient-to-r from-[#25273c] to-[#554e8f] p-6">
             <p className="text-white font-semibold text-xs md:text-sm">
-              Для тих, хто вже в ринку — від Ігоря Пороха та команди
-              трейдерів-практиків сумарно 15+ років досвіду
+              {t.expertBadge}
             </p>
           </div>
         </div>
 
         <div className="text-3xl md:text-7xl font-black text-[#D2D2FF] font-sans leading-tight">
-          {`«Трейдинг-чат»`}
+          {t.title}
         </div>
 
         <div className="pt-6 w-full md:w-[80%] text-lg  md:text-3xl leading-snug">
-          Канал, де приймаються зважені, обгрунтовані на сценаріях і аналізі
-          рішення, а не на емоціях і новинах.
+          {t.subtitle}
         </div>
 
         {/* <div className='mt-8 mb-4 flex flex-wrap gap-6 text-xl font-bold text-[#C9A24D]'>
@@ -95,26 +57,20 @@ export default function TradingChats() {
         {/* Divider */}
         <div className="h-[1px] w-[50%] bg-white/10 my-6"></div>
 
-        <div className="text-lg md:text-2xl font-bold mb-4">Для тих, хто:</div>
+        <div className="text-lg md:text-2xl font-bold mb-4">{t.forWhoTitle}</div>
         <div className="mb-6">
           <ul className="flex flex-col gap-4">
             <li className="font-medium text-xs md:text-lg flex flex-row justify-start items-start gap-3">
               <CircleCheck className="w-6 h-6 text-gray-400 mt-1 flex-shrink-0" />
-              <p>
-                хоче бачити, як працюють практики: розбір ринку, сценарії,
-                рішення, ризик.
-              </p>
+              <p>{t.forWho1}</p>
             </li>
             <li className="font-medium text-xs md:text-lg flex flex-row justify-start items-start gap-3">
               <CircleCheck className="w-6 h-6 text-gray-400 mt-1 flex-shrink-0" />
-              <p>
-                знайомий зі спотом / ф’ючерсами / біржами / TradingView і хоче
-                більше ясності в діях.
-              </p>
+              <p>{t.forWho2}</p>
             </li>
             <li className="font-medium text-xs md:text-lg flex flex-row justify-start items-start gap-3">
               <CircleCheck className="w-6 h-6 text-gray-400 mt-1 flex-shrink-0" />
-              <p>будує зрозумілий процес: що робити, коли робити, і чому.</p>
+              <p>{t.forWho3}</p>
             </li>
           </ul>
         </div>
@@ -135,7 +91,7 @@ export default function TradingChats() {
               active:border-b-0 active:translate-y-[6px] active:shadow-none
             "
           >
-            ПОДАТИ ЗАЯВКУ
+            {t.applyButton}
           </Link>
 
           <Link
@@ -145,7 +101,7 @@ export default function TradingChats() {
             className="self-start flex-[1.5] py-6 bg-gradient-to-r from-[#6b6f8a] to-[#554e8f] rounded-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300"
           >
             <p className="text-white text-md md:text-2xl italic font-medium text-center leading-tight px-6">
-              Мислити, аналізувати, діяти
+              {t.tagline}
             </p>
           </Link>
         </div>
@@ -153,7 +109,7 @@ export default function TradingChats() {
       <div className="h-[1px] w-full bg-white/10 my-6"></div>
       <div className="max-w-6xl mx-auto px-4 py-10 text-white">
         <h3 className="text-left text-xl md:text-3xl font-bold mb-6">
-          Дізнайся, що буде в чаті:
+          {t.learnMoreTitle}
         </h3>
 
         <div className="w-full aspect-video rounded-lg overflow-hidden mb-8 shadow-lg bg-gray-900 border border-white/10">
@@ -161,7 +117,7 @@ export default function TradingChats() {
             width="100%"
             height="100%"
             src="https://www.youtube.com/embed/ymoKxCmpI5g"
-            title="Презентація чату"
+            title={t.chatPresentationTitle}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -178,7 +134,7 @@ export default function TradingChats() {
           hover:bg-[#FACC15] hover:-translate-y-[2px] hover:shadow-xl
           active:border-b-0 active:translate-y-[6px] active:shadow-none"
           >
-            Приєднатись до чату
+            {t.joinButton}
           </Link>
         </div>
       </div>
@@ -186,7 +142,7 @@ export default function TradingChats() {
       <div>
         <div className="max-w-6xl mx-auto px-4 py-10 text-white">
           <h2 className="text-xl md:text-3xl font-bold text-center mb-10">
-            Усередині чату буде:
+            {t.insideTitle}
           </h2>
 
           <div className="flex justify-center">
@@ -211,7 +167,7 @@ export default function TradingChats() {
       <div className="h-[1px] w-full bg-white/10 my-6"></div>
       <div className="max-w-6xl mx-auto px-4 py-10 text-white">
         <h2 className="text-lg md:text-3xl font-bold text-center mb-16">
-          Результат після перебування в чаті:
+          {t.resultsTitle}
         </h2>
         <div className="flex justify-center">
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-12 w-full">
@@ -253,7 +209,7 @@ export default function TradingChats() {
               active:border-b-0 active:translate-y-[6px] active:shadow-none
             "
         >
-          ПОДАТИ ЗАЯВКУ
+          {t.applyButton}
         </Link>
 
         <Link
@@ -263,7 +219,7 @@ export default function TradingChats() {
           className="self-start flex-[1.5] py-6 bg-gradient-to-r from-[#6b6f8a] to-[#554e8f] rounded-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300"
         >
           <p className="text-white text-md md:text-2xl italic font-medium text-center leading-tight px-6">
-            Чат підтримки
+            {t.supportChat}
           </p>
         </Link>
       </div>
