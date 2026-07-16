@@ -14,11 +14,25 @@ export const TKeys = {
 	common: 'common',
 	meta: 'meta',
 	notFound: 'notFound',
+	about: 'about',
+	privacy: 'privacy',
+	contacts: 'contacts',
+	webinars: 'webinars',
+	blog: 'blog',
+	paywall: 'paywall',
+	payments: 'payments',
+	cabinet: {
+		studyPlatform: 'cabinet.studyPlatform',
+	},
+	screener: 'screener',
+	aiAgent: 'aiAgent',
+	tradingChat: 'tradingChat',
 } as const
 
 export interface MessageShapes {
 	'common': {
 		loading: string
+		home: string
 	}
 	'meta': {
 		title: string
@@ -29,6 +43,317 @@ export interface MessageShapes {
 		description: string
 		goHome: string
 		myAccount: string
+	}
+	'about': {
+		home: string
+		breadcrumb: string
+		igorTitle: string
+		resultsTitle: string
+		top3Trader: string
+		top3TraderDesc: string
+		profit80: string
+		profit80Desc: string
+		marketplacePre: string
+		marketplace: string
+		marketplaceDesc: string
+		accuracy95: string
+		accuracy95Desc: string
+		missionText: string
+		workWithTitle: string
+		workWith1: string
+		workWith2: string
+		workWith3: string
+		dontKnowStart: string
+		aiHelp: string
+		goToInterview: string
+		eduardTitle: string
+		eduardPath1: string
+		eduardPath2: string
+		eduardRealityTitle: string
+		realityItem1: string
+		realityItem2: string
+		realityItem3: string
+		realityItem4: string
+		eduardNotGiveUp: string
+		eduardStudied: string
+		eduardNowStable: string
+		eduardFoundation1: string
+		eduardFoundation2: string
+		pantheonXTitle: string
+		pantheonXItem1: string
+		pantheonXItem2: string
+		pantheonXItem3: string
+		pantheonXItem4: string
+		finalCta1: string
+		finalCta2: string
+		finalCta3: string
+	}
+	'privacy': {
+		title: string
+		lastUpdated: string
+		intro: string
+		section1Title: string
+		section1Intro: string
+		section1Label1: string
+		section1Text1: string
+		section1Label2: string
+		section1Text2: string
+		section1Label3: string
+		section1Text3: string
+		section1Label4: string
+		section1Text4: string
+		section1Label5: string
+		section1Text5: string
+		section2Title: string
+		section2Intro: string
+		section2Item1: string
+		section2Item2: string
+		section2Item3: string
+		section2Item4: string
+		section2Item5: string
+		section2Item6: string
+		section3Title: string
+		section3Body: string
+		section4Title: string
+		section4Body: string
+		section5Title: string
+		section5Intro: string
+		section5Item1: string
+		section5Item2: string
+		section5Item3: string
+		section6Title: string
+		section6Body: string
+		section7Title: string
+		section7Intro: string
+		section7Item1: string
+		section7Item2: string
+		section7Item3: string
+		section7Item4: string
+		section7Item5: string
+		section7Item6: string
+		section8Title: string
+		section8Body: string
+		section9Title: string
+		section9Body: string
+		section10Title: string
+		section10Body: string
+	}
+	'contacts': {
+		breadcrumbTitle: string
+		title: string
+		addressLabel: string
+		address: string
+		phoneLabel: string
+		phone: string
+		hours: string
+		emailLabel: string
+		email: string
+		socialLabel: string
+		consultTitle: string
+		namePlaceholder: string
+		phonePlaceholder: string
+		emailPlaceholder: string
+		messagePlaceholder: string
+		submit: string
+		mapAlt: string
+	}
+	'webinars': {
+		loadingError: string
+		tryRefresh: string
+		noWebinars: string
+		title: string
+		subtitle: string
+	}
+	'blog': {
+		title: string
+		loading: string
+		notFound: string
+		notFoundDesc: string
+		commentsTitle: string
+		commentPlaceholder: string
+		send: string
+		mentorComment: string
+		bodyLabel: string
+		readMore: string
+	}
+	'paywall': {
+		breadcrumbTitle: string
+		title: string
+		featureModules: string
+		featureWorkbook: string
+		featureWorkshops: string
+		featureAiAgents: string
+		featureScreener: string
+		featureIndicators: string
+		featureBlog: string
+		oldPrice: string
+		price: string
+		priceUntil: string
+		sixMonths: string
+		oneYear: string
+		featureAll: string
+		featureIncluded: string
+		featureAllMeetings: string
+		featureUnlimitedRequests: string
+		featureUnlimited: string
+		featureBlogUnlim: string
+		purchase: string
+		paymentError: (values: TranslationValues) => string
+		gatewayError: (values: TranslationValues) => string
+		serverError: string
+		unexpectedError: string
+		noPaymentUrl: string
+		oldPriceMonth: string
+		priceMonth: string
+		oneMonth: string
+		threeMonths: string
+		featureForPay: string
+		featureMonthMeetings: string
+		featureLimitedRequests: string
+	}
+	'payments': {
+		verifyingPayment: string
+		autoRedirect: string
+		successTitle: string
+		errorTitle: string
+		pendingTitle: string
+		loadingTitle: string
+		defaultMessage: string
+		successActivated: string
+		goToSubscriptions: string
+		goToCourses: string
+		tryAgain: string
+		mySubscriptions: string
+		goToCabinet: string
+		goToPayment: string
+		myCabinet: string
+		contactSupport: string
+		pageLoading: string
+		pageLoadingDesc: string
+	}
+	'cabinet.studyPlatform': {
+		breadcrumbTitle: string
+		pageTitle: string
+		filterAll: string
+		filterMyCourses: string
+		findCourseAi: string
+		lectureCount: (values: TranslationValues) => string
+		moreDetails: string
+		loadingCourses: string
+		breadcrumbAcademy: string
+		breadcrumbCourse: string
+		goalLabel: string
+		learningProgress: string
+		purchased: string
+		courseCost: string
+		purchase: string
+		hasPromoCode: string
+		enterPromoCode: string
+		withoutPromoCode: string
+		back: string
+		closeLabel: string
+		enterPromoCodeTitle: string
+		promoPlaceholder: string
+		checkPromoCode: string
+		checking: string
+		changePromoCode: string
+		promoValid: (values: TranslationValues) => string
+		freeCourse: string
+		newPrice: string
+		getFree: string
+		proceedToPay: string
+		modulesList: string
+		courseAddedFree: string
+		promoInvalid: string
+		promoCheckError: string
+		lessonsCount: (values: TranslationValues) => string
+		videoTooltip: string
+		presentationTooltip: string
+		quizTooltip: string
+		breadcrumbLesson: string
+		lessonTopics: string
+		contentInDev: string
+		pdfMaterial: string
+		docMaterial: string
+		xlsxMaterial: string
+		download: string
+		completeWithQuiz: string
+		takeQuiz: string
+		breadcrumbQuiz: string
+		quizAlreadyPassed: string
+		quizPassedDesc: string
+		mentorComment: string
+		textAnswerPlaceholder: string
+		noQuestions: string
+		quizCompleted: string
+		finishQuiz: string
+		quizPassed: string
+		alreadyAttempted: string
+		quizError: string
+	}
+	'screener': {
+		title: string
+		terminal: string
+		backToScreener: string
+		pairNotFound: (values: TranslationValues) => string
+		loading: string
+		filters: {
+			searchPlaceholder: string
+		}
+		table: {
+			pair: string
+			priceAndChange: string
+			noPairs: string
+		}
+		feed: {
+			bigTrades: string
+			time: string
+			price: string
+			size: string
+			loadingTrades: string
+			noTrades: string
+			waitingVolumes: string
+		}
+	}
+	'aiAgent': {
+		greeting: string
+		breadcrumb: string
+		inputPlaceholder: string
+		deleteChat: string
+		limitError: string
+		requestError: (values: TranslationValues) => string
+		unexpectedError: string
+		deleteTitle: string
+		confirmYes: string
+		confirmNo: string
+	}
+	'tradingChat': {
+		expertBadge: string
+		title: string
+		subtitle: string
+		forWhoTitle: string
+		forWho1: string
+		forWho2: string
+		forWho3: string
+		applyButton: string
+		tagline: string
+		learnMoreTitle: string
+		chatPresentationTitle: string
+		joinButton: string
+		insideTitle: string
+		feature1: string
+		feature2: string
+		feature3: string
+		feature4: string
+		feature5: string
+		resultsTitle: string
+		result1: string
+		result2: string
+		result3: string
+		result4: string
+		result5: string
+		result6: string
+		supportChat: string
 	}
 }
 

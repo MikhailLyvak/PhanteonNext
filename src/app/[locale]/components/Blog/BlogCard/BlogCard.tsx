@@ -2,8 +2,11 @@ import React from "react";
 
 import "./BlogCard.scss";
 import Image from "next/image";
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const BlogCard = () => {
+  const { t } = useCustomTranslations(TKeys.blog)
   return (
     <article className="group h-full overflow-hidden rounded-3xl border-2 border-gray-200 border-opacity-60 transition-all ease-in-out duration-500 shadow-lg hover:shadow-2xl">
       <Image
@@ -15,7 +18,7 @@ const BlogCard = () => {
       />
 
       <span className="text-white text-xs font-semibold mt-[28px] ml-[16px] px-2.5 py-0.5 rounded-full bg-[#48B592]">
-        Тіло
+        {t.bodyLabel}
       </span>
       <div className="py-4 px-6">
         <p className="line-clamp-6 mb-3 ml-[-5px] cursor-pointer overflow-hidden leading-relaxed text-gray-500">
@@ -26,7 +29,7 @@ const BlogCard = () => {
       <div className="flex flex-wrap items-center justify-between px-6 pt-1 pb-4">
         <div className="mt-1">
           <button className="border-2 border-[#037F6A] text-[#037F6A] px-5 py-2 rounded-3xl flex items-center group-hover:border-black group-hover:text-black transition-all duration-300">
-            Читати ...
+            {t.readMore}
           </button>
         </div>
         <div className="flex flex-wrap text-sm text-gray-500">

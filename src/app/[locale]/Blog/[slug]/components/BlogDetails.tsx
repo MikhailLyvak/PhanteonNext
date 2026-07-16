@@ -2,6 +2,8 @@
 
 import { useGetBlogDetail } from '@/hooks/Blog/useGetBlogDetail'
 import BlogComments from './BlogComments'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 type Props = {
 	slug: string
@@ -9,11 +11,12 @@ type Props = {
 
 export default function BlogDetail({ slug }: Props) {
 	const { data, refetch } = useGetBlogDetail(slug)
+	const { t } = useCustomTranslations(TKeys.blog)
 
 	if (!data) {
 		return (
 			<div className='max-w-3xl mx-auto px-4 py-10 text-white'>
-				Завантаження...
+				{t.loading}
 			</div>
 		)
 	}
@@ -31,7 +34,7 @@ export default function BlogDetail({ slug }: Props) {
 			)}
 
 			<article
-				className='prose prose-invert max-w-none 
+				className='prose prose-invert max-w-none
           prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-400'
 				dangerouslySetInnerHTML={{ __html: data.content_html }}
 			/>

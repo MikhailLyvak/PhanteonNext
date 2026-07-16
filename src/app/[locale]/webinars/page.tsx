@@ -5,10 +5,13 @@ import { useUserStore } from '@/store/UserData/useUserStore';
 import { Triangle } from 'react-loader-spinner';
 import { useGetWebinarsList } from '@/hooks/Webinars/useGetWebinarsList';
 import WebinarCard from '../myCabinet/webinars/components/WebinarCard';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const WebinarsPage = () => {
   const { user } = useUserStore();
   const { data: webinars, isLoading, error } = useGetWebinarsList();
+  const { t } = useCustomTranslations(TKeys.webinars)
 
 
   if (isLoading) {
@@ -31,8 +34,8 @@ const WebinarsPage = () => {
     return (
       <div className="min-h-screen bg-[#171723] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-400 text-lg">Помилка завантаження вебінарів</p>
-          <p className="text-gray-400 mt-2">Спробуйте оновити сторінку</p>
+          <p className="text-red-400 text-lg">{t.loadingError}</p>
+          <p className="text-gray-400 mt-2">{t.tryRefresh}</p>
         </div>
       </div>
     );
@@ -42,7 +45,7 @@ const WebinarsPage = () => {
     return (
       <div className="min-h-screen bg-[#171723] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 text-lg">Наразі немає доступних вебінарів</p>
+          <p className="text-gray-400 text-lg">{t.noWebinars}</p>
         </div>
       </div>
     );
@@ -54,19 +57,19 @@ const WebinarsPage = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            Вебінари
+            {t.title}
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Дізнайтеся нове з наших експертних вебінарів та покращуйте свої знання
+            {t.subtitle}
           </p>
         </div>
 
                  {/* Webinars Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
            {webinars.map((webinar) => (
-             <WebinarCard 
-               key={webinar.id} 
-               webinar={webinar} 
+             <WebinarCard
+               key={webinar.id}
+               webinar={webinar}
                hasAccess={webinar.has_access}
                subscriptionTypes={webinar.subscription_types}
              />
