@@ -14,6 +14,14 @@ export const TKeys = {
 	common: 'common',
 	meta: 'meta',
 	notFound: 'notFound',
+	auth: {
+		login: 'auth.login',
+		register: 'auth.register',
+		forgotPassword: 'auth.forgotPassword',
+		resetPassword: 'auth.resetPassword',
+	},
+	validation: 'validation',
+	errors: 'errors',
 } as const
 
 export interface MessageShapes {
@@ -29,6 +37,80 @@ export interface MessageShapes {
 		description: string
 		goHome: string
 		myAccount: string
+	}
+	'auth.login': {
+		tabLabel: string
+		passwordPlaceholder: string
+		consent: string
+		submit: string
+		forgotPassword: string
+		screenerPromo: string
+		accountDeleted: string
+		passwordResetSuccess: string
+	}
+	'auth.register': {
+		tabLabel: string
+		screenerPromo: string
+		passwordPlaceholder: string
+		passwordRequirementsLabel: string
+		confirmPasswordPlaceholder: string
+		submit: string
+		consent: string
+		privacyPolicy: string
+		consentSuffix: string
+		errorGeneral: string
+		errorEmailExists: string
+		errorFieldBlank: string
+		errorFieldRequired: string
+		errorFieldMinChars: string
+	}
+	'auth.forgotPassword': {
+		title: string
+		instructions: string
+		backToLogin: string
+		description: string
+		submit: string
+		errorGeneral: string
+	}
+	'auth.resetPassword': {
+		title: string
+		validating: string
+		linkInvalid: string
+		requestNewLink: string
+		backToLogin: string
+		success: string
+		signIn: string
+		description: string
+		newPasswordPlaceholder: string
+		confirmPasswordPlaceholder: string
+		submit: string
+		errorGeneral: string
+		showPassword: string
+		hidePassword: string
+		serverErrorInvalidToken: string
+		serverErrorPasswordTooCommon: string
+	}
+	'validation': {
+		firstNameRequired: string
+		lastNameRequired: string
+		phoneInvalid: string
+		solanaInvalid: string
+		currentPasswordRequired: string
+		minChars: (values: TranslationValues) => string
+		passwordsMismatch: string
+		newPasswordMustDiffer: string
+		emailRequired: string
+		emailInvalid: string
+		passwordConfirmationRequired: string
+		passwordMin8: string
+		passwordNeedsUppercase: string
+		passwordNeedsLowercase: string
+		passwordNeedsDigit: string
+		repeatPassword: string
+	}
+	'errors': {
+		invalidCredentials: string
+		userNotActive: string
 	}
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useRouter } from '@/i18n/navigation'
 import { useParams } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
@@ -12,24 +12,9 @@ import { Eye, EyeOff } from 'lucide-react'
 
 import { confirmPasswordReset } from '@/api/Auth/getPasswordResetConfirm'
 import { setNewPassword } from '@/api/Auth/patchSetNewPassword'
-import { SetNewPasswordData, SetNewPasswordSchema } from '@/api/Auth/types'
-
-// Backend validation messages arrive in English; translate the known ones to
-// Ukrainian to match the rest of the UI. Unknown strings pass through as-is.
-const SERVER_MESSAGE_UK: Record<string, string> = {
-	'Invalid token': 'Посилання недійсне або застаріле',
-	'Token is invalid or expired': 'Посилання недійсне або застаріле',
-	'The reset link is invalid': 'Посилання недійсне або застаріле',
-	'This password is too common.': 'Пароль занадто простий',
-}
-
-const translateServerError = (msg: string): string => {
-	const trimmed = msg.trim()
-	if (SERVER_MESSAGE_UK[trimmed]) return SERVER_MESSAGE_UK[trimmed]
-	const minLen = trimmed.match(/at least (\d+) characters/i)
-	if (minLen) return `Мінімум ${minLen[1]} символів`
-	return msg
-}
+import { SetNewPasswordData, createSetNewPasswordSchema } from '@/api/Auth/types'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const pickFirst = (v: unknown): string | null =>
 	Array.isArray(v) ? String(v[0]) : typeof v === 'string' ? v : null
@@ -49,6 +34,7 @@ function PasswordInput({
 	placeholder: string
 }) {
 	const [show, setShow] = useState(false)
+	const { t: tAuth } = useCustomTranslations(TKeys.auth.resetPassword)
 	return (
 		<div className='mt-6'>
 			<div className='relative'>
@@ -62,7 +48,7 @@ function PasswordInput({
 				<button
 					type='button'
 					onClick={() => setShow(s => !s)}
-					aria-label={show ? 'Сховати пароль' : 'Показати пароль'}
+					aria-label={show ? tAuth.hidePassword : tAuth.showPassword}
 					className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
 				>
 					{show ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -80,6 +66,23 @@ export default function ResetPasswordPage() {
 	const [done, setDone] = useState(false)
 	const [formError, setFormError] = useState<string | null>(null)
 
+	const { t: tAuth } = useCustomTranslations(TKeys.auth.resetPassword)
+	const { t: tValidation } = useCustomTranslations(TKeys.validation)
+	const setNewPasswordSchema = useMemo(() => createSetNewPasswordSchema(tValidation), [tValidation])
+
+	const translateServerError = (msg: string): string => {
+		const trimmed = msg.trim()
+		if (trimmed === 'Invalid token' || trimmed === 'Token is invalid or expired' || trimmed === 'The reset link is invalid') {
+			return tAuth.serverErrorInvalidToken
+		}
+		if (trimmed === 'This password is too common.') {
+			return tAuth.serverErrorPasswordTooCommon
+		}
+		const minLen = trimmed.match(/at least (\d+) characters/i)
+		if (minLen) return tValidation.minChars({ count: Number(minLen[1]) })
+		return msg
+	}
+
 	// Step 2 — validate the link on page load.
 	const {
 		isPending: validating,
@@ -93,7 +96,7 @@ export default function ResetPasswordPage() {
 	})
 
 	const { control, handleSubmit, setError } = useForm<SetNewPasswordData>({
-		resolver: zodResolver(SetNewPasswordSchema),
+		resolver: zodResolver(setNewPasswordSchema),
 		defaultValues: { password: '', password_confirm: '' },
 	})
 
@@ -130,7 +133,7 @@ export default function ResetPasswordPage() {
 			if (general) {
 				setFormError(translateServerError(general))
 			} else if (!passwordMsg) {
-				setFormError('Не вдалося змінити пароль. Спробуйте пізніше.')
+				setFormError(tAuth.errorGeneral)
 			}
 		},
 	})
@@ -148,7 +151,7 @@ export default function ResetPasswordPage() {
 				className={cardClass}
 			>
 				<h1 className='text-xl sm:text-2xl font-bold text-[#D2D2FF] text-center'>
-					Новий пароль
+					{tAuth.title}
 				</h1>
 
 				{/* Validating the link */}
@@ -161,7 +164,7 @@ export default function ResetPasswordPage() {
 							color='#6A56E4'
 							ariaLabel='triangle-loading'
 						/>
-						<p className='text-sm text-[#98A0B3]'>Перевіряємо посилання…</p>
+						<p className='text-sm text-[#98A0B3]'>{tAuth.validating}</p>
 					</div>
 				)}
 
@@ -169,20 +172,19 @@ export default function ResetPasswordPage() {
 				{!validating && linkInvalid && (
 					<>
 						<p className='mt-6 text-sm text-[#98A0B3] text-center leading-relaxed'>
-							Посилання для скидання пароля недійсне або застаріло. Запитайте
-							нове посилання та спробуйте ще раз.
+							{tAuth.linkInvalid}
 						</p>
 						<Link
 							href='/forgotPassword'
 							className='mt-6 w-full block text-center bg-[#6A56E4] text-white p-3 rounded-3xl hover:shadow-xl'
 						>
-							Запитати нове посилання
+							{tAuth.requestNewLink}
 						</Link>
 						<Link
 							href='/login'
 							className='mt-4 block text-center text-sm text-[#D2D2FF] hover:underline'
 						>
-							Повернутись до входу
+							{tAuth.backToLogin}
 						</Link>
 					</>
 				)}
@@ -191,13 +193,13 @@ export default function ResetPasswordPage() {
 				{!validating && !linkInvalid && done && (
 					<>
 						<p className='mt-6 text-sm text-green-400 text-center leading-relaxed'>
-							Пароль успішно змінено. Перенаправляємо на сторінку входу…
+							{tAuth.success}
 						</p>
 						<Link
 							href='/login'
 							className='mt-6 w-full block text-center bg-[#6A56E4] text-white p-3 rounded-3xl hover:shadow-xl'
 						>
-							Увійти
+							{tAuth.signIn}
 						</Link>
 					</>
 				)}
@@ -206,7 +208,7 @@ export default function ResetPasswordPage() {
 				{!validating && !linkInvalid && !done && (
 					<>
 						<p className='mt-4 text-sm text-gray-400 text-center'>
-							Введіть новий пароль для вашого акаунта.
+							{tAuth.description}
 						</p>
 
 						<form onSubmit={handleSubmit(onSubmit)}>
@@ -217,7 +219,7 @@ export default function ResetPasswordPage() {
 									<PasswordInput
 										field={field}
 										error={fieldState.error?.message}
-										placeholder='Новий пароль'
+										placeholder={tAuth.newPasswordPlaceholder}
 									/>
 								)}
 							/>
@@ -228,7 +230,7 @@ export default function ResetPasswordPage() {
 									<PasswordInput
 										field={field}
 										error={fieldState.error?.message}
-										placeholder='Повторіть новий пароль'
+										placeholder={tAuth.confirmPasswordPlaceholder}
 									/>
 								)}
 							/>
@@ -247,7 +249,7 @@ export default function ResetPasswordPage() {
 										ariaLabel='triangle-loading'
 									/>
 								)}
-								Зберегти пароль
+								{tAuth.submit}
 							</button>
 
 							{formError && (
@@ -261,7 +263,7 @@ export default function ResetPasswordPage() {
 							href='/login'
 							className='mt-6 block text-center text-sm text-[#D2D2FF] hover:underline'
 						>
-							Повернутись до входу
+							{tAuth.backToLogin}
 						</Link>
 					</>
 				)}

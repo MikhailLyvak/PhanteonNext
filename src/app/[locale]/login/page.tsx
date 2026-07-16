@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import LoginModalFormComponent from '../components/Auth/components/Login'
 import Register from '../components/Auth/components/Register'
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 export default function LoginPage() {
 	const { activeTab, setActiveTab } = useAuthModalStore()
@@ -12,6 +14,9 @@ export default function LoginPage() {
 	// useSearchParams() Suspense requirement and any hydration mismatch.
 	const [accountDeleted, setAccountDeleted] = useState(false)
 	const [passwordReset, setPasswordReset] = useState(false)
+
+	const { t: tLogin } = useCustomTranslations(TKeys.auth.login)
+	const { t: tRegister } = useCustomTranslations(TKeys.auth.register)
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search)
@@ -23,20 +28,16 @@ export default function LoginPage() {
 		<div className='min-h-screen flex flex-col items-center justify-center bg-[#171723] gap-6'>
 			{accountDeleted && (
 				<p className='text-sm text-green-400 font-medium text-center max-w-[500px] bg-green-400/10 border border-green-400/30 rounded-xl px-4 py-3'>
-					Ваш акаунт видалено.
+					{tLogin.accountDeleted}
 				</p>
 			)}
 			{passwordReset && (
 				<p className='text-sm text-green-400 font-medium text-center max-w-[500px] bg-green-400/10 border border-green-400/30 rounded-xl px-4 py-3'>
-					Пароль успішно змінено. Увійдіть з новим паролем.
+					{tLogin.passwordResetSuccess}
 				</p>
 			)}
 			<p className='mt-6 text-lg text-[#fff] font-bold text-center max-w-[500px]'>
-				<span className='text-xl font-bold uppercase text-[#e0b75e]'>
-					Скрінер
-				</span>{' '}
-				- інструмент для системного аналізу ринку та відбору активів за заданими
-				параметрами. Доступний після реєстрації.
+				{tLogin.screenerPromo}
 			</p>
 			<motion.div
 				initial={{ opacity: 0, scale: 0.9 }}
@@ -52,7 +53,7 @@ export default function LoginPage() {
 						}`}
 						onClick={() => setActiveTab('login')}
 					>
-						Вхід
+						{tLogin.tabLabel}
 					</button>
 					<button
 						className={`text-lg pb-1 ${
@@ -62,7 +63,7 @@ export default function LoginPage() {
 						}`}
 						onClick={() => setActiveTab('register')}
 					>
-						Реєстрація
+						{tRegister.tabLabel}
 					</button>
 				</div>
 

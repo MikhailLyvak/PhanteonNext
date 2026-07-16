@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Controller, useForm, Control, FieldValues, Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Triangle } from 'react-loader-spinner'
@@ -18,13 +18,15 @@ import useChangeLogin from '@/hooks/Auth/useChangeLogin'
 import useDeleteAccount from '@/hooks/Auth/useDeleteAccount'
 import { useUserStore } from '@/store/UserData/useUserStore'
 import { useAlgonixSessionStore } from '@/store/TradingBots/useAlgonixSessionStore'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 import {
 	ChangePasswordData,
-	ChangePasswordSchema,
+	createChangePasswordSchema,
 	ChangeLoginData,
-	ChangeLoginSchema,
+	createChangeLoginSchema,
 	DeleteAccountData,
-	DeleteAccountSchema,
+	createDeleteAccountSchema,
 } from '@/api/Auth/types'
 
 // Pull a human-readable message out of a Django REST Framework error response,
@@ -158,6 +160,11 @@ const SettingsPage = () => {
 	const { clearUser } = useUserStore()
 	const { data: profile } = useGetMyProfileData()
 
+	const { t: tValidation } = useCustomTranslations(TKeys.validation)
+	const changePasswordSchema = useMemo(() => createChangePasswordSchema(tValidation), [tValidation])
+	const changeLoginSchema = useMemo(() => createChangeLoginSchema(tValidation), [tValidation])
+	const deleteAccountSchema = useMemo(() => createDeleteAccountSchema(tValidation), [tValidation])
+
 	// ── Change password ──────────────────────────────────────────────────────
 	const { mutate: changePassword, isPending: changingPassword } =
 		useChangePassword()
@@ -167,7 +174,7 @@ const SettingsPage = () => {
 	} | null>(null)
 
 	const passwordForm = useForm<ChangePasswordData>({
-		resolver: zodResolver(ChangePasswordSchema),
+		resolver: zodResolver(changePasswordSchema),
 		defaultValues: {
 			old_password: '',
 			new_password: '',
@@ -230,7 +237,7 @@ const SettingsPage = () => {
 	} | null>(null)
 
 	const loginForm = useForm<ChangeLoginData>({
-		resolver: zodResolver(ChangeLoginSchema),
+		resolver: zodResolver(changeLoginSchema),
 		defaultValues: { email: '', password: '' },
 		values: profile?.email
 			? { email: String(profile.email), password: '' }
@@ -259,7 +266,7 @@ const SettingsPage = () => {
 	const [deleteMsg, setDeleteMsg] = useState<string | null>(null)
 
 	const deleteForm = useForm<DeleteAccountData>({
-		resolver: zodResolver(DeleteAccountSchema),
+		resolver: zodResolver(deleteAccountSchema),
 		defaultValues: { password: '' },
 	})
 
@@ -419,7 +426,7 @@ const SettingsPage = () => {
 									Видалення акаунту
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
-									Це назавжди видалить ваш акаунт та всі пов’язані з ним дані. Дію
+									Це назавжди видалить ваш акаунт та всі пов'язані з ним дані. Дію
 									неможливо скасувати.
 								</p>
 
@@ -449,7 +456,7 @@ const SettingsPage = () => {
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
 									Цю дію <span className="font-semibold text-red-400">неможливо
-									скасувати</span>. Ваш акаунт і всі пов’язані з ним дані буде
+									скасувати</span>. Ваш акаунт і всі пов'язані з ним дані буде
 									видалено назавжди. Введіть поточний пароль, щоб підтвердити.
 								</p>
 
