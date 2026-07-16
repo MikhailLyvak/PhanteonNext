@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import AdaptiveButtons from "./AdaptiveButtons";
 import CryptoTicker from "./CryptoTicker"; // ✅ Import it

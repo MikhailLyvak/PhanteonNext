@@ -8,7 +8,7 @@
  * Click navigates to `?step=detail&robotId=…`.
  */
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Triangle } from 'react-loader-spinner'
 
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'

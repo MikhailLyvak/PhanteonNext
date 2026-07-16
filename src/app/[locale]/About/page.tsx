@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { setRequestLocale } from 'next-intl/server'
 
 export default async function About({ params }: { params: Promise<{ locale: string }> }) {
@@ -13,21 +13,21 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 					<nav className='flex items-center' aria-label='Breadcrumb'>
 						<ol className='inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse'>
 							<li>
-								<a
+								<Link
 									href='/'
 									className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 								>
 									Головна
-								</a>
+								</Link>
 							</li>
 							<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>•</li>
 							<li>
-								<a
+								<Link
 									href='/About'
 									className='text-xs sm:text-sm font-semibold md:ms-2 text-[#D2D2FF]'
 								>
 									Про нас
-								</a>
+								</Link>
 							</li>
 						</ol>
 					</nav>

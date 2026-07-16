@@ -6,7 +6,7 @@
  * robot. Local tab state — no URL coupling.
  */
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import useUserRobots from '@/hooks/TradingBots/useUserRobots'
 import useUserApis from '@/hooks/TradingBots/useUserApis'
 import RobotsList from './RobotsList'

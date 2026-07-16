@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react';
-import Link from 'next/link';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot, Radar } from "lucide-react";
-import { usePathname, useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/UserData/useUserStore";
 import { useAlgonixSessionStore } from "@/store/TradingBots/useAlgonixSessionStore";
 import { Cookies } from "react-cookie";

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Triangle } from 'react-loader-spinner'
 import { Pause, Square } from 'lucide-react'
 

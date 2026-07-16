@@ -3,7 +3,7 @@ import { LuCheck, LuPlus, LuLock } from 'react-icons/lu'
 import { FaPlus, FaMinus } from 'react-icons/fa6'
 import React from 'react'
 import IconWithToolTip from './components/IconWithToolTip'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 interface Props {
 	data: ModuleDetail

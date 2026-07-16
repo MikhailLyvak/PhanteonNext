@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Trash2 } from 'lucide-react'
 import { Triangle } from 'react-loader-spinner'
 import useUserApis from '@/hooks/TradingBots/useUserApis'

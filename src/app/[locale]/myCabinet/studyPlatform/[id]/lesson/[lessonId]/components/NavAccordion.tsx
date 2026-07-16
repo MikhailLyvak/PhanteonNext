@@ -1,5 +1,5 @@
 import { NavModule } from '@/api/StudyPlatform/types'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useParams } from 'next/navigation'
 import React, { useState } from 'react'
 import { LuCheck, LuLock } from 'react-icons/lu'

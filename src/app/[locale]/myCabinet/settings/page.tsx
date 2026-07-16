@@ -5,7 +5,7 @@ import { Controller, useForm, Control, FieldValues, Path } from 'react-hook-form
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Triangle } from 'react-loader-spinner'
 import Modal from 'react-modal'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Cookies } from 'react-cookie'
 import { useQueryClient } from '@tanstack/react-query'
 

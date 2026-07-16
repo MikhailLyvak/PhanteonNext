@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 
 interface BackButtonProps {
   /** Where to go on click. Defaults to the trading-bots landing. */

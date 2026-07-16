@@ -8,7 +8,7 @@ import { LuChevronLeft } from "react-icons/lu";
 import { useMainDrawerStore } from "@/store/Nav/useMainDrawerStore";
 import Image from "next/image";
 import LoginButton from "../LoginButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 
 const MainDrawer = () => {

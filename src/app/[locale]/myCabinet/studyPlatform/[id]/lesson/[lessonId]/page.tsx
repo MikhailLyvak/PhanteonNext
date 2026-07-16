@@ -6,7 +6,7 @@ import { LuArrowBigDown, LuChevronDown } from 'react-icons/lu'
 import React, { useState } from 'react'
 import NavAccordion from './components/NavAccordion'
 import VitalisGreenButton from '@components/Buttons/VitalisGreenButton'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 function getYouTubeId(url?: string): string {
@@ -41,34 +41,34 @@ const LessonDetail = () => {
 							<nav className='flex items-center' aria-label='Breadcrumb'>
 								<ol className='inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse'>
 									<li>
-										<a
+										<Link
 											href='/'
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
 											Головна
-										</a>
+										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
 										•
 									</li>
 									<li>
-										<a
+										<Link
 											href='/myCabinet/studyPlatform/'
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
 											Академія
-										</a>
+										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
 										•
 									</li>
 									<li>
-										<a
+										<Link
 											href={`/myCabinet/studyPlatform/${courseId}`}
 											className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 										>
 											Курс
-										</a>
+										</Link>
 									</li>
 									<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>
 										•

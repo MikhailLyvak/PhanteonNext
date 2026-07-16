@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { ChevronRight } from 'lucide-react'
 import { AssetPair, DashboardAssetData } from '@/lib/screener/types'
 import { formatPercent, formatPrice, formatUsdShort } from '@/lib/screener/format'

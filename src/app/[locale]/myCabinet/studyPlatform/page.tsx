@@ -5,7 +5,7 @@ import CourseList from './components/CourseList'
 import Sidebar from '../components/Sidebar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 const StudyPlatformPage = () => {
 	const [selectedPage, setSelectedPage] = useState<string>('all')

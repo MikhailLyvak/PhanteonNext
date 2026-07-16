@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions'
 import MyCabinetBreadCrump from '../myCabinet/studyPlatform/components/BreadCrump'
 import MonthSubscriptions from './components/MonthSubscription'

@@ -9,7 +9,7 @@ import { useUserStore } from "@/store/UserData/useUserStore";
 import { useAuthModalStore } from "@/store/AuthModal/useAuthModalStore";
 import { getProfile } from "@/api/Auth/getProfile";
 import { Triangle } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 const schema = z.object({
   email: z.string().min(1, "required field"),

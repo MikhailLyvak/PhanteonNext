@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscriptions';
 import { Triangle } from 'react-loader-spinner';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Calendar, CreditCard, Clock, CheckCircle } from 'lucide-react';
 
 const SubscriptionsPage = () => {
