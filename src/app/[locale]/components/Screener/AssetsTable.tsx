@@ -269,7 +269,7 @@ const AssetsTable: React.FC = () => {
 										role='separator'
 										aria-orientation='vertical'
 										aria-label={`Resize ${col.label} column`}
-										title='Drag to resize column'
+										title={t.tooltips.dragResizeColumn}
 										className='group absolute top-0 bottom-0 right-0 w-4 flex items-center justify-end cursor-col-resize touch-none z-10'
 									>
 										<div className='w-1 h-full bg-[#262b38] group-hover:bg-[#8AA6FF] transition-colors' />
@@ -280,7 +280,7 @@ const AssetsTable: React.FC = () => {
 								<button
 									onClick={() => setColumnsMenuOpen(v => !v)}
 									className='p-1 rounded hover:bg-[#2F2F40] text-[#98A0B3] hover:text-[#D2D2FF] transition-colors'
-									title='Toggle columns'
+									title={t.tooltips.toggleColumns}
 								>
 									<Columns3 size={14} />
 								</button>

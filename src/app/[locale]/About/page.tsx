@@ -9,6 +9,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 	const { locale } = await params
 	setRequestLocale(locale)
 	const { t } = await getCustomTranslations(TKeys.about)
+	const { t: tCommon } = await getCustomTranslations(TKeys.common, locale)
 	return (
 		<>
 			<div className='pb-20 max-w-[1320px] w-full mx-auto'>
@@ -20,7 +21,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 									href='/'
 									className='text-xs sm:text-sm font-normal hover:font-semibold text-[#D2D2FF]'
 								>
-									{t.home}
+									{tCommon.home}
 								</Link>
 							</li>
 							<li className='text-lg font-extrabold pl-1 text-[#D2D2FF]'>•</li>
@@ -53,8 +54,7 @@ export default async function About({ params }: { params: Promise<{ locale: stri
 							{t.igorTitle}
 						</h1>
 						<p className='text-white text-sm md:text-2xl mt-2'>
-							<span className='font-bold'>Я – Ігор Порох</span>, експерт із
-							фінансових ринків, трейдер і ментор із понад 10-річним досвідом.
+							{t.igorBio({ b: (chunks) => <span className='font-bold'>{chunks}</span> })}
 						</p>
 
 						<div className='bg-[#2A2A39] rounded-[15px] mt-6 p-5'>

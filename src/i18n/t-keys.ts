@@ -45,7 +45,6 @@ export interface MessageShapes {
 		myAccount: string
 	}
 	'about': {
-		home: string
 		breadcrumb: string
 		igorTitle: string
 		resultsTitle: string
@@ -87,6 +86,7 @@ export interface MessageShapes {
 		finalCta1: string
 		finalCta2: string
 		finalCta3: string
+		igorBio: (values: RichValues) => ReactNode
 	}
 	'privacy': {
 		title: string
@@ -210,6 +210,8 @@ export interface MessageShapes {
 		featureForPay: string
 		featureMonthMeetings: string
 		featureLimitedRequests: string
+		validationFallback: string
+		gatewayFallback: string
 	}
 	'payments': {
 		verifyingPayment: string
@@ -316,6 +318,13 @@ export interface MessageShapes {
 			loadingTrades: string
 			noTrades: string
 			waitingVolumes: string
+		}
+		tooltips: {
+			dragResizeColumn: string
+			toggleColumns: string
+			dragResizeChart: string
+			dragResizeChartWidth: string
+			toggleIndicator: (values: TranslationValues) => string
 		}
 	}
 	'aiAgent': {

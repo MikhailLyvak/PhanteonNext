@@ -45,13 +45,13 @@ const YearSubscriptions = () => {
 					// Обробляємо різні типи помилок
 					if (error.response?.status === 400) {
 						const errorDetail =
-							error.response.data?.detail || 'Помилка валідації даних'
+							error.response.data?.detail || t.validationFallback
 						alert(t.paymentError({ detail: errorDetail }))
 					} else if (error.response?.status === 500) {
 						alert(t.serverError)
 					} else if (error.response?.data?.error === 'Payment gateway error') {
 						const detail =
-							error.response.data.detail || 'Помилка платіжного шлюзу'
+							error.response.data.detail || t.gatewayFallback
 						alert(t.gatewayError({ detail }))
 					} else {
 						alert(t.unexpectedError)

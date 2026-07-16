@@ -14,7 +14,6 @@
 		"myAccount": "My Account"
 	},
 	"about": {
-		"home": "Home",
 		"breadcrumb": "About Us",
 		"igorTitle": "About Me",
 		"resultsTitle": "Results that speak for themselves:",
@@ -55,7 +54,8 @@
 		"pantheonXItem4": "breaking down market maker manipulations so you don't become their victim",
 		"finalCta1": "So, if you're tired of guessing —",
 		"finalCta2": "slow down and become part of PantheonX",
-		"finalCta3": "and let's finally trade with our heads, not our emotions"
+		"finalCta3": "and let's finally trade with our heads, not our emotions",
+		"igorBio": "<b>I am Ihor Porokh</b>, a financial-markets expert, trader and mentor with over 10 years of experience."
 	},
 	"privacy": {
 		"title": "Privacy Policy",
@@ -178,7 +178,9 @@
 		"threeMonths": "3 months",
 		"featureForPay": "Additional fee applies",
 		"featureMonthMeetings": "Monthly sessions + recordings of previous sessions",
-		"featureLimitedRequests": "Limited requests"
+		"featureLimitedRequests": "Limited requests",
+		"validationFallback": "Data validation error",
+		"gatewayFallback": "Payment gateway error"
 	},
 	"payments": {
 		"verifyingPayment": "Please wait, we are verifying your payment...",
@@ -287,6 +289,13 @@
 			"loadingTrades": "Loading trades…",
 			"noTrades": "No large trades yet",
 			"waitingVolumes": "Waiting for anomalous volume"
+		},
+		"tooltips": {
+			"dragResizeColumn": "Drag to resize column",
+			"toggleColumns": "Toggle columns",
+			"dragResizeChart": "Drag to resize chart",
+			"dragResizeChartWidth": "Drag to resize chart width",
+			"toggleIndicator": "Toggle {indicator}"
 		}
 	},
 	"aiAgent": {
