@@ -143,6 +143,7 @@ const SettingsPage = () => {
 
 	const { t: tValidation } = useCustomTranslations(TKeys.validation)
 	const { t: tErrors } = useCustomTranslations(TKeys.errors)
+	const { t: tSettings } = useCustomTranslations(TKeys.cabinet.settings)
 
 	// The backend returns validation messages in English; resolve the known ones
 	// through the errors/validation namespaces so they follow the active locale.
@@ -319,12 +320,12 @@ const SettingsPage = () => {
 			<div className="w-full">
 				<div className="max-w-8xl mx-auto px-4 md:px-6">
 					<div className="mt-6">
-						<MyCabinetBreadCrump currentPageTitle="Налаштування" />
+						<MyCabinetBreadCrump currentPageTitle={tSettings.breadcrumbTitle} />
 					</div>
 
 					<div className="mt-6">
 						<h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-							Особистий кабінет
+							{tSettings.pageTitle}
 						</h6>
 					</div>
 
@@ -337,28 +338,28 @@ const SettingsPage = () => {
 
 						<div className="flex flex-col w-full sm:ml-10">
 							<h6 className="text-[#D2D2FF] text-xl md:text-3xl font-bold">
-								Налаштування
+								{tSettings.sectionTitle}
 							</h6>
 
 							{/* Change password */}
-							<Card title="Зміна пароля">
+							<Card title={tSettings.changePassword}>
 								<form onSubmit={passwordForm.handleSubmit(onChangePassword)}>
 									<PasswordField
 										control={passwordForm.control}
 										name="old_password"
-										placeholder="Поточний пароль"
+										placeholder={tSettings.currentPasswordPlaceholder}
 									/>
 									<PasswordField
 										control={passwordForm.control}
 										name="new_password"
-										placeholder="Новий пароль"
+										placeholder={tSettings.newPasswordPlaceholder}
 									/>
 									<PasswordField
 										control={passwordForm.control}
 										name="new_password_confirm"
-										placeholder="Повторіть новий пароль"
+										placeholder={tSettings.confirmPasswordPlaceholder}
 									/>
-									<SubmitButton pending={changingPassword} label="Змінити пароль" />
+									<SubmitButton pending={changingPassword} label={tSettings.changePasswordBtn} />
 									{passwordMsg && (
 										<p
 											className={`mt-2 text-center text-sm ${
@@ -374,7 +375,7 @@ const SettingsPage = () => {
 							</Card>
 
 							{/* Change login (email) */}
-							<Card title="Зміна логіну (email)">
+							<Card title={tSettings.changeLogin}>
 								<form onSubmit={loginForm.handleSubmit(onChangeLogin)}>
 									<Controller
 										control={loginForm.control}
@@ -386,7 +387,7 @@ const SettingsPage = () => {
 													value={field.value ?? ''}
 													type="text"
 													inputMode="email"
-													placeholder="Новий email"
+													placeholder={tSettings.newEmailPlaceholder}
 													className="w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none"
 												/>
 												{fieldState.error && (
@@ -400,9 +401,9 @@ const SettingsPage = () => {
 									<PasswordField
 										control={loginForm.control}
 										name="password"
-										placeholder="Пароль для підтвердження"
+										placeholder={tSettings.passwordConfirmPlaceholder}
 									/>
-									<SubmitButton pending={changingLogin} label="Змінити email" />
+									<SubmitButton pending={changingLogin} label={tSettings.changeEmailBtn} />
 									{loginMsg && (
 										<p
 											className={`mt-2 text-center text-sm ${
@@ -420,11 +421,10 @@ const SettingsPage = () => {
 							{/* Danger zone — delete account */}
 							<div className="mt-[30px] p-6 bg-[#242433] rounded-2xl border border-red-500/40">
 								<h6 className="text-red-400 text-xl font-semibold">
-									Видалення акаунту
+									{tSettings.dangerZoneTitle}
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
-									Це назавжди видалить ваш акаунт та всі пов'язані з ним дані. Дію
-									неможливо скасувати.
+									{tSettings.dangerZoneDesc}
 								</p>
 
 								<button
@@ -436,7 +436,7 @@ const SettingsPage = () => {
 									}}
 									className="w-full mt-4 bg-red-600 text-white p-3 rounded-3xl hover:bg-red-700 transition-colors"
 								>
-									Видалити акаунт
+									{tSettings.deleteAccountBtn}
 								</button>
 							</div>
 
@@ -449,12 +449,10 @@ const SettingsPage = () => {
 								ariaHideApp={false}
 							>
 								<h6 className="text-red-400 text-xl font-semibold">
-									Видалити акаунт?
+									{tSettings.deleteModalTitle}
 								</h6>
 								<p className="text-[#98A0B3] text-sm mt-2">
-									Цю дію <span className="font-semibold text-red-400">неможливо
-									скасувати</span>. Ваш акаунт і всі пов'язані з ним дані буде
-									видалено назавжди. Введіть поточний пароль, щоб підтвердити.
+									{tSettings.deleteModalDesc}
 								</p>
 
 								<form
@@ -464,7 +462,7 @@ const SettingsPage = () => {
 									<PasswordField
 										control={deleteForm.control}
 										name="password"
-										placeholder="Введіть пароль для підтвердження"
+										placeholder={tSettings.deletePasswordPlaceholder}
 									/>
 									{deleteMsg && (
 										<p className="mt-2 text-sm text-red-500">{deleteMsg}</p>
@@ -476,7 +474,7 @@ const SettingsPage = () => {
 											disabled={deleting}
 											className="flex-1 bg-[#2F2F40] text-[#D2D2FF] p-3 rounded-3xl hover:bg-[#3a3a4d] transition-colors disabled:opacity-60"
 										>
-											Скасувати
+											{tSettings.cancelBtn}
 										</button>
 										<button
 											type="submit"
@@ -492,7 +490,7 @@ const SettingsPage = () => {
 													ariaLabel="triangle-loading"
 												/>
 											)}
-											Видалити назавжди
+											{tSettings.deleteForeverBtn}
 										</button>
 									</div>
 								</form>

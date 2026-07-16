@@ -3,6 +3,8 @@
 import React from 'react'
 import { X, User, Wallet } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface PersonalDataModalProps {
   isOpen: boolean
@@ -15,16 +17,18 @@ const PersonalDataModal: React.FC<PersonalDataModalProps> = ({
   onClose,
   missingFields
 }) => {
+  const { t } = useCustomTranslations(TKeys.cabinet.certificates)
+
   if (!isOpen) return null
 
   const getFieldName = (field: string): string => {
     switch (field) {
       case 'first_name':
-        return "Ім'я"
+        return t.fieldFirstName
       case 'last_name':
-        return 'Прізвище'
+        return t.fieldLastName
       case 'solana_wallet':
-        return 'Solana гаманець'
+        return t.fieldSolanaWallet
       default:
         return field
     }
@@ -48,7 +52,7 @@ const PersonalDataModal: React.FC<PersonalDataModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-[#D2D2FF] text-xl font-bold">
-            Заповніть персональні дані
+            {t.modalTitle}
           </h3>
           <button
             onClick={onClose}
@@ -62,9 +66,9 @@ const PersonalDataModal: React.FC<PersonalDataModalProps> = ({
         <div className="space-y-4">
           <div className="bg-[#1D1D2A] rounded-2xl p-4">
             <p className="text-white text-sm leading-relaxed mb-4">
-              Для отримання сертифікату необхідно заповнити наступні поля в розділі "Персональні дані":
+              {t.modalDesc}
             </p>
-            
+
             <div className="space-y-3">
               {missingFields.map((field) => (
                 <div key={field} className="flex items-center gap-3 p-3 bg-[#242433] rounded-lg">
@@ -84,11 +88,10 @@ const PersonalDataModal: React.FC<PersonalDataModalProps> = ({
               <Wallet size={20} className="text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
                 <h4 className="text-blue-400 font-semibold text-sm mb-1">
-                  Solana гаманець
+                  {t.solanaInfoTitle}
                 </h4>
                 <p className="text-white text-xs leading-relaxed">
-                  Введіть адресу вашого Solana гаманця для отримання NFT сертифікатів. 
-                  Це поле обов'язкове для випуску сертифікатів.
+                  {t.solanaInfoDesc}
                 </p>
               </div>
             </div>
@@ -101,14 +104,14 @@ const PersonalDataModal: React.FC<PersonalDataModalProps> = ({
             onClick={onClose}
             className="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-2xl font-semibold transition-colors"
           >
-            Скасувати
+            {t.cancel}
           </button>
           <Link
             href="/myCabinet/personalData"
             className="flex-1 px-4 py-3 bg-[#6A56E4] hover:bg-[#5A4BC4] text-white rounded-2xl font-semibold transition-colors text-center"
             onClick={onClose}
           >
-            Заповнити дані
+            {t.fillData}
           </Link>
         </div>
       </div>

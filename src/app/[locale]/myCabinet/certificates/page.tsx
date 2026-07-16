@@ -6,27 +6,30 @@ import CertificatesList from './components/CertificatesList';
 import MyCertificates from './components/MyCertificates';
 import Sidebar from '../components/Sidebar';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const CertificatesPage = () => {
 	const [activeTab, setActiveTab] = useState<'courses' | 'my-certificates'>('courses')
+	const { t } = useCustomTranslations(TKeys.cabinet.certificates)
 
 	return (
 		<ProtectedRoute>
 			<div className='w-full'>
 				<div className='max-w-8xl mx-auto px-4 md:px-6'>
-					{/* ✅ First Row: Breadcrumbs */}
+					{/* First Row: Breadcrumbs */}
 					<div className='mt-6'>
-						<MyCabinetBreadCrump currentPageTitle='Сертифікати' />
+						<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 					</div>
 
-					{/* ✅ Second Row: Page Title */}
+					{/* Second Row: Page Title */}
 					<div className='mt-6'>
 						<h6 className='text-[#D2D2FF] text-xl md:text-4xl font-bold'>
-							Особистий кабінет
+							{t.pageTitle}
 						</h6>
 					</div>
 
-					{/* ✅ Third Row: Sidebar + Certificates */}
+					{/* Third Row: Sidebar + Certificates */}
 					<div className="flex w-full mt-8">
 						{/* Sidebar - Fixed Width */}
 						<div className="hidden xl:block w-[312px] shrink-0 sticky top-[140px]">
@@ -47,7 +50,7 @@ const CertificatesPage = () => {
 											: 'text-gray-400 hover:text-white'
 									}`}
 								>
-									Курси
+									{t.tabCourses}
 								</button>
 								<button
 									onClick={() => setActiveTab('my-certificates')}
@@ -57,7 +60,7 @@ const CertificatesPage = () => {
 											: 'text-gray-400 hover:text-white'
 									}`}
 								>
-									Мої сертифікати
+									{t.tabMyCertificates}
 								</button>
 							</div>
 

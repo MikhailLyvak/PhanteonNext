@@ -7,9 +7,14 @@ import { useGetUserSubscriptions } from '@/hooks/Subscriptions/useGetUserSubscri
 import { Triangle } from 'react-loader-spinner';
 import { Link } from '@/i18n/navigation';
 import { Calendar, CreditCard, Clock, CheckCircle } from 'lucide-react';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
+import { useFormatter } from 'next-intl'
 
 const SubscriptionsPage = () => {
 	const { data: subscriptionsData, isLoading, error } = useGetUserSubscriptions();
+	const { t } = useCustomTranslations(TKeys.cabinet.subscriptions)
+	const format = useFormatter()
 
 	if (isLoading) {
 		return (
@@ -17,11 +22,11 @@ const SubscriptionsPage = () => {
 				<div className="w-full">
 					<div className="max-w-8xl mx-auto px-4 md:px-6">
 						<div className="mt-6">
-							<MyCabinetBreadCrump currentPageTitle="Керування підписками" />
+							<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 						</div>
 						<div className="mt-6">
 							<h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-								Особистий кабінет
+								{t.pageTitle}
 							</h6>
 						</div>
 						<div className="flex w-full mt-8">
@@ -52,11 +57,11 @@ const SubscriptionsPage = () => {
 				<div className="w-full">
 					<div className="max-w-8xl mx-auto px-4 md:px-6">
 						<div className="mt-6">
-							<MyCabinetBreadCrump currentPageTitle="Керування підписками" />
+							<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 						</div>
 						<div className="mt-6">
 							<h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-								Особистий кабінет
+								{t.pageTitle}
 							</h6>
 						</div>
 						<div className="flex w-full mt-8">
@@ -67,8 +72,8 @@ const SubscriptionsPage = () => {
 							</div>
 							<div className="flex flex-col w-full sm:ml-10 items-center justify-center h-64">
 								<div className="text-red-500 text-center">
-									<p className="text-xl mb-4">Помилка завантаження підписок</p>
-									<p className="text-sm">Спробуйте оновити сторінку або зверніться до підтримки</p>
+									<p className="text-xl mb-4">{t.loadError}</p>
+									<p className="text-sm">{t.loadErrorHint}</p>
 								</div>
 							</div>
 						</div>
@@ -84,13 +89,13 @@ const SubscriptionsPage = () => {
 				<div className="max-w-8xl mx-auto px-4 md:px-6">
 					{/* Breadcrumbs */}
 					<div className="mt-6">
-						<MyCabinetBreadCrump currentPageTitle="Керування підписками" />
+						<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 					</div>
 
 					{/* Page Title */}
 					<div className="mt-6">
 						<h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-							Особистий кабінет
+							{t.pageTitle}
 						</h6>
 					</div>
 
@@ -110,26 +115,26 @@ const SubscriptionsPage = () => {
 								<div className="bg-[#242433] rounded-2xl p-8 text-center">
 									<CreditCard size={64} className="mx-auto mb-6 text-[#D2D2FF]" />
 									<h3 className="text-2xl font-bold text-white mb-4">
-										У вас немає активних підписок
+										{t.noSubscriptionsTitle}
 									</h3>
 									<p className="text-[#58587B] mb-8 max-w-md mx-auto">
-										Отримайте доступ до всіх функцій платформи з нашими підписками
+										{t.noSubscriptionsDesc}
 									</p>
 									<Link
 										href="/paywall"
 										className="inline-flex items-center px-6 py-3 bg-[#D2D2FF] text-[#171723] font-semibold rounded-lg hover:bg-[#C0C0FF] transition-colors"
 									>
 										<CreditCard size={20} className="mr-2" />
-										Перейти до підписок
+										{t.goToPaywall}
 									</Link>
 								</div>
 							) : (
 								// Active subscriptions
 								<div className="space-y-6">
 									<h2 className="text-2xl font-bold text-white mb-6">
-										Ваші активні підписки
+										{t.activeSubscriptionsTitle}
 									</h2>
-									
+
 									{subscriptionsData.subscriptions.map((subscription) => (
 										<div
 											key={subscription.id}
@@ -145,7 +150,7 @@ const SubscriptionsPage = () => {
 															{subscription.subscription_name}
 														</h3>
 														<p className="text-[#58587B]">
-															{subscription.subscription_type === 'monthly' ? 'Місячна підписка' : 'Річна підписка'}
+															{subscription.subscription_type === 'monthly' ? t.monthly : t.yearly}
 														</p>
 													</div>
 												</div>
@@ -153,12 +158,12 @@ const SubscriptionsPage = () => {
 													{subscription.is_expired ? (
 														<div className="flex items-center text-red-500">
 															<Clock size={20} className="mr-2" />
-															<span className="font-semibold">Закінчилася</span>
+															<span className="font-semibold">{t.expired}</span>
 														</div>
 													) : (
 														<div className="flex items-center text-green-500">
 															<CheckCircle size={20} className="mr-2" />
-															<span className="font-semibold">Активна</span>
+															<span className="font-semibold">{t.active}</span>
 														</div>
 													)}
 												</div>
@@ -168,25 +173,25 @@ const SubscriptionsPage = () => {
 												<div className="flex items-center">
 													<Calendar size={20} className="text-[#D2D2FF] mr-3" />
 													<div>
-														<p className="text-sm text-[#58587B]">Дата початку</p>
+														<p className="text-sm text-[#58587B]">{t.startDate}</p>
 														<p className="text-white font-semibold">
-															{new Date(subscription.start_date).toLocaleDateString('uk-UA')}
+															{format.dateTime(new Date(subscription.start_date), { day: 'numeric', month: 'numeric', year: 'numeric' })}
 														</p>
 													</div>
 												</div>
 												<div className="flex items-center">
 													<Clock size={20} className="text-[#D2D2FF] mr-3" />
 													<div>
-														<p className="text-sm text-[#58587B]">Дата закінчення</p>
+														<p className="text-sm text-[#58587B]">{t.endDate}</p>
 														<p className="text-white font-semibold">
-															{new Date(subscription.end_date).toLocaleDateString('uk-UA')}
+															{format.dateTime(new Date(subscription.end_date), { day: 'numeric', month: 'numeric', year: 'numeric' })}
 														</p>
 													</div>
 												</div>
 												<div className="flex items-center">
 													<CreditCard size={20} className="text-[#D2D2FF] mr-3" />
 													<div>
-														<p className="text-sm text-[#58587B]">Сума оплати</p>
+														<p className="text-sm text-[#58587B]">{t.paymentAmount}</p>
 														<p className="text-white font-semibold">
 															${subscription.payment.price}
 														</p>
@@ -196,20 +201,20 @@ const SubscriptionsPage = () => {
 
 											<div className="flex items-center justify-between pt-4 border-t border-[#2F2F40]">
 												<div className="text-sm text-[#58587B]">
-													Тривалість: {subscription.payment.duration_months} місяців
+													{t.duration({ months: subscription.payment.duration_months })}
 												</div>
 												<div className="flex items-center gap-4">
 													<div className="text-sm text-[#58587B]">
-														Статус оплати: 
+														{t.paymentStatus}:{' '}
 														<span className={`ml-1 font-semibold ${
-															subscription.payment.status === 'SUCCESS' 
-																? 'text-green-500' 
+															subscription.payment.status === 'SUCCESS'
+																? 'text-green-500'
 																: subscription.payment.status === 'PENDING'
 																? 'text-yellow-500'
 																: 'text-red-500'
 														}`}>
-															{subscription.payment.status === 'SUCCESS' ? 'Оплачено' :
-															 subscription.payment.status === 'PENDING' ? 'Очікує' : 'Відхилено'}
+															{subscription.payment.status === 'SUCCESS' ? t.paid :
+															 subscription.payment.status === 'PENDING' ? t.pending : t.declined}
 														</span>
 													</div>
 													{subscription.can_renew && (
@@ -217,7 +222,7 @@ const SubscriptionsPage = () => {
 															href="/paywall"
 															className="px-4 py-2 bg-[#D2D2FF] text-[#171723] font-semibold rounded-lg hover:bg-[#C0C0FF] transition-colors text-sm"
 														>
-															Поновить підписку
+															{t.renewSubscription}
 														</Link>
 													)}
 												</div>
@@ -235,4 +240,3 @@ const SubscriptionsPage = () => {
 };
 
 export default SubscriptionsPage;
-

@@ -11,27 +11,30 @@ import {
 	Video,
 	Settings,
 } from 'lucide-react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 // Horizontal cabinet navigation rendered below xl, where the vertical Sidebar
 // is hidden. Without this the cabinet has no inner navigation on mobile/tablet
 // (see audit #4).
-const items = [
-	{ icon: User, text: 'Персональні дані', href: '/myCabinet/personalData' },
-	{ icon: GraduationCap, text: 'Академія', href: '/myCabinet/studyPlatform' },
-	{ icon: Award, text: 'Сертифікати', href: '/myCabinet/certificates' },
-	{ icon: CreditCard, text: 'Підписки', href: '/myCabinet/subscriptions' },
-	{ icon: Bot, text: 'Алготрейдинг', href: '/myCabinet/tradingBots' },
-	{ icon: Radar, text: 'Скрінер', href: '/myCabinet/screener' },
-	{ icon: Video, text: 'Вебінари', href: '/myCabinet/webinars' },
-	{ icon: Settings, text: 'Налаштування', href: '/myCabinet/settings' },
-]
-
 const MobileTabs = () => {
 	const pathname = usePathname() ?? ''
+	const { t } = useCustomTranslations(TKeys.cabinet.common)
+
+	const items = [
+		{ icon: User, text: t.personalData, href: '/myCabinet/personalData' },
+		{ icon: GraduationCap, text: t.academy, href: '/myCabinet/studyPlatform' },
+		{ icon: Award, text: t.certificates, href: '/myCabinet/certificates' },
+		{ icon: CreditCard, text: t.subscriptions, href: '/myCabinet/subscriptions' },
+		{ icon: Bot, text: t.algoTrading, href: '/myCabinet/tradingBots' },
+		{ icon: Radar, text: t.screener, href: '/myCabinet/screener' },
+		{ icon: Video, text: t.webinars, href: '/myCabinet/webinars' },
+		{ icon: Settings, text: t.settings, href: '/myCabinet/settings' },
+	]
 
 	return (
 		<nav
-			aria-label='Навігація кабінету'
+			aria-label={t.navigation}
 			className='xl:hidden -mx-4 md:-mx-6 px-4 md:px-6 overflow-x-auto'
 		>
 			<ul className='flex gap-2 py-2 min-w-max'>

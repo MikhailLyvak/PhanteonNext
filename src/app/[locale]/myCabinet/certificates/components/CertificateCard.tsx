@@ -11,6 +11,8 @@ import { useGenerateCertificate } from '@/hooks/Certificates/useGenerateCertific
 import LockIcon from './LockIcon'
 import CertificateIcon from './CertificateIcon'
 import PersonalDataModal from './PersonalDataModal'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 interface CertificateCardProps {
 	course: Course
@@ -23,6 +25,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 	const { canGetCertificate, missingFields } = useCheckPersonalData()
 	const { data: profileData } = useGetMyProfileData()
 	const generateCertificateMutation = useGenerateCertificate()
+	const { t } = useCustomTranslations(TKeys.cabinet.certificates)
 
 	const toggleModule = (moduleId: number) => {
 		setExpandedModules(prev => {
@@ -37,20 +40,17 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 	}
 
 	const handleGetCertificate = (moduleId: number) => {
-		// Перевіряємо чи заповнені персональні дані
 		if (!canGetCertificate) {
 			setShowPersonalDataModal(true)
 			return
 		}
 
-		// Знаходимо модуль для отримання деталей
 		const module = courseDetail?.modules.find(m => m.id === moduleId)
 		if (!module) {
 			console.error('Module not found')
 			return
 		}
 
-		// Генеруємо сертифікат
 		generateCertificateMutation.mutate({
 			course_id: course.id,
 			module_id: moduleId,
@@ -61,11 +61,9 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 		}, {
 			onSuccess: (data) => {
 				console.log('Certificate generated successfully:', data)
-				// Можна додати успішне повідомлення або перенаправлення
 			},
 			onError: (error) => {
 				console.error('Certificate generation failed:', error)
-				// Можна додати повідомлення про помилку
 			}
 		})
 	}
@@ -104,11 +102,11 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 						</h3>
 						{/* Course Access Indicator */}
 						<div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							course.mine 
-								? 'bg-green-600 text-white' 
+							course.mine
+								? 'bg-green-600 text-white'
 								: 'bg-gray-600 text-gray-300'
 						}`}>
-							{course.mine ? 'Придбано' : 'Не придбано'}
+							{course.mine ? t.purchased : t.notPurchased}
 						</div>
 					</div>
 					<p className="text-white text-sm mb-3 line-clamp-2">
@@ -120,7 +118,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 								<LuCheck size={14} />
 							</div>
 							<span className="text-[#D2D2FF] text-sm font-medium">
-								Курс пройдено на {course.course_progress}%
+								{t.courseProgress({ percent: course.course_progress })}
 							</span>
 						</div>
 					)}
@@ -131,7 +129,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 			{course.mine && (
 				<div className="mb-6">
 					<div className="flex justify-between items-center mb-2">
-						<span className="text-white text-sm font-medium">Загальний прогрес курсу</span>
+						<span className="text-white text-sm font-medium">{t.overallProgress}</span>
 						<span className="text-[#D2D2FF] text-sm font-bold">{course.course_progress}%</span>
 					</div>
 					<div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -146,13 +144,13 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 			{/* Modules */}
 			<div className="space-y-4">
 				<h4 className="text-[#D2D2FF] text-lg font-semibold mb-4">
-					Модулі курсу
+					{t.courseModules}
 				</h4>
 				{courseDetail.modules.map((module) => {
 					const isExpanded = expandedModules.has(module.id)
 					const isModuleCompleted = module.module_progress === 100
 					const isModuleAccessible = course.mine || module.lessons_list.some(lesson => lesson.is_free)
-					
+
 					return (
 						<div key={module.id} className="bg-[#1D1D2A] rounded-2xl p-4">
 							{/* Module Header */}
@@ -162,8 +160,8 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 							>
 								<div className="flex items-center gap-3 flex-1 min-w-0">
 									<div className={`w-6 h-6 flex items-center justify-center rounded-full ${
-										isModuleCompleted 
-											? 'bg-[#D2D2FF] text-[#242433]' 
+										isModuleCompleted
+											? 'bg-[#D2D2FF] text-[#242433]'
 											: isModuleAccessible
 												? 'border-gray-500 border-[1px] text-gray-500'
 												: 'bg-gray-600 text-gray-400'
@@ -177,21 +175,21 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 											</h5>
 											{/* Module Access Indicator */}
 											<div className={`px-2 py-1 rounded-full text-xs font-semibold ${
-												course.mine 
-													? 'bg-green-600 text-white' 
+												course.mine
+													? 'bg-green-600 text-white'
 													: isModuleAccessible
 														? 'bg-blue-600 text-white'
 														: 'bg-gray-600 text-gray-300'
 											}`}>
-												{course.mine ? 'Доступно' : isModuleAccessible ? 'Частково' : 'Заблоковано'}
+												{course.mine ? t.accessible : isModuleAccessible ? t.partial : t.locked}
 											</div>
 										</div>
 										<p className="text-white text-sm">
-											{module.lessons_count} лекцій
+											{module.lessons_count}
 										</p>
 									</div>
 								</div>
-								
+
 								<div className="flex items-center gap-3">
 									{/* Progress - Only show for accessible modules */}
 									{isModuleAccessible && (
@@ -207,7 +205,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 											</div>
 										</div>
 									)}
-									
+
 									{/* Expand/Collapse Button */}
 									<div className="w-8 h-8 flex items-center justify-center text-gray-400">
 										{isExpanded ? <FaMinus size={16} /> : <FaPlus size={16} />}
@@ -223,11 +221,11 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 											{module.description}
 										</p>
 									</div>
-									
+
 									{/* Lessons List */}
 									<div className="mb-4">
 										<h6 className="text-[#D2D2FF] text-sm font-semibold mb-3">
-											Уроки модуля:
+											{t.lessonsList}
 										</h6>
 										<div className="space-y-2">
 											{module.lessons_list.map((lesson, index) => {
@@ -235,8 +233,8 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 												return (
 													<div key={lesson.id} className="flex items-center gap-3 p-2 rounded-lg bg-[#242433]">
 														<div className={`w-5 h-5 flex items-center justify-center rounded-full ${
-															lesson.is_passed 
-																? 'bg-[#D2D2FF] text-[#242433]' 
+															lesson.is_passed
+																? 'bg-[#D2D2FF] text-[#242433]'
 																: isLessonAccessible
 																	? 'border-gray-500 border-[1px] text-gray-500'
 																	: 'bg-gray-600 text-gray-400'
@@ -251,20 +249,20 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 															</span>
 														</div>
 														<div className={`px-2 py-1 rounded-full text-xs font-semibold ${
-															lesson.is_free 
-																? 'bg-blue-600 text-white' 
+															lesson.is_free
+																? 'bg-blue-600 text-white'
 																: course.mine
 																	? 'bg-green-600 text-white'
 																	: 'bg-gray-600 text-gray-300'
 														}`}>
-															{lesson.is_free ? 'Безплатно' : course.mine ? 'Доступно' : 'Заблоковано'}
+															{lesson.is_free ? t.free : course.mine ? t.accessible : t.locked}
 														</div>
 													</div>
 												)
 											})}
 										</div>
 									</div>
-									
+
 									{/* Certificate Button */}
 									<div className="flex justify-end">
 										{isModuleCompleted && course.mine ? (
@@ -276,24 +274,24 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ course }) => {
 												{generateCertificateMutation.isPending ? (
 													<>
 														<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-														Генерація...
+														{t.generating}
 													</>
 												) : (
 													<>
 														<CertificateIcon size={18} />
-														Отримати сертифікат
+														{t.getCertificate}
 													</>
 												)}
 											</button>
 										) : !course.mine ? (
 											<div className="flex items-center gap-2 bg-gray-600 text-gray-400 px-6 py-3 rounded-2xl font-semibold cursor-not-allowed">
 												<LockIcon size={18} />
-												Придбайте курс
+												{t.buyCourse}
 											</div>
 										) : (
 											<div className="flex items-center gap-2 bg-gray-600 text-gray-400 px-6 py-3 rounded-2xl font-semibold cursor-not-allowed">
 												<LockIcon size={18} />
-												Завершіть модуль
+												{t.completeModule}
 											</div>
 										)}
 									</div>

@@ -4,9 +4,14 @@ import React from 'react'
 import { useGetCertificates } from '@/hooks/Certificates/useGetCertificates'
 import { Triangle } from 'react-loader-spinner'
 import { ExternalLink, Download, Eye } from 'lucide-react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
+import { useFormatter } from 'next-intl'
 
 const MyCertificates: React.FC = () => {
 	const { data: certificatesData, isLoading, error } = useGetCertificates()
+	const { t } = useCustomTranslations(TKeys.cabinet.certificates)
+	const format = useFormatter()
 
 	if (isLoading) {
 		return (
@@ -26,7 +31,7 @@ const MyCertificates: React.FC = () => {
 		return (
 			<div className="bg-red-600 bg-opacity-20 border border-red-600 rounded-2xl p-6">
 				<p className="text-red-400 text-center">
-					Помилка завантаження сертифікатів. Спробуйте пізніше.
+					{t.loadError}
 				</p>
 			</div>
 		)
@@ -41,10 +46,10 @@ const MyCertificates: React.FC = () => {
 					<Download size={32} className="text-gray-400" />
 				</div>
 				<h3 className="text-[#D2D2FF] text-xl font-semibold mb-2">
-					У вас поки немає сертифікатів
+					{t.noCertificatesTitle}
 				</h3>
 				<p className="text-gray-400 text-sm">
-					Завершіть модулі курсів, щоб отримати свої перші NFT сертифікати
+					{t.noCertificatesDesc}
 				</p>
 			</div>
 		)
@@ -54,7 +59,7 @@ const MyCertificates: React.FC = () => {
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h2 className="text-[#D2D2FF] text-2xl font-bold">
-					Мої сертифікати ({certificates.length})
+					{t.myCertificatesTitle({ count: certificates.length })}
 				</h2>
 			</div>
 
@@ -89,21 +94,21 @@ const MyCertificates: React.FC = () => {
 										</p>
 									</div>
 									<div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-										certificate.status === 'confirmed' 
+										certificate.status === 'confirmed'
 											? 'bg-green-600 text-white'
 											: certificate.status === 'issued'
 												? 'bg-blue-600 text-white'
 												: 'bg-yellow-600 text-white'
 									}`}>
-										{certificate.status === 'confirmed' ? 'Підтверджено' :
-										 certificate.status === 'issued' ? 'Видано' : 'В обробці'}
+										{certificate.status === 'confirmed' ? t.statusConfirmed :
+										 certificate.status === 'issued' ? t.statusIssued : t.statusPending}
 									</div>
 								</div>
 
 								<div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
 									<span>ID: {certificate.certificate_id}</span>
 									<span>•</span>
-									<span>{new Date(certificate.created_at).toLocaleDateString('uk-UA')}</span>
+									<span>{format.dateTime(new Date(certificate.created_at), { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
 									<span>•</span>
 									<span className="uppercase">{certificate.network}</span>
 								</div>
@@ -125,7 +130,7 @@ const MyCertificates: React.FC = () => {
 								className="flex items-center gap-2 px-4 py-2 bg-[#6A56E4] hover:bg-[#5A4BC4] text-white rounded-xl font-medium transition-colors"
 							>
 								<Eye size={16} />
-								Переглянути
+								{t.view}
 							</a>
 
 							{certificate.image_url && (
@@ -135,7 +140,7 @@ const MyCertificates: React.FC = () => {
 									className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors"
 								>
 									<Download size={16} />
-									Завантажити
+									{t.download}
 								</a>
 							)}
 
@@ -147,7 +152,7 @@ const MyCertificates: React.FC = () => {
 									className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors"
 								>
 									<ExternalLink size={16} />
-									Метадані
+									{t.metadata}
 								</a>
 							)}
 						</div>

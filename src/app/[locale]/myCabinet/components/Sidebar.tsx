@@ -6,12 +6,14 @@ import { User, Settings, LogOut, GraduationCap, Video, Award, CreditCard, Bot, R
 import { useUserStore } from "@/store/UserData/useUserStore";
 import { useAlgonixSessionStore } from "@/store/TradingBots/useAlgonixSessionStore";
 import { Cookies } from "react-cookie";
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { clearUser } = useUserStore();
-
+  const { t } = useCustomTranslations(TKeys.cabinet.common)
 
   const logout = () => {
     const cookies = new Cookies();
@@ -25,55 +27,55 @@ const Sidebar = () => {
     <div className="min-w-[312px] p-4 bg-[#242433] rounded-2xl flex flex-col gap-1">
       <NavItem
         icon={<User size={20} />}
-        text="Персональні дані"
+        text={t.personalData}
         href="/myCabinet/personalData"
         active={pathname === '/myCabinet/personalData'}
       />
       <NavItem
         icon={<GraduationCap size={20} />}
-        text="Академія"
+        text={t.academy}
         href="/myCabinet/studyPlatform"
         active={pathname === '/myCabinet/studyPlatform'}
       />
       <NavItem
         icon={<Award size={20} />}
-        text="Сертифікати"
+        text={t.certificates}
         href="/myCabinet/certificates"
         active={pathname === '/myCabinet/certificates'}
       />
       <NavItem
         icon={<CreditCard size={20} />}
-        text="Керування підписками"
+        text={t.subscriptions}
         href="/myCabinet/subscriptions"
         active={pathname === '/myCabinet/subscriptions'}
       />
       <NavItem
         icon={<Bot size={20} />}
-        text="Алготрейдинг"
+        text={t.algoTrading}
         href="/myCabinet/tradingBots"
         active={pathname === '/myCabinet/tradingBots'}
       />
       <NavItem
         icon={<Radar size={20} />}
-        text="Скрінер"
+        text={t.screener}
         href="/myCabinet/screener"
         active={pathname.includes('/myCabinet/screener')}
       />
       <NavItem
         icon={<Video size={20} />}
-        text="Вебінари"
+        text={t.webinars}
         href="/myCabinet/webinars"
         active={pathname.includes('/myCabinet/webinars')}
       />
       <NavItem
         icon={<Settings size={20} />}
-        text="Налаштування"
+        text={t.settings}
         href="/myCabinet/settings"
         active={pathname === '/myCabinet/settings'}
       />
       <LogoutNavItem
         icon={<LogOut size={20} />}
-        text="Вихід"
+        text={t.logout}
         onClick={logout}
       />
     </div>

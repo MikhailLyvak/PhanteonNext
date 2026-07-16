@@ -10,10 +10,13 @@ import usePutMyProfileData from '@/hooks/Auth/usePutMyProfileData'
 import { Triangle } from 'react-loader-spinner'
 import { ProfileUpdateData, ProfileUpdateSchema } from '@/api/Auth/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 const PersonalDataPage = () => {
 	const { data, isLoading, refetch } = useGetMyProfileData();
 	const { mutate: updateMyProfileData, isPending } = usePutMyProfileData();
+	const { t } = useCustomTranslations(TKeys.cabinet.personalData)
 
 	const { control, handleSubmit } = useForm<ProfileUpdateData>({
 		resolver: zodResolver(ProfileUpdateSchema),
@@ -45,19 +48,19 @@ const PersonalDataPage = () => {
 		<ProtectedRoute>
 			<div className="w-full">
 				<div className="max-w-8xl mx-auto px-4 md:px-6">
-					{/* ✅ First Row: Breadcrumbs */}
+					{/* First Row: Breadcrumbs */}
 					<div className="mt-6">
-						<MyCabinetBreadCrump currentPageTitle="Персональні дані" />
+						<MyCabinetBreadCrump currentPageTitle={t.breadcrumbTitle} />
 					</div>
 
-					{/* ✅ Second Row: Page Title */}
+					{/* Second Row: Page Title */}
 					<div className="mt-6">
 						<h6 className="text-[#D2D2FF] text-xl md:text-4xl font-bold">
-							Особистий кабінет
+							{t.pageTitle}
 						</h6>
 					</div>
 
-					{/* ✅ Third Row: Sidebar + Courses */}
+					{/* Third Row: Sidebar + Courses */}
 					<div className="flex w-full mt-8">
 						{/* Sidebar - Fixed Width */}
 						<div className="hidden xl:block w-[312px] shrink-0 sticky top-[140px]">
@@ -76,11 +79,11 @@ const PersonalDataPage = () => {
 						) : (
 							<div className="flex flex-col w-full sm:ml-10">
 								<h6 className="text-[#D2D2FF] text-xl md:text-3xl font-bold">
-									Персональні дані
+									{t.sectionTitle}
 								</h6>
 								<div className='mt-[30px] p-6 bg-[#242433] rounded-2xl'>
 									<h6 className='text-[#D2D2FF] text-xl font-semibold'>
-										Контактна інформація
+										{t.contactInfo}
 									</h6>
 									<form method='put'>
 										<Controller
@@ -92,7 +95,7 @@ const PersonalDataPage = () => {
 														{...field}
 														value={field.value ?? ''}
 														type='text'
-														placeholder="Ім'я"
+														placeholder={t.firstNamePlaceholder}
 														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 													/>
 													{fieldState.error && (
@@ -111,7 +114,7 @@ const PersonalDataPage = () => {
 														{...field}
 														value={field.value ?? ''}
 														type='text'
-														placeholder='Прізвище'
+														placeholder={t.lastNamePlaceholder}
 														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 													/>
 													{fieldState.error && (
@@ -131,7 +134,7 @@ const PersonalDataPage = () => {
 														value={field.value ?? ''}
 														type='text'
 														inputMode='tel'
-														placeholder='Телефон'
+														placeholder={t.phonePlaceholder}
 														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 													/>
 													{fieldState.error && (
@@ -150,14 +153,14 @@ const PersonalDataPage = () => {
 														{...field}
 														value={field.value ?? ''}
 														type='text'
-														placeholder='Solana гаманець (для отримання сертифікатів)'
+														placeholder={t.solanaPlaceholder}
 														className='w-full mt-4 p-3 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 													/>
 													{fieldState.error && (
 														<p className="text-red-500 text-sm">{fieldState.error.message}</p>
 													)}
 													<p className="text-gray-400 text-xs mt-1">
-														Введіть адресу вашого Solana гаманця для отримання NFT сертифікатів
+														{t.solanaHint}
 													</p>
 												</>
 											)}
@@ -178,7 +181,7 @@ const PersonalDataPage = () => {
 													ariaLabel="triangle-loading"
 												/>
 											)}
-											Зберегти
+											{t.save}
 										</button>
 									</form>
 								</div>

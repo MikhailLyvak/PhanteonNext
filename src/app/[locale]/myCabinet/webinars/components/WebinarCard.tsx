@@ -7,6 +7,9 @@ import { Cookies } from 'react-cookie';
 import { useUserStore } from '@/store/UserData/useUserStore';
 import { useAuthModalStore } from '@/store/AuthModal/useAuthModalStore';
 import axiosInterceptor from '@/interceptor/axiosClient';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
+import { useFormatter } from 'next-intl'
 
 interface WebinarCardProps {
   webinar: Webinar;
@@ -18,9 +21,12 @@ interface WebinarCardProps {
 const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, subscriptionTypes = [], purchaseStatus }) => {
   const { user } = useUserStore();
   const { toggleModal, setActiveTab } = useAuthModalStore();
+  const { t } = useCustomTranslations(TKeys.cabinet.webinars)
+  const format = useFormatter()
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('uk-UA', {
+    return format.dateTime(date, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -29,7 +35,7 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('uk-UA', {
+    return format.dateTime(date, {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -56,11 +62,11 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
           window.location.href = data.payment_url;
         } else {
           console.error('Purchase failed:', data);
-          alert('Помилка при створенні платежу: ' + (data?.error || 'Невідома помилка'));
+          alert(t.paymentError + ': ' + (data?.error || ''));
         }
       } catch (error: any) {
         console.error('Purchase error:', error);
-        const message = error?.response?.data?.error || 'Помилка при створенні платежу';
+        const message = error?.response?.data?.error || t.paymentError;
         alert(message);
       }
     }
@@ -71,30 +77,30 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
       await axiosInterceptor.post('/api/webinar/cancel-purchase/', {
         webinar_id: webinar.id,
       });
-      alert('Покупку скасовано успішно');
+      alert(t.cancelSuccess);
       window.location.reload();
     } catch (error: any) {
       console.error('Cancel error:', error);
-      const message = error?.response?.data?.error || 'Помилка при скасуванні покупки';
+      const message = error?.response?.data?.error || t.cancelError;
       alert(message);
     }
   };
 
   const getSubscriptionBadges = () => {
     if (hasAccess) return null;
-    
+
     const badges = [];
     if (subscriptionTypes.includes('monthly')) {
       badges.push(
         <span key="monthly" className="px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
-          Частина Місячної підписки
+          {t.monthlyBadge}
         </span>
       );
     }
     if (subscriptionTypes.includes('yearly')) {
       badges.push(
         <span key="yearly" className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-          Частина Річної підписки
+          {t.yearlyBadge}
         </span>
       );
     }
@@ -130,18 +136,18 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-              webinar.is_active 
-                ? 'bg-green-500/20 text-green-400' 
+              webinar.is_active
+                ? 'bg-green-500/20 text-green-400'
                 : 'bg-red-500/20 text-red-400'
             }`}>
-              {webinar.is_active ? 'Активний' : 'Неактивний'}
+              {webinar.is_active ? t.active : t.inactive}
             </div>
             {/* Subscription badges */}
             <div className="flex flex-wrap gap-1">
               {getSubscriptionBadges()}
             </div>
           </div>
-          
+
           <div className="flex gap-2">
             {purchaseStatus === 'PENDING' ? (
               <button
@@ -149,13 +155,13 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
                 className="flex items-center gap-2 px-4 py-2 bg-[#FFA500] text-white rounded-xl hover:bg-[#FF8C00] transition-colors duration-200 font-medium"
               >
                 <ShoppingCart size={16} />
-                Скасувати покупку
+                {t.cancelPurchase}
               </button>
             ) : (
               <button
                 onClick={handleWatchClick}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors duration-200 font-medium ${
-                  hasAccess 
+                  hasAccess
                     ? 'bg-[#D2D2FF] text-[#171723] hover:bg-[#B8B8FF]'
                     : 'bg-[#FF6B6B] text-white hover:bg-[#FF5252]'
                 }`}
@@ -163,12 +169,12 @@ const WebinarCard: React.FC<WebinarCardProps> = ({ webinar, hasAccess = false, s
                 {hasAccess ? (
                   <>
                     <ExternalLink size={16} />
-                    Дивитися
+                    {t.watch}
                   </>
                 ) : (
                   <>
                     <ShoppingCart size={16} />
-                    Придбати
+                    {t.buy}
                   </>
                 )}
               </button>

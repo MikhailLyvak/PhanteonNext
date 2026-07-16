@@ -33,6 +33,12 @@ export const TKeys = {
 	payments: 'payments',
 	cabinet: {
 		studyPlatform: 'cabinet.studyPlatform',
+		common: 'cabinet.common',
+		personalData: 'cabinet.personalData',
+		subscriptions: 'cabinet.subscriptions',
+		certificates: 'cabinet.certificates',
+		settings: 'cabinet.settings',
+		webinars: 'cabinet.webinars',
 	},
 	screener: 'screener',
 	aiAgent: 'aiAgent',
@@ -467,6 +473,137 @@ export interface MessageShapes {
 		quizPassed: string
 		alreadyAttempted: string
 		quizError: string
+	}
+	'cabinet.common': {
+		pageTitle: string
+		personalData: string
+		academy: string
+		certificates: string
+		subscriptions: string
+		algoTrading: string
+		screener: string
+		webinars: string
+		settings: string
+		logout: string
+		navigation: string
+	}
+	'cabinet.personalData': {
+		breadcrumbTitle: string
+		pageTitle: string
+		sectionTitle: string
+		contactInfo: string
+		firstNamePlaceholder: string
+		lastNamePlaceholder: string
+		phonePlaceholder: string
+		solanaPlaceholder: string
+		solanaHint: string
+		save: string
+	}
+	'cabinet.subscriptions': {
+		breadcrumbTitle: string
+		pageTitle: string
+		loadError: string
+		loadErrorHint: string
+		noSubscriptionsTitle: string
+		noSubscriptionsDesc: string
+		goToPaywall: string
+		activeSubscriptionsTitle: string
+		monthly: string
+		yearly: string
+		expired: string
+		active: string
+		startDate: string
+		endDate: string
+		paymentAmount: string
+		duration: (values: TranslationValues) => string
+		paymentStatus: string
+		paid: string
+		pending: string
+		declined: string
+		renewSubscription: string
+	}
+	'cabinet.certificates': {
+		breadcrumbTitle: string
+		pageTitle: string
+		tabCourses: string
+		tabMyCertificates: string
+		loadError: string
+		noCertificatesTitle: string
+		noCertificatesDesc: string
+		myCertificatesTitle: (values: TranslationValues) => string
+		statusConfirmed: string
+		statusIssued: string
+		statusPending: string
+		view: string
+		download: string
+		metadata: string
+		loadingCourses: string
+		noCoursesTitle: string
+		noCoursesHint: string
+		purchased: string
+		notPurchased: string
+		courseProgress: (values: TranslationValues) => string
+		overallProgress: string
+		courseModules: string
+		accessible: string
+		partial: string
+		locked: string
+		free: string
+		getCertificate: string
+		generating: string
+		buyCourse: string
+		completeModule: string
+		lessonsList: string
+		modalTitle: string
+		modalDesc: string
+		fieldFirstName: string
+		fieldLastName: string
+		fieldSolanaWallet: string
+		solanaInfoTitle: string
+		solanaInfoDesc: string
+		cancel: string
+		fillData: string
+	}
+	'cabinet.settings': {
+		breadcrumbTitle: string
+		pageTitle: string
+		sectionTitle: string
+		changePassword: string
+		currentPasswordPlaceholder: string
+		newPasswordPlaceholder: string
+		confirmPasswordPlaceholder: string
+		changePasswordBtn: string
+		changeLogin: string
+		newEmailPlaceholder: string
+		passwordConfirmPlaceholder: string
+		changeEmailBtn: string
+		dangerZoneTitle: string
+		dangerZoneDesc: string
+		deleteAccountBtn: string
+		deleteModalTitle: string
+		deleteModalDesc: string
+		deletePasswordPlaceholder: string
+		cancelBtn: string
+		deleteForeverBtn: string
+	}
+	'cabinet.webinars': {
+		breadcrumbTitle: string
+		pageTitle: string
+		loadError: string
+		tryRefresh: string
+		noWebinars: string
+		title: string
+		total: (values: TranslationValues) => string
+		active: string
+		inactive: string
+		monthlyBadge: string
+		yearlyBadge: string
+		cancelPurchase: string
+		watch: string
+		buy: string
+		paymentError: string
+		cancelSuccess: string
+		cancelError: string
 	}
 	'screener': {
 		title: string
