@@ -97,7 +97,16 @@
 	},
 	"errors": {
 		"invalidCredentials": "Невірні облікові дані",
-		"userNotActive": "Обліковий запис не активний"
+		"userNotActive": "Обліковий запис не активний",
+		"oldPasswordIncorrect": "Невірний старий пароль",
+		"passwordIncorrect": "Невірний пароль",
+		"passwordsMismatch": "Паролі не співпадають",
+		"newPasswordMustDiffer": "Новий пароль має відрізнятися від поточного",
+		"passwordChangedSuccess": "Пароль успішно змінено",
+		"emailChangedSuccess": "Email успішно змінено",
+		"changePasswordFailed": "Не вдалося змінити пароль",
+		"changeEmailFailed": "Не вдалося змінити email",
+		"deleteAccountFailed": "Не вдалося видалити акаунт"
 	},
 	"nav": {
 		"personalData": "Персональні дані",
@@ -117,9 +126,9 @@
 		"aboutUsUpper": "ПРО НАС",
 		"blogUpper": "БЛОГ",
 		"menuSets": "Набори",
-		"menuVitaminComplexes": "Вітамінні комлекси",
+		"menuVitaminComplexes": "Вітамінні комплекси",
 		"menuMineralComplexes": "Мінеральні комплекси",
-		"menuImmunityAntioxidants": "Імунутет та Антикосиданти",
+		"menuImmunityAntioxidants": "Імунітет та Антиоксиданти",
 		"menuSoundSleep": "Міцний сон",
 		"menuEmotionalIntelligence": "Емоційний інтелект",
 		"menuWebinars": "Вебінари",
@@ -161,7 +170,7 @@
 		"biohacking": "Біохакінг",
 		"vitaminsNutrition": "Вітаміни, мінерали та Нутрицевтики",
 		"emotionalIntelligence": "Емоційний інтелект",
-		"balancedNutrition": "Збалансоване харчювання",
+		"balancedNutrition": "Збалансоване харчування",
 		"retreatCenter": "Ретрит-центр",
 		"detailsShort": "Детальніше",
 		"visitShopTitle": "Завітай у наш Магазин за....",

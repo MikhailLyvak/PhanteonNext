@@ -97,7 +97,16 @@
 	},
 	"errors": {
 		"invalidCredentials": "Invalid credentials",
-		"userNotActive": "Account is not active"
+		"userNotActive": "Account is not active",
+		"oldPasswordIncorrect": "Old password is incorrect",
+		"passwordIncorrect": "Password is incorrect",
+		"passwordsMismatch": "Passwords do not match",
+		"newPasswordMustDiffer": "New password must differ from the old password",
+		"passwordChangedSuccess": "Password changed successfully",
+		"emailChangedSuccess": "Email changed successfully",
+		"changePasswordFailed": "Failed to change password",
+		"changeEmailFailed": "Failed to change email",
+		"deleteAccountFailed": "Failed to delete account"
 	},
 	"nav": {
 		"personalData": "Personal Data",

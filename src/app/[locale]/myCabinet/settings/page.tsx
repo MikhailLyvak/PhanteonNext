@@ -52,25 +52,6 @@ const extractError = (error: any, fallback: string): string => {
 	)
 }
 
-// The backend returns validation messages in English; translate the known ones
-// to Ukrainian to match the rest of the UI. Unknown strings pass through as-is.
-const SERVER_MESSAGE_UK: Record<string, string> = {
-	'Old password is incorrect': 'Невірний старий пароль',
-	'Password is incorrect': 'Невірний пароль',
-	'New passwords do not match': 'Паролі не співпадають',
-	'New password must differ from the old password':
-		'Новий пароль має відрізнятися від поточного',
-}
-
-const translateServerError = (msg: string): string => {
-	const trimmed = msg.trim()
-	if (SERVER_MESSAGE_UK[trimmed]) return SERVER_MESSAGE_UK[trimmed]
-	// DRF min-length message, e.g. "Ensure this field has at least 6 characters."
-	const minLen = trimmed.match(/at least (\d+) characters/i)
-	if (minLen) return `Мінімум ${minLen[1]} символів`
-	return msg
-}
-
 const inputClass =
 	'w-full mt-4 p-3 pr-12 border rounded-lg text-gray-800 focus:ring focus:ring-[#6A56E4] focus:outline-none'
 
@@ -161,6 +142,22 @@ const SettingsPage = () => {
 	const { data: profile } = useGetMyProfileData()
 
 	const { t: tValidation } = useCustomTranslations(TKeys.validation)
+	const { t: tErrors } = useCustomTranslations(TKeys.errors)
+
+	// The backend returns validation messages in English; resolve the known ones
+	// through the errors/validation namespaces so they follow the active locale.
+	const translateServerError = (msg: string): string => {
+		const trimmed = msg.trim()
+		if (trimmed === 'Old password is incorrect') return tErrors.oldPasswordIncorrect
+		if (trimmed === 'Password is incorrect') return tErrors.passwordIncorrect
+		if (trimmed === 'New passwords do not match') return tErrors.passwordsMismatch
+		if (trimmed === 'New password must differ from the old password') return tErrors.newPasswordMustDiffer
+		// DRF min-length message, e.g. "Ensure this field has at least 6 characters."
+		const minLen = trimmed.match(/at least (\d+) characters/i)
+		if (minLen) return tValidation.minChars({ count: Number(minLen[1]) })
+		return msg
+	}
+
 	const changePasswordSchema = useMemo(() => createChangePasswordSchema(tValidation), [tValidation])
 	const changeLoginSchema = useMemo(() => createChangeLoginSchema(tValidation), [tValidation])
 	const deleteAccountSchema = useMemo(() => createDeleteAccountSchema(tValidation), [tValidation])
@@ -186,7 +183,7 @@ const SettingsPage = () => {
 		setPasswordMsg(null)
 		changePassword(values, {
 			onSuccess: () => {
-				setPasswordMsg({ type: 'success', text: 'Пароль успішно змінено' })
+				setPasswordMsg({ type: 'success', text: tErrors.passwordChangedSuccess })
 				passwordForm.reset()
 			},
 			onError: (error: any) => {
@@ -222,7 +219,7 @@ const SettingsPage = () => {
 				} else if (!mappedField) {
 					setPasswordMsg({
 						type: 'error',
-						text: extractError(error, 'Не вдалося змінити пароль'),
+						text: extractError(error, tErrors.changePasswordFailed),
 					})
 				}
 			},
@@ -248,14 +245,14 @@ const SettingsPage = () => {
 		setLoginMsg(null)
 		changeLogin(values, {
 			onSuccess: () => {
-				setLoginMsg({ type: 'success', text: 'Email успішно змінено' })
+				setLoginMsg({ type: 'success', text: tErrors.emailChangedSuccess })
 				loginForm.resetField('password')
 				queryClient.invalidateQueries({ queryKey: ['my-profile-data'] })
 			},
 			onError: (error: any) =>
 				setLoginMsg({
 					type: 'error',
-					text: extractError(error, 'Не вдалося змінити email'),
+					text: extractError(error, tErrors.changeEmailFailed),
 				}),
 		})
 	}
@@ -311,7 +308,7 @@ const SettingsPage = () => {
 				if (general) {
 					setDeleteMsg(translateServerError(general))
 				} else if (!fieldMsg) {
-					setDeleteMsg(extractError(error, 'Не вдалося видалити акаунт'))
+					setDeleteMsg(extractError(error, tErrors.deleteAccountFailed))
 				}
 			},
 		})

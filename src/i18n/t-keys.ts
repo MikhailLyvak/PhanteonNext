@@ -125,6 +125,15 @@ export interface MessageShapes {
 	'errors': {
 		invalidCredentials: string
 		userNotActive: string
+		oldPasswordIncorrect: string
+		passwordIncorrect: string
+		passwordsMismatch: string
+		newPasswordMustDiffer: string
+		passwordChangedSuccess: string
+		emailChangedSuccess: string
+		changePasswordFailed: string
+		changeEmailFailed: string
+		deleteAccountFailed: string
 	}
 	'nav': {
 		personalData: string
