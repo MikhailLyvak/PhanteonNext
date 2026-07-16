@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
+		"prebuild": "npm run validate-i18n:full && npm run test:scripts",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",

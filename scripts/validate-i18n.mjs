@@ -6,7 +6,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { generate } from './generate-t-keys.mjs'
+import { generate, leafType } from './generate-t-keys.mjs'
 
 export const CYRILLIC = /[Ѐ-ӿ]/
 
@@ -18,6 +18,24 @@ export function flattenKeys(node, prefix = '') {
 		else out.push(...flattenKeys(v, p))
 	}
 	return out.sort()
+}
+
+export function kindMismatches(uk, en, prefix = '') {
+	const out = []
+	for (const k of Object.keys(uk)) {
+		const ukVal = uk[k]
+		const enVal = en[k]
+		if (enVal === undefined) continue
+		const p = prefix ? `${prefix}.${k}` : k
+		if (typeof ukVal === 'string' && typeof enVal === 'string') {
+			const ukKind = leafType(ukVal)
+			const enKind = leafType(enVal)
+			if (ukKind !== enKind) out.push(`${p}: uk=${ukKind} en=${enKind}`)
+		} else if (typeof ukVal === 'object' && ukVal !== null && typeof enVal === 'object' && enVal !== null) {
+			out.push(...kindMismatches(ukVal, enVal, p))
+		}
+	}
+	return out
 }
 
 export function diffKeys(ukKeys, enKeys) {
@@ -52,15 +70,17 @@ if (isMain) {
 	const problems = []
 
 	// 1. Parity
-	const { missing, extra } = diffKeys(
-		flattenKeys(read('src/i18n/messages/uk.json')),
-		flattenKeys(read('src/i18n/messages/en.json')),
-	)
+	const ukJson = read('src/i18n/messages/uk.json')
+	const enJson = read('src/i18n/messages/en.json')
+	const { missing, extra } = diffKeys(flattenKeys(ukJson), flattenKeys(enJson))
 	for (const k of missing) problems.push(`missing in en.json: ${k}`)
 	for (const k of extra) problems.push(`extra in en.json: ${k}`)
 
+	// 1b. Kind-parity check
+	for (const m of kindMismatches(ukJson, enJson)) problems.push(`kind mismatch: ${m}`)
+
 	// 2. Staleness
-	const fresh = generate(read('src/i18n/messages/uk.json'))
+	const fresh = generate(ukJson)
 	const current = fs.readFileSync(path.join(root, 'src/i18n/t-keys.ts'), 'utf8')
 	if (fresh !== current)
 		problems.push('src/i18n/t-keys.ts is stale — run: npm run generate-t-keys')

@@ -135,6 +135,7 @@ export interface MessageShapes {
 		newPasswordMustDiffer: string
 		emailRequired: string
 		emailInvalid: string
+		passwordRequired: string
 		passwordConfirmationRequired: string
 		passwordMin8: string
 		passwordNeedsUppercase: string

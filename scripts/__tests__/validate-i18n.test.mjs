@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { flattenKeys, diffKeys, stripComments, CYRILLIC } from '../validate-i18n.mjs'
+import { flattenKeys, diffKeys, stripComments, CYRILLIC, kindMismatches } from '../validate-i18n.mjs'
 
 test('flattenKeys returns sorted dot paths of string leaves', () => {
 	assert.deepEqual(
@@ -25,4 +25,10 @@ test('CYRILLIC matches Ukrainian-specific letters', () => {
 	assert.ok(CYRILLIC.test('Ґанок'))
 	assert.ok(CYRILLIC.test('є'))
 	assert.ok(!CYRILLIC.test('hello'))
+})
+
+test('kindMismatches flags cross-locale leaf-kind divergence', () => {
+	const uk = { a: { x: 'Привіт', y: 'Мінімум {n}' } }
+	const en = { a: { x: 'Hello {name}', y: 'Minimum {n}' } }
+	assert.deepEqual(kindMismatches(uk, en), ['a.x: uk=plain en=args'])
 })

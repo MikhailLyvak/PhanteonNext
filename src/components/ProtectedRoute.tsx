@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { Cookies } from 'react-cookie';
 
 interface ProtectedRouteProps {

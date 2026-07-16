@@ -28,7 +28,7 @@ const LoginModalFormComponent = () => {
 
   const schema = useMemo(() => z.object({
     email: z.string().min(1, tValidation.emailRequired),
-    password: z.string().min(1, tValidation.passwordConfirmationRequired),
+    password: z.string().min(1, tValidation.passwordRequired),
   }), [tValidation]);
 
   const { mutate: handleLogin, isPending } = useMutation({
