@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import Filters from '@/app/[locale]/components/Screener/Filters'
-import AssetsTable from '@/app/[locale]/components/Screener/AssetsTable'
+import Filters from '@components/Screener/Filters'
+import AssetsTable from '@components/Screener/AssetsTable'
 
 const ScreenerPage = () => {
 	return (

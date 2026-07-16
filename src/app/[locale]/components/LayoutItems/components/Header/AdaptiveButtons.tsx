@@ -1,7 +1,7 @@
 'use client'
 
 import { LuShoppingCart } from 'react-icons/lu';
-import LoginButton from '@/app/[locale]/components/HeaderComps/LoginButton';
+import LoginButton from '@components/HeaderComps/LoginButton';
 
 import { Squash as Burger } from 'hamburger-react';
 import { useState } from 'react';

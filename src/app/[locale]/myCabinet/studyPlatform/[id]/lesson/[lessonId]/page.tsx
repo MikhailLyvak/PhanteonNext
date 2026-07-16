@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { LuArrowBigDown, LuChevronDown } from 'react-icons/lu'
 import React, { useState } from 'react'
 import NavAccordion from './components/NavAccordion'
-import VitalisGreenButton from '@/app/[locale]/components/Buttons/VitalisGreenButton'
+import VitalisGreenButton from '@components/Buttons/VitalisGreenButton'
 import Link from 'next/link'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 

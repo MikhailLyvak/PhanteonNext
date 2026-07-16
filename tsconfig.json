@@ -23,6 +23,9 @@
       }
     ],
     "paths": {
+      "@components/*": [
+        "./src/app/[locale]/components/*"
+      ],
       "@/*": [
         "./src/*"
       ]

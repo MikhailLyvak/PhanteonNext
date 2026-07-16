@@ -9,7 +9,7 @@ import NavAccordion from '../../components/NavAccordion'
 import { useQuizSubmission } from '@/hooks/StudyPlatform/usePostQuizSubmission'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
-import VitalisGreenButton from '@/app/[locale]/components/Buttons/VitalisGreenButton'
+import VitalisGreenButton from '@components/Buttons/VitalisGreenButton'
 
 const QuizPage = () => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({})

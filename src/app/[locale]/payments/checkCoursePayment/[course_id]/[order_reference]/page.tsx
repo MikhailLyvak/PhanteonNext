@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import InnerWhiteHeader from '@/app/[locale]/components/LayoutItems/components/Header/InnerWhiteHeader';
+import InnerWhiteHeader from '@components/LayoutItems/components/Header/InnerWhiteHeader';
 import { Triangle } from 'react-loader-spinner';
 import { usePostCkeckPaymentStatus } from '@/hooks/StudyPlatform/usePostCkeckPaymentStatus';
 
