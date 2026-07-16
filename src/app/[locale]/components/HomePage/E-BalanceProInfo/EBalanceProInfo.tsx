@@ -1,8 +1,14 @@
+"use client";
+
 import React from "react";
 import "./EBalanceProInfo.scss";
 import Image from "next/image";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const EBalanceProInfo = () => {
+  const { t } = useCustomTranslations(TKeys.home);
+
   return (
     <div className="relative rounded-3xl px-6 pt-9 pb-[20px] lg:py-16 text-white lg:mx-4 bg-gradient-to-r from-[#343434] via-[#4E4E4E] to-[#343434]">
       {/* Background Logo */}
@@ -46,7 +52,7 @@ const EBalanceProInfo = () => {
           </p>
           <div className="flex justify-center lg:justify-start items-end">
             <button className="border lg:border-0 text-white px-5 py-2 rounded-full font-semibold flex items-center gap-2">
-              Детальніше ...
+              {t.readMore}
             </button>
           </div>
           <div className="flex gap-4 lg:gap-10 mt-12">

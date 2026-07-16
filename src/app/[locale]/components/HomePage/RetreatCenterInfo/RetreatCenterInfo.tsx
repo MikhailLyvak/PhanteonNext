@@ -1,12 +1,18 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
+import { useCustomTranslations } from "@/lib/contexts/translations/translations-context";
+import { TKeys } from "@/i18n/t-keys";
 
 const RetreatCenterInfo = () => {
+  const { t } = useCustomTranslations(TKeys.home);
+
   return (
     <div className="max-w-7xl flex flex-col-reverse lg:flex-row justify-between items-center gap-10 pt-[40px] lg:pt-[120px] mx-4 xl:mx-auto">
       <div className="flex flex-col max-w-lg items-start">
         <h6 className="text-gray-900 text-4xl font-bold pb-[37px] text-left">
-          Ретрит-центр
+          {t.retreatCenter}
         </h6>
         <p className="text-gray-900 text-sm leading-relaxed mb-6">
           Lorem ipsum dolor sit amet consectetur. Posuere ornare lorem donec
@@ -36,7 +42,7 @@ const RetreatCenterInfo = () => {
         </div>
 
         <button className="mt-6  text-white px-6 py-2 rounded-full flex items-center gap-2 text-lg font-semibold bg-gradient-to-r to-[#007E6C] from-[#494949] transition-all ">
-          <div className="text-sm">Детальніше</div>
+          <div className="text-sm">{t.detailsShort}</div>
           <div className="pb-[6px]">...</div>
         </button>
       </div>
