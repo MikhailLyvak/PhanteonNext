@@ -5,11 +5,14 @@ import { useParams } from 'next/navigation';
 import InnerWhiteHeader from '@components/LayoutItems/components/Header/InnerWhiteHeader';
 import { Triangle } from 'react-loader-spinner';
 import { usePostCkeckPaymentStatus } from '@/hooks/StudyPlatform/usePostCkeckPaymentStatus';
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context';
+import { TKeys } from '@/i18n/t-keys';
 
 const PaymentStatusPage: React.FC = () => {
   const params = useParams();
   const rawCourseId = params.course_id;
   const rawOrderRef = params.order_reference;
+  const { t } = useCustomTranslations(TKeys.payments);
 
   const courseId = Array.isArray(rawCourseId)
     ? parseInt(rawCourseId[0], 10)
@@ -57,10 +60,10 @@ const PaymentStatusPage: React.FC = () => {
               ariaLabel="triangle-loading"
             />
             <h2 className="text-gray-800 text-center lg:text-4xl font-semibold">
-              Зачекайте, ми перевіряємо вашу оплату...
+              {t.verifyingPayment}
             </h2>
             <h6 className="text-xs lg:text-lg text-center font-normal text-gray-500">
-              Як тільки оплата підтверджена — вас автоматично перенаправить на курс!
+              {t.autoRedirect}
             </h6>
           </div>
         </div>

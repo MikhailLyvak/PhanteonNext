@@ -4,18 +4,21 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Link, useRouter } from '@/i18n/navigation'
 import { CheckCircle, XCircle, Clock, CreditCard } from 'lucide-react'
+import { useCustomTranslations } from '@/lib/contexts/translations/translations-context'
+import { TKeys } from '@/i18n/t-keys'
 
 export default function PaymentResultPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'pending'>('loading')
   const [message, setMessage] = useState('')
+  const { t } = useCustomTranslations(TKeys.payments)
 
   useEffect(() => {
     // Перевіряємо параметри URL для визначення статусу
     const statusParam = searchParams.get('status')
     const messageParam = searchParams.get('message')
-    
+
     if (statusParam) {
       setStatus(statusParam as any)
       setMessage(messageParam || '')
@@ -24,7 +27,7 @@ export default function PaymentResultPage() {
       const timer = setTimeout(() => {
         // Для демонстрації встановлюємо успішний статус
         setStatus('success')
-        setMessage('Ваша підписка успішно активована!')
+        setMessage(t.successActivated)
       }, 2000)
 
       return () => clearTimeout(timer)
@@ -60,13 +63,13 @@ export default function PaymentResultPage() {
   const getStatusTitle = () => {
     switch (status) {
       case 'success':
-        return 'Оплата успішна!'
+        return t.successTitle
       case 'error':
-        return 'Помилка оплати'
+        return t.errorTitle
       case 'pending':
-        return 'Оплата обробляється'
+        return t.pendingTitle
       default:
-        return 'Перевірка статусу...'
+        return t.loadingTitle
     }
   }
 
@@ -79,13 +82,13 @@ export default function PaymentResultPage() {
               href="/myCabinet/subscriptions"
               className="block w-full bg-[#D2D2FF] text-[#171723] font-semibold py-3 px-6 rounded-lg hover:bg-[#C0C0FF] transition-colors"
             >
-              Перейти до підписок
+              {t.goToSubscriptions}
             </Link>
             <Link
               href="/myCabinet/studyPlatform"
               className="block w-full bg-[#2F2F40] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#3F3F50] transition-colors"
             >
-              Перейти до курсів
+              {t.goToCourses}
             </Link>
           </>
         )
@@ -96,13 +99,13 @@ export default function PaymentResultPage() {
               href="/paywall"
               className="block w-full bg-[#D2D2FF] text-[#171723] font-semibold py-3 px-6 rounded-lg hover:bg-[#C0C0FF] transition-colors"
             >
-              Спробувати ще раз
+              {t.tryAgain}
             </Link>
             <Link
               href="/myCabinet/subscriptions"
               className="block w-full bg-[#2F2F40] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#3F3F50] transition-colors"
             >
-              Мої підписки
+              {t.mySubscriptions}
             </Link>
           </>
         )
@@ -112,7 +115,7 @@ export default function PaymentResultPage() {
             href="/myCabinet/subscriptions"
             className="block w-full bg-[#D2D2FF] text-[#171723] font-semibold py-3 px-6 rounded-lg hover:bg-[#C0C0FF] transition-colors"
           >
-            Перейти до кабінету
+            {t.goToCabinet}
           </Link>
         )
       default:
@@ -122,13 +125,13 @@ export default function PaymentResultPage() {
               href="/paywall"
               className="block w-full bg-[#D2D2FF] text-[#171723] font-semibold py-3 px-6 rounded-lg hover:bg-[#C0C0FF] transition-colors"
             >
-              До оплати
+              {t.goToPayment}
             </Link>
             <Link
               href="/myCabinet"
               className="block w-full bg-[#2F2F40] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#3F3F50] transition-colors"
             >
-              Особистий кабінет
+              {t.myCabinet}
             </Link>
           </>
         )
@@ -141,22 +144,22 @@ export default function PaymentResultPage() {
         <div className="mb-6">
           {getStatusIcon()}
         </div>
-        
+
         <h1 className={`text-2xl font-bold mb-4 ${getStatusColor()}`}>
           {getStatusTitle()}
         </h1>
-        
+
         <p className="text-[#58587B] mb-8">
-          {message || 'Обробляємо ваш платіж...'}
+          {message || t.defaultMessage}
         </p>
-        
+
         <div className="space-y-4">
           {getActionButtons()}
         </div>
-        
+
         <div className="mt-8 pt-6 border-t border-[#2F2F40]">
           <p className="text-sm text-[#58587B]">
-            Якщо у вас виникли питання, зверніться до служби підтримки
+            {t.contactSupport}
           </p>
         </div>
       </div>
