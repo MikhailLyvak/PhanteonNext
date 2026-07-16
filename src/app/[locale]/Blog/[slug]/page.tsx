@@ -21,9 +21,9 @@ async function getBlogForMeta(slug: string): Promise<BlogDetailsType | null> {
 export async function generateMetadata({
 	params,
 }: {
-	params: Promise<{ slug: string }>
+	params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
-	const { slug } = await params
+	const { locale, slug } = await params
 	const blog = await getBlogForMeta(slug)
 
 	if (!blog) {
@@ -47,6 +47,7 @@ export async function generateMetadata({
 			description,
 			url,
 			type: 'article',
+			locale: locale === 'uk' ? 'uk_UA' : 'en_US',
 			images: blog.cover ? [{ url: blog.cover, alt: blog.title }] : undefined,
 		},
 		alternates: {

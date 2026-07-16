@@ -2,6 +2,10 @@
 	"common": {
 		"loading": "Loading…"
 	},
+	"meta": {
+		"title": "PantheonX",
+		"description": "PantheonX crypto dashboard and education platform"
+	},
 	"notFound": {
 		"title": "Page not found",
 		"description": "The link may be outdated or the page may have moved. Check the address or return to the home page.",

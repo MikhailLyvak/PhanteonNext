@@ -13,6 +13,8 @@ import { notFound } from 'next/navigation'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
+import { getCustomTranslations } from '@/lib/contexts/translations/translations-server'
+import { TKeys } from '@/i18n/t-keys'
 
 const montserrat = Montserrat({
 	subsets: ['latin', 'cyrillic'],
@@ -20,47 +22,59 @@ const montserrat = Montserrat({
 	variable: '--font-montserrat',
 })
 
-export const metadata: Metadata = {
-	title: 'PantheonX',
-	description: 'PantheonX crypto dashboard',
-	applicationName: 'PantheonX',
-	category: 'cryptology',
-	icons: {
-		icon: '/favicon.ico',
-		shortcut: '/favicon.ico',
-		apple: '/favicon.png',
-	},
-	formatDetection: {
-		email: true,
-	},
-	openGraph: {
-		title: 'PantheonX',
-		description: 'PantheonX crypto dashboard',
-		url: 'https://www.pantheonx.club',
-		siteName: 'PantheonX',
-		images: [
-			{
-				url: 'https://www.pantheonx.club/Header/og-image.png',
-				width: 300,
-				height: 200,
-			},
-		],
-		locale: 'uk-UA',
-		type: 'website',
-	},
-	robots: {
-		index: true,
-		follow: true,
-		nocache: false,
-		googleBot: {
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const { t } = await getCustomTranslations(TKeys.meta, locale)
+	return {
+		metadataBase: new URL('https://www.pantheonx.club'),
+		title: t.title,
+		description: t.description,
+		applicationName: 'PantheonX',
+		category: 'cryptology',
+		icons: {
+			icon: '/favicon.ico',
+			shortcut: '/favicon.ico',
+			apple: '/favicon.png',
+		},
+		formatDetection: {
+			email: true,
+		},
+		alternates: {
+			languages: { uk: '/', en: '/en' },
+		},
+		openGraph: {
+			title: t.title,
+			description: t.description,
+			url: 'https://www.pantheonx.club',
+			siteName: 'PantheonX',
+			images: [
+				{
+					url: 'https://www.pantheonx.club/Header/og-image.png',
+					width: 300,
+					height: 200,
+				},
+			],
+			locale: locale === 'uk' ? 'uk_UA' : 'en_US',
+			type: 'website',
+		},
+		robots: {
 			index: true,
 			follow: true,
-			noimageindex: false,
-			'max-video-preview': -1,
-			'max-image-preview': 'large',
-			'max-snippet': -1,
+			nocache: false,
+			googleBot: {
+				index: true,
+				follow: true,
+				noimageindex: false,
+				'max-video-preview': -1,
+				'max-image-preview': 'large',
+				'max-snippet': -1,
+			},
 		},
-	},
+	}
 }
 
 export function generateStaticParams() {
