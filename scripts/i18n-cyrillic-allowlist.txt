@@ -1,3 +1,8 @@
 # Files allowed to contain Cyrillic outside src/i18n/messages/.
 # One path prefix per line, relative to the repo root. Keep this list empty
 # unless there is a documented reason a source file must keep Cyrillic.
+#
+# Register.tsx: regex character classes /[A-ZА-ЯЁІЇЄҐ]/ and /[a-zа-яёіїєґ]/
+# used for password strength validation — Cyrillic ranges are intentional
+# so that Ukrainian-language passwords are accepted by the validator.
+src/app/[locale]/components/Auth/components/Register.tsx
