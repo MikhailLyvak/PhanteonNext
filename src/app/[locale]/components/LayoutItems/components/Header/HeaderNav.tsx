@@ -69,10 +69,7 @@ const HeaderNav: React.FC<Props> = ({ textColor = 'text-black' }) => {
 					<div className='font-bold text-sm xl:text-base'>{tNav.blogUpper}</div>
 				</div>
 
-				<AdaptiveButtons
-					textColor={textColor}
-					hoverTextColorClass={hoverTextColorClass}
-				/>
+				<AdaptiveButtons />
 			</div>
 
 			<div className='hidden lg:group-hover:block w-full bg-white'>

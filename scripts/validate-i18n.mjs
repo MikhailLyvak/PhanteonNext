@@ -20,7 +20,7 @@ export function flattenKeys(node, prefix = '') {
 	return out.sort()
 }
 
-export function kindMismatches(uk, en, prefix = '') {
+export function kindMismatches(uk, en, prefix = '', label = 'en') {
 	const out = []
 	for (const k of Object.keys(uk)) {
 		const ukVal = uk[k]
@@ -30,9 +30,9 @@ export function kindMismatches(uk, en, prefix = '') {
 		if (typeof ukVal === 'string' && typeof enVal === 'string') {
 			const ukKind = leafType(ukVal)
 			const enKind = leafType(enVal)
-			if (ukKind !== enKind) out.push(`${p}: uk=${ukKind} en=${enKind}`)
+			if (ukKind !== enKind) out.push(`${p}: uk=${ukKind} ${label}=${enKind}`)
 		} else if (typeof ukVal === 'object' && ukVal !== null && typeof enVal === 'object' && enVal !== null) {
-			out.push(...kindMismatches(ukVal, enVal, p))
+			out.push(...kindMismatches(ukVal, enVal, p, label))
 		}
 	}
 	return out
@@ -69,15 +69,21 @@ if (isMain) {
 	const read = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf8'))
 	const problems = []
 
-	// 1. Parity
+	// 1. Parity — uk.json is the source of truth; every other locale must match it.
 	const ukJson = read('src/i18n/messages/uk.json')
-	const enJson = read('src/i18n/messages/en.json')
-	const { missing, extra } = diffKeys(flattenKeys(ukJson), flattenKeys(enJson))
-	for (const k of missing) problems.push(`missing in en.json: ${k}`)
-	for (const k of extra) problems.push(`extra in en.json: ${k}`)
+	const otherLocales = fs
+		.readdirSync(path.join(root, 'src/i18n/messages'))
+		.filter((f) => f.endsWith('.json') && f !== 'uk.json')
+		.map((f) => f.replace(/\.json$/, ''))
+	for (const loc of otherLocales) {
+		const locJson = read(`src/i18n/messages/${loc}.json`)
+		const { missing, extra } = diffKeys(flattenKeys(ukJson), flattenKeys(locJson))
+		for (const k of missing) problems.push(`missing in ${loc}.json: ${k}`)
+		for (const k of extra) problems.push(`extra in ${loc}.json: ${k}`)
 
-	// 1b. Kind-parity check
-	for (const m of kindMismatches(ukJson, enJson)) problems.push(`kind mismatch: ${m}`)
+		// 1b. Kind-parity check
+		for (const m of kindMismatches(ukJson, locJson, '', loc)) problems.push(`kind mismatch: ${m}`)
+	}
 
 	// 2. Staleness
 	const fresh = generate(ukJson)

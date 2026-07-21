@@ -50,7 +50,7 @@ export async function generateMetadata({
 			description,
 			url,
 			type: 'article',
-			locale: locale === 'uk' ? 'uk_UA' : 'en_US',
+			locale: locale === 'uk' ? 'uk_UA' : locale === 'ru' ? 'ru_RU' : 'en_US',
 			images: blog.cover ? [{ url: blog.cover, alt: blog.title }] : undefined,
 		},
 		alternates: {

@@ -301,7 +301,7 @@ const InnerWhiteHeader = () => {
           {/* ✅ Right - Buttons */}
           <div className="flex items-center gap-3">
             <LocaleSwitcher />
-            <AdaptiveButtons textColor="text-[#D2D2FF]" />
+            <AdaptiveButtons />
           </div>
         </div>
       </div>

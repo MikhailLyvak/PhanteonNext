@@ -44,7 +44,7 @@ export async function generateMetadata({
 			email: true,
 		},
 		alternates: {
-			languages: { uk: '/', en: '/en' },
+			languages: { uk: '/', en: '/en', ru: '/ru' },
 		},
 		openGraph: {
 			title: t.title,
@@ -58,7 +58,7 @@ export async function generateMetadata({
 					height: 200,
 				},
 			],
-			locale: locale === 'uk' ? 'uk_UA' : 'en_US',
+			locale: locale === 'uk' ? 'uk_UA' : locale === 'ru' ? 'ru_RU' : 'en_US',
 			type: 'website',
 		},
 		robots: {

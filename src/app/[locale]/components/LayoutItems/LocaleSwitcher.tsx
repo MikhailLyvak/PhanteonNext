@@ -5,6 +5,13 @@ import { useLocale } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { Link, usePathname } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
+import type { AppLocale } from '@/i18n/routing'
+
+const LOCALE_LABELS: Record<AppLocale, string> = {
+	uk: 'UA',
+	en: 'EN',
+	ru: 'RU',
+}
 
 function SwitcherLinks() {
 	const locale = useLocale()
@@ -14,19 +21,19 @@ function SwitcherLinks() {
 	const href = query ? `${pathname}?${query}` : pathname
 
 	return (
-		<div className='flex items-center gap-1.5 text-xs font-semibold uppercase'>
+		<div className='flex items-center rounded-full bg-[#242433] border border-[#58587B] p-1 text-xs font-semibold'>
 			{routing.locales.map((l) => (
 				<Link
 					key={l}
 					href={href}
 					locale={l}
-					className={
+					className={`rounded-full px-2.5 py-1 transition-colors ${
 						l === locale
-							? 'text-white'
+							? 'bg-[#D2D2FF] text-[#171723]'
 							: 'text-[#D2D2FF] opacity-60 hover:opacity-100'
-					}
+					}`}
 				>
-					{l}
+					{LOCALE_LABELS[l] ?? l.toUpperCase()}
 				</Link>
 			))}
 		</div>
